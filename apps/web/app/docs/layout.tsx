@@ -3,6 +3,7 @@ import Link from "next/link"
 
 const components = [
   { id: "001", title: "Button", href: "/docs/components/button" },
+  { id: "002", title: "Flight Status Card", href: "/docs/components/flight-status-card" },
 ]
 
 export default function DocsLayout({
