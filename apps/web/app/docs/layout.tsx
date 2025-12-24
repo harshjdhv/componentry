@@ -1,11 +1,8 @@
 import type React from "react"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
-
-const components = [
-  { id: "001", title: "Button", href: "/docs/components/button" },
-  { id: "002", title: "Flight Status Card", href: "/docs/components/flight-status-card" },
-]
+import { CommandMenu } from "@/components/command-menu"
+import { docsConfig } from "@/config/docs"
 
 export default function DocsLayout({
   children,
@@ -33,7 +30,10 @@ export default function DocsLayout({
               </Link>
             </nav>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <CommandMenu />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -42,33 +42,25 @@ export default function DocsLayout({
         <aside className="w-64 shrink-0 border-r border-border hidden md:block">
           <div className="sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto px-6 py-8">
             <nav className="space-y-8">
-              <div className="space-y-3">
-                <Link
-                  href="/docs"
-                  className="block text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
-                >
-                  Introduction
-                </Link>
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground/60">
-                  Components
-                </p>
-                <ul className="space-y-2">
-                  {components.map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <span className="text-xs tabular-nums">{item.id}</span>
-                        <span>{item.title}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {docsConfig.nav.map((group) => (
+                <div key={group.title} className="space-y-3">
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground/60">
+                    {group.title}
+                  </p>
+                  <ul className="space-y-2">
+                    {group.items.map((item) => (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <span>{item.title}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </nav>
           </div>
         </aside>
