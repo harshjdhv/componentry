@@ -2,25 +2,78 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 
 export function TableOfContents(): React.JSX.Element | null {
+  const pathname = usePathname()
   const [headings, setHeadings] = useState<{ id: string; text: string }[]>([])
   const [activeId, setActiveId] = useState<string>("")
 
   useEffect(() => {
-    // Find all sections with an ID and a specific class or structure
-    // For this specific page, we'll look for the section headers
-    // We can target the "text-xs uppercase tracking-widest" divs if they have IDs
-    // OR we can rely on standard h2/h3 if we add them.
+    // Helper to generate IDs
+    const slugify = (text: string) =>
+      text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+
+    // 1. Select elements that look like section titles
+    // - Existing data attributes
+    // - The specific "label" styling used in docs (div or p tags only to avoid links)
+    const selectors = [
+      "[data-section-title]",
+      "div.text-xs.uppercase.tracking-widest.text-muted-foreground",
+      "p.text-xs.uppercase.tracking-widest.text-muted-foreground",
+    ]
     
-    // Let's assume we will add IDs to the section containers or headers.
-    // We'll query for elements with `data-section-title` attribute for robustness.
-    const elements = Array.from(document.querySelectorAll("[data-section-title]"))
+    const candidateElements = Array.from(document.querySelectorAll(selectors.join(",")))
     
-    const items = elements.map((elem) => ({
-      id: elem.id,
-      text: elem.getAttribute("data-section-title") || "",
-    })).filter(item => item.id && item.text)
+    const items: { id: string; text: string }[] = []
+    const observedElements: Element[] = []
+
+    candidateElements.forEach((elem) => {
+      // Avoid processing the TOC's own header if it happens to match (it does!)
+      if (elem.closest("aside")) return
+
+      // Determine text content
+      let text = elem.getAttribute("data-section-title") || elem.textContent || ""
+      text = text.trim()
+      if (!text) return
+
+      // Determine the target element that should have the ID
+      // If it's the "label" style, the ID should usually be on the parent container 
+      // to handle scroll offset correctly (especially for the grid layouts).
+      let target: Element = elem
+      if (!elem.hasAttribute("data-section-title")) {
+        // If it's a label inside a grid or stack, try to use the parent
+        if (elem.parentElement) {
+          target = elem.parentElement
+        }
+      }
+
+      // Determine or Generate ID
+      let id = target.id
+      if (!id) {
+        id = slugify(text)
+        // Ensure uniqueness
+        if (document.getElementById(id) && document.getElementById(id) !== target) {
+          let counter = 1
+          while (document.getElementById(`${id}-${counter}`)) {
+            counter++
+          }
+          id = `${id}-${counter}`
+        }
+        target.id = id
+      }
+
+      // Add to list if not already added
+      if (!items.find((item) => item.id === id)) {
+        items.push({ id, text })
+        observedElements.push(target)
+      }
+    })
 
     setHeadings(items)
 
@@ -35,10 +88,10 @@ export function TableOfContents(): React.JSX.Element | null {
       { rootMargin: "-20% 0% -35% 0%" }
     )
 
-    elements.forEach((elem) => observer.observe(elem))
+    observedElements.forEach((elem) => observer.observe(elem))
 
     return () => observer.disconnect()
-  }, [])
+  }, [pathname])
 
   if (headings.length === 0) return null
 
