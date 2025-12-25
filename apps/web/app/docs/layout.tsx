@@ -2,7 +2,7 @@ import type React from "react"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { CommandMenu } from "@/components/command-menu"
-import { docsConfig } from "@/config/docs"
+import { DocsSidebar } from "@/components/docs-sidebar"
 
 export default function DocsLayout({
   children,
@@ -50,31 +50,7 @@ export default function DocsLayout({
 
       <div className="flex-1 flex">
         {/* Sidebar */}
-        <aside className="w-64 shrink-0 border-r border-border hidden md:block">
-          <div className="sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto px-6 py-8">
-            <nav className="space-y-8">
-              {docsConfig.nav.map((group) => (
-                <div key={group.title} className="space-y-3">
-                  <p className="text-xs uppercase tracking-widest text-muted-foreground/60">
-                    {group.title}
-                  </p>
-                  <ul className="space-y-2">
-                    {group.items.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          <span>{item.title}</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </nav>
-          </div>
-        </aside>
+        <DocsSidebar />
 
         {/* Main content */}
         <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-12 md:py-16">
