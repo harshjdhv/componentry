@@ -12,6 +12,7 @@ import {
 } from "@workspace/ui/components/spotlight-card"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
+import { ComponentLayout, Section } from "@/components/component-layout"
 
 const usageCode = `import {
   SpotlightCard,
@@ -63,32 +64,12 @@ const tiltSpotlightCode = `<TiltSpotlightCard className="w-full max-w-lg mx-auto
 
 export default function SpotlightCardPage(): React.JSX.Element {
   return (
-    <div className="space-y-16">
-      <header className="grid md:grid-cols-[120px_1fr] gap-8">
-        <div>
-          <span className="text-6xl font-light text-muted-foreground/50">
-            003
-          </span>
-        </div>
-        <div className="space-y-4">
-          <h1
-            className="text-5xl md:text-6xl tracking-tight"
-            style={{ fontFamily: "var(--font-serif)" }}
-          >
-            Spotlight Card
-          </h1>
-          <p className="text-muted-foreground max-w-md">
-            Interactive cards with cursor-following spotlight effects, animated
-            gradient borders, and 3D tilt animations. Inspired by the premium
-            designs of Vercel, Linear, and Stripe.
-          </p>
-        </div>
-      </header>
-
-      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="preview" data-section-title="Preview">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Preview
-        </div>
+    <ComponentLayout
+      title="Spotlight Card"
+      description="Interactive cards with cursor-following spotlight effects, animated gradient borders, and 3D tilt animations. Inspired by the premium designs of Vercel, Linear, and Stripe."
+      componentId="003"
+    >
+      <Section title="Preview">
         <div className="space-y-6">
           <div className="p-8 bg-muted/30 rounded-xl flex items-center justify-center">
             <SpotlightCard className="w-96">
@@ -112,14 +93,9 @@ export default function SpotlightCardPage(): React.JSX.Element {
             action.
           </p>
         </div>
-      </div>
+      </Section>
 
-
-
-      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="custom" data-section-title="Custom">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Custom
-        </div>
+      <Section title="Custom">
         <div className="space-y-6">
           <div className="p-8 bg-muted/30 rounded-xl flex items-center justify-center">
             <SpotlightCard
@@ -146,12 +122,9 @@ export default function SpotlightCardPage(): React.JSX.Element {
             All props are customizable to match your brand colors.
           </p>
         </div>
-      </div>
+      </Section>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="install" data-section-title="Install">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Install
-        </div>
+      <Section title="Install">
         <div className="space-y-3">
           <InstallCommand component="spotlight-card" />
           <p className="text-xs text-muted-foreground">
@@ -160,24 +133,18 @@ export default function SpotlightCardPage(): React.JSX.Element {
             first if not set up.
           </p>
         </div>
-      </div>
+      </Section>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="code" data-section-title="Code">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Code
-        </div>
+      <Section title="Code">
         <div className="space-y-4">
           <CodeBlock code={usageCode} lang="tsx" />
           <p className="text-xs text-muted-foreground">
             Basic usage with the structured card components.
           </p>
         </div>
-      </div>
+      </Section>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="examples" data-section-title="Examples">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Examples
-        </div>
+      <Section title="Examples">
         <div className="space-y-12">
           
           <div className="space-y-0">
@@ -233,89 +200,79 @@ export default function SpotlightCardPage(): React.JSX.Element {
           </div>
 
         </div>
-      </div>
+      </Section>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="features" data-section-title="Features">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Features
-        </div>
-        <div>
-          <div className="grid grid-cols-1 divide-y border rounded-xl bg-muted/30">
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-medium text-sm">Cursor Tracking</div>
-              <div className="text-sm text-muted-foreground">
-                Spotlight effect smoothly follows mouse position across the card
-              </div>
+      <Section title="Features">
+        <div className="grid grid-cols-1 divide-y border rounded-xl bg-muted/30">
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-medium text-sm">Cursor Tracking</div>
+            <div className="text-sm text-muted-foreground">
+              Spotlight effect smoothly follows mouse position across the card
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-medium text-sm">Animated Border</div>
-              <div className="text-sm text-muted-foreground">
-                Rotating gradient border creates a subtle animated glow
-              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-medium text-sm">Animated Border</div>
+            <div className="text-sm text-muted-foreground">
+              Rotating gradient border creates a subtle animated glow
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-medium text-sm">3D Tilt Effect</div>
-              <div className="text-sm text-muted-foreground">
-                Perspective-based tilt with glare for realistic depth
-              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-medium text-sm">3D Tilt Effect</div>
+            <div className="text-sm text-muted-foreground">
+              Perspective-based tilt with glare for realistic depth
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-medium text-sm">Multiple Variants</div>
-              <div className="text-sm text-muted-foreground">
-                Choose from spotlight, multi-spotlight, beam, gradient, or tilt
-              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-medium text-sm">Multiple Variants</div>
+            <div className="text-sm text-muted-foreground">
+              Choose from spotlight, multi-spotlight, beam, gradient, or tilt
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-medium text-sm">Customizable</div>
-              <div className="text-sm text-muted-foreground">
-                Fully configurable colors, intensity, radius, and animation
-              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-medium text-sm">Customizable</div>
+            <div className="text-sm text-muted-foreground">
+              Fully configurable colors, intensity, radius, and animation
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-medium text-sm">Performance</div>
-              <div className="text-sm text-muted-foreground">
-                GPU-accelerated animations with smooth 60fps transitions
-              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-medium text-sm">Performance</div>
+            <div className="text-sm text-muted-foreground">
+              GPU-accelerated animations with smooth 60fps transitions
             </div>
           </div>
         </div>
-      </div>
+      </Section>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="props" data-section-title="Props">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Props
-        </div>
-        <div>
-          <div className="grid grid-cols-1 divide-y border rounded-xl bg-muted/30">
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-mono text-sm">spotlightColor</div>
-              <div className="text-sm text-muted-foreground">
-                Color of the spotlight effect (default: rgba(120, 119, 198,
-                0.3))
-              </div>
+      <Section title="Props">
+        <div className="grid grid-cols-1 divide-y border rounded-xl bg-muted/30">
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-mono text-sm">spotlightColor</div>
+            <div className="text-sm text-muted-foreground">
+              Color of the spotlight effect (default: rgba(120, 119, 198,
+              0.3))
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-mono text-sm">glowIntensity</div>
-              <div className="text-sm text-muted-foreground">
-                Intensity of the glow effect 0-1 (default: 0.15)
-              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-mono text-sm">glowIntensity</div>
+            <div className="text-sm text-muted-foreground">
+              Intensity of the glow effect 0-1 (default: 0.15)
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-mono text-sm">borderRadius</div>
-              <div className="text-sm text-muted-foreground">
-                Border radius in pixels (default: 16)
-              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-mono text-sm">borderRadius</div>
+            <div className="text-sm text-muted-foreground">
+              Border radius in pixels (default: 16)
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-              <div className="font-mono text-sm">maxTilt</div>
-              <div className="text-sm text-muted-foreground">
-                Maximum tilt angle in degrees for TiltSpotlightCard (default:
-                10)
-              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
+            <div className="font-mono text-sm">maxTilt</div>
+            <div className="text-sm text-muted-foreground">
+              Maximum tilt angle in degrees for TiltSpotlightCard (default:
+              10)
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </Section>
+    </ComponentLayout>
   )
 }
