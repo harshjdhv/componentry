@@ -43,13 +43,24 @@ function BentoCard({
 
 export default function DocsIntroPage(): React.JSX.Element {
   return (
-    <div className="space-y-12">
-      <div className="space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-          Explore Componentry
+    <div className="space-y-16">
+      {/* Manifesto Section */}
+      <div className="space-y-8">
+        <p className="text-xs uppercase tracking-widest text-muted-foreground">
+          Manifesto
+        </p>
+        <h1
+          className="text-5xl md:text-6xl leading-[1.1] tracking-tight"
+          style={{ fontFamily: "var(--font-serif)" }}
+        >
+          A sketchbook,
+          <br />
+          not a system.
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl">
-          A collection of polished, interactive, and reusable components built with React and Tailwind CSS.
+        <p className="text-muted-foreground leading-relaxed max-w-md">
+          This is a personal workshop for building UI components in public.
+          Ideas are rough. Experiments are welcome. Nothing here is meant to be
+          complete.
         </p>
       </div>
 
