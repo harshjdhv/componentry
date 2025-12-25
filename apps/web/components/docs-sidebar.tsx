@@ -16,7 +16,7 @@ export function DocsSidebar() {
               <p className="text-xs uppercase tracking-widest text-muted-foreground/60">
                 {group.title}
               </p>
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 {group.items.map((item) => {
                   const isActive = pathname === item.href
                   return (
@@ -24,7 +24,7 @@ export function DocsSidebar() {
                       <Link
                         href={item.href}
                         className={`
-                          group relative flex items-center gap-2 py-1.5 pl-4 pr-3 text-sm transition-colors
+                          group relative flex items-center gap-2 py-1 pl-4 pr-3 text-sm transition-colors
                           ${isActive ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}
                         `}
                       >
