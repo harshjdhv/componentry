@@ -56,7 +56,7 @@ export function Section({ title, children, id }: SectionProps) {
       <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
         {title}
       </div>
-      <div className="space-y-6">
+      <div className="space-y-6 min-w-0">
         {children}
       </div>
     </div>

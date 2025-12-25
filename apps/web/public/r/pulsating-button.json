@@ -1,0 +1,35 @@
+{
+  "name": "pulsating-button",
+  "type": "registry:ui",
+  "dependencies": [],
+  "registryDependencies": [],
+  "description": "A button with a pulsating glow effect.",
+  "files": [
+    {
+      "path": "components/ui/pulsating-button.tsx",
+      "content": "\"use client\"\n\nimport React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\ninterface PulsatingButtonProps\n  extends React.ButtonHTMLAttributes<HTMLButtonElement> {\n  pulseColor?: string\n  duration?: string\n}\n\nconst PulsatingButton = React.forwardRef<\n  HTMLButtonElement,\n  PulsatingButtonProps\n>(\n  (\n    {\n      className,\n      children,\n      pulseColor = \"#0096ff\",\n      duration = \"1.5s\",\n      ...props\n    },\n    ref,\n  ) => {\n    return (\n      <button\n        ref={ref}\n        className={cn(\n          \"relative flex cursor-pointer items-center justify-center rounded-full bg-blue-500 px-4 py-2 text-center text-white dark:bg-blue-500 dark:text-black\",\n          className,\n        )}\n        style={\n          {\n            \"--pulse-color\": pulseColor,\n            \"--duration\": duration,\n          } as React.CSSProperties\n        }\n        {...props}\n      >\n        <div className=\"relative z-10\">{children}</div>\n        <div className=\"absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit opacity-40\" />\n      </button>\n    )\n  },\n)\n\nPulsatingButton.displayName = \"PulsatingButton\"\n\nexport { PulsatingButton }\n",
+      "type": "registry:ui"
+    }
+  ],
+  "tailwind": {
+    "config": {
+      "theme": {
+        "extend": {
+          "animation": {
+            "pulse": "pulse var(--duration) ease-out infinite"
+          },
+          "keyframes": {
+            "pulse": {
+              "0%": {
+                "box-shadow": "0 0 0 0 var(--pulse-color)"
+              },
+              "100%": {
+                "box-shadow": "0 0 0 8px rgba(0, 0, 0, 0)"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

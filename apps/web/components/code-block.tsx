@@ -57,7 +57,7 @@ export async function CodeBlock({ code, lang = "tsx", className }: CodeBlockProp
         }
       `}</style>
       <div
-        className={`rounded-lg overflow-hidden text-sm [&_pre]:p-4 [&_pre]:overflow-x-auto bg-zinc-100 dark:bg-zinc-900 ${className || ""}`}
+        className={`rounded-lg overflow-hidden text-sm w-full [&_pre]:p-4 [&_pre]:overflow-x-auto bg-zinc-100 dark:bg-zinc-900 ${className || ""}`}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </>

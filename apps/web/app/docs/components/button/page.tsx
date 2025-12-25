@@ -1,15 +1,19 @@
 import type React from "react"
 import { Button } from "@workspace/ui/components/button"
+import { ShimmerButton } from "@workspace/ui/components/shimmer-button"
+import { InteractiveHoverButton } from "@workspace/ui/components/interactive-hover-button"
+import { PulsatingButton } from "@workspace/ui/components/pulsating-button"
 import { ComponentLayout, Section } from "@/components/component-layout"
+import { CodeBlock } from "@/components/code-block"
 
 export default function ButtonPage(): React.JSX.Element {
   return (
     <ComponentLayout
       title="Button"
-      description="The most fundamental interactive element. A starting point for everything else."
+      description="The most fundamental interactive element. From basic actions to high-impact calls to action."
       componentId="001"
     >
-      <Section title="Variants">
+      <Section title="Standard Variants">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
             { variant: "default" as const, label: "Default" },
@@ -26,6 +30,61 @@ export default function ButtonPage(): React.JSX.Element {
               <p className="text-xs text-muted-foreground">{label}</p>
             </div>
           ))}
+        </div>
+      </Section>
+
+      <Section title="Creative Variants">
+        <div className="space-y-12">
+          
+          <div className="space-y-0">
+            <h3 className="text-xl font-medium mb-3">Shimmer Button</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              A high-performance button with a rotating shimmer effect on the border. Ideal for primary CTAs.
+            </p>
+            <div className="p-10 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+              <ShimmerButton className="shadow-2xl">
+                <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+                  Shimmer Button
+                </span>
+              </ShimmerButton>
+            </div>
+            <CodeBlock 
+              code={`import { ShimmerButton } from "components/ui/shimmer-button"\n\n<ShimmerButton>\n  <span>Shimmer Button</span>\n</ShimmerButton>`} 
+              lang="tsx" 
+              className="rounded-t-none"
+            />
+          </div>
+
+          <div className="space-y-0">
+            <h3 className="text-xl font-medium mb-3">Interactive Hover</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Expands on hover to reveal an arrow icon. Great for &quot;Learn More&quot; or navigation links.
+            </p>
+            <div className="p-10 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+              <InteractiveHoverButton />
+            </div>
+            <CodeBlock 
+              code={`import { InteractiveHoverButton } from "components/ui/interactive-hover-button"\n\n<InteractiveHoverButton text="Get Started" />`} 
+              lang="tsx" 
+              className="rounded-t-none"
+            />
+          </div>
+
+          <div className="space-y-0">
+            <h3 className="text-xl font-medium mb-3">Pulsating Button</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              A button with a subtle, continuous pulse animation. Useful for drawing attention without being overwhelming.
+            </p>
+            <div className="p-10 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+              <PulsatingButton>Click me</PulsatingButton>
+            </div>
+            <CodeBlock 
+              code={`import { PulsatingButton } from "components/ui/pulsating-button"\n\n<PulsatingButton>Click me</PulsatingButton>`} 
+              lang="tsx" 
+              className="rounded-t-none"
+            />
+          </div>
+
         </div>
       </Section>
 
@@ -48,15 +107,13 @@ export default function ButtonPage(): React.JSX.Element {
 
       <Section title="Code">
         <div className="space-y-4">
-          <pre className="p-6 bg-muted/30 text-sm overflow-x-auto font-mono">
-            {`import { Button } from "@workspace/ui/components/button"
+          <CodeBlock code={`import { Button } from "@workspace/ui/components/button"
 
 <Button>Default</Button>
 <Button variant="outline">Outline</Button>
-<Button variant="ghost" size="sm">Small ghost</Button>`}
-          </pre>
+<Button variant="ghost" size="sm">Small ghost</Button>`} lang="tsx" />
           <p className="text-xs text-muted-foreground">
-            Copy-paste ready. Tweak as needed.
+            Standard button usage.
           </p>
         </div>
       </Section>
