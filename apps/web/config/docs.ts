@@ -24,6 +24,10 @@ export const docsConfig = {
           title: "Spotlight Card",
           href: "/docs/components/spotlight-card",
         },
+        {
+          title: "Border Beam",
+          href: "/docs/components/border-beam",
+        },
       ],
     },
   ],
