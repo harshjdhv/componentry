@@ -13,11 +13,39 @@ export async function CodeBlock({ code, lang = "tsx", className }: CodeBlockProp
       light: "github-light",
       dark: "github-dark",
     },
+    transformers: [
+      {
+        name: "line-numbers",
+        code(node) {
+          if (!node.properties.class) node.properties.class = ""
+          node.properties.class += " grid counter-reset-line"
+        },
+        line(node, line) {
+          node.properties["data-line"] = line
+        },
+      },
+    ],
   })
 
   return (
     <>
       <style>{`
+        .shiki {
+          counter-reset: line;
+        }
+        .shiki code {
+          display: grid;
+        }
+        .shiki [data-line]::before {
+          counter-increment: line;
+          content: counter(line);
+          display: inline-block;
+          width: 1rem;
+          margin-right: 1rem;
+          text-align: right;
+          color: #a1a1aa;
+          user-select: none;
+        }
         .shiki,
         .shiki span {
           background-color: transparent !important;
