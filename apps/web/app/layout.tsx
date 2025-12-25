@@ -45,6 +45,11 @@ export const metadata: Metadata = {
     description: "A personal workshop for handcrafted UI components.",
     images: ["/preview.png"],
   },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 }
 
 export default function RootLayout({

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="6" fill="#000000" />
+  <path 
+    d="M7 7H25C26.1046 7 27 7.89543 27 9V23C27 24.1046 26.1046 25 25 25H7C5.89543 25 5 24.1046 5 23V9C5 7.89543 5.89543 7 7 7Z" 
+    stroke="white" 
+    stroke-width="2" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+  />
+  <rect x="13" y="13" width="6" height="6" rx="1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M7 7L13 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M25 7L19 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M25 25L19 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M7 25L13 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

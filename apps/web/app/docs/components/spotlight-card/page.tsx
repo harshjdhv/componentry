@@ -33,24 +33,32 @@ const usageCode = `import {
   </SpotlightCardContent>
 </SpotlightCard>`
 
-const variantsCode = `// Multi-spotlight with multiple color sources
-<MultiSpotlightCard colors={["#7877c6", "#ff4d4d", "#4dffae"]}>
-  ...
-</MultiSpotlightCard>
+const multiSpotlightCode = `<MultiSpotlightCard className="w-full max-w-lg mx-auto p-6 h-64">
+  <h4 className="text-white font-medium mb-2">Multi Spotlight</h4>
+  <p className="text-neutral-400 text-sm">
+    Multiple colored spotlight sources follow your cursor
+  </p>
+</MultiSpotlightCard>`
 
-// Beam spotlight with crossing light beams
-<BeamSpotlightCard beamColor="rgba(120, 119, 198, 0.5)">
-  ...
-</BeamSpotlightCard>
+const beamSpotlightCode = `<BeamSpotlightCard className="w-full max-w-lg mx-auto p-6 h-64">
+  <h4 className="text-white font-medium mb-2">Beam Spotlight</h4>
+  <p className="text-neutral-400 text-sm">
+    Crossing light beams create a dramatic effect
+  </p>
+</BeamSpotlightCard>`
 
-// Gradient follow with moving gradient
-<GradientFollowCard gradientColors={["#7877c6", "#5eead4", "#f472b6"]}>
-  ...
-</GradientFollowCard>
+const gradientFollowCode = `<GradientFollowCard className="w-full max-w-lg mx-auto p-6 h-64">
+  <h4 className="text-white font-medium mb-2">Gradient Follow</h4>
+  <p className="text-neutral-400 text-sm">
+    Dynamic gradient background follows cursor position
+  </p>
+</GradientFollowCard>`
 
-// 3D Tilt with perspective effect
-<TiltSpotlightCard maxTilt={15} scale={1.05}>
-  ...
+const tiltSpotlightCode = `<TiltSpotlightCard className="w-full max-w-lg mx-auto p-6 h-64">
+  <h4 className="text-white font-medium mb-2">3D Tilt</h4>
+  <p className="text-neutral-400 text-sm">
+    Perspective tilt with glare effect for depth
+  </p>
 </TiltSpotlightCard>`
 
 export default function SpotlightCardPage(): React.JSX.Element {
@@ -77,7 +85,7 @@ export default function SpotlightCardPage(): React.JSX.Element {
         </div>
       </header>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8">
+      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="preview" data-section-title="Preview">
         <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
           Preview
         </div>
@@ -106,56 +114,9 @@ export default function SpotlightCardPage(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Variants
-        </div>
-        <div className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <MultiSpotlightCard className="p-6 h-48">
-                <h4 className="text-white font-medium mb-2">Multi Spotlight</h4>
-                <p className="text-neutral-400 text-sm">
-                  Multiple colored spotlight sources follow your cursor
-                </p>
-              </MultiSpotlightCard>
-              <p className="text-xs text-muted-foreground">MultiSpotlightCard</p>
-            </div>
 
-            <div className="space-y-3">
-              <BeamSpotlightCard className="p-6 h-48">
-                <h4 className="text-white font-medium mb-2">Beam Spotlight</h4>
-                <p className="text-neutral-400 text-sm">
-                  Crossing light beams create a dramatic effect
-                </p>
-              </BeamSpotlightCard>
-              <p className="text-xs text-muted-foreground">BeamSpotlightCard</p>
-            </div>
 
-            <div className="space-y-3">
-              <GradientFollowCard className="p-6 h-48">
-                <h4 className="text-white font-medium mb-2">Gradient Follow</h4>
-                <p className="text-neutral-400 text-sm">
-                  Dynamic gradient background follows cursor position
-                </p>
-              </GradientFollowCard>
-              <p className="text-xs text-muted-foreground">GradientFollowCard</p>
-            </div>
-
-            <div className="space-y-3">
-              <TiltSpotlightCard className="p-6 h-48">
-                <h4 className="text-white font-medium mb-2">3D Tilt</h4>
-                <p className="text-neutral-400 text-sm">
-                  Perspective tilt with glare effect for depth
-                </p>
-              </TiltSpotlightCard>
-              <p className="text-xs text-muted-foreground">TiltSpotlightCard</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-[120px_1fr] gap-8">
+      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="custom" data-section-title="Custom">
         <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
           Custom
         </div>
@@ -187,7 +148,7 @@ export default function SpotlightCardPage(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8">
+      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="install" data-section-title="Install">
         <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
           Install
         </div>
@@ -201,7 +162,7 @@ export default function SpotlightCardPage(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8">
+      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="code" data-section-title="Code">
         <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
           Code
         </div>
@@ -213,19 +174,68 @@ export default function SpotlightCardPage(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8">
+      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="examples" data-section-title="Examples">
         <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
-          Variants
+          Examples
         </div>
-        <div className="space-y-4">
-          <CodeBlock code={variantsCode} lang="tsx" />
-          <p className="text-xs text-muted-foreground">
-            Different spotlight variants for various use cases.
-          </p>
+        <div className="space-y-12">
+          
+          <div className="space-y-0">
+            <h3 className="text-xl font-medium mb-4">Multi Spotlight</h3>
+            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+              <MultiSpotlightCard className="w-full max-w-lg mx-auto p-6 h-64">
+                <h4 className="text-white font-medium mb-2">Multi Spotlight</h4>
+                <p className="text-neutral-400 text-sm">
+                  Multiple colored spotlight sources follow your cursor
+                </p>
+              </MultiSpotlightCard>
+            </div>
+            <CodeBlock code={multiSpotlightCode} lang="tsx" className="rounded-t-none" />
+          </div>
+
+          <div className="space-y-0">
+            <h3 className="text-xl font-medium mb-4">Beam Spotlight</h3>
+            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+              <BeamSpotlightCard className="w-full max-w-lg mx-auto p-6 h-64">
+                <h4 className="text-white font-medium mb-2">Beam Spotlight</h4>
+                <p className="text-neutral-400 text-sm">
+                  Crossing light beams create a dramatic effect
+                </p>
+              </BeamSpotlightCard>
+            </div>
+            <CodeBlock code={beamSpotlightCode} lang="tsx" className="rounded-t-none" />
+          </div>
+
+          <div className="space-y-0">
+            <h3 className="text-xl font-medium mb-4">Gradient Follow</h3>
+            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+              <GradientFollowCard className="w-full max-w-lg mx-auto p-6 h-64">
+                <h4 className="text-white font-medium mb-2">Gradient Follow</h4>
+                <p className="text-neutral-400 text-sm">
+                  Dynamic gradient background follows cursor position
+                </p>
+              </GradientFollowCard>
+            </div>
+            <CodeBlock code={gradientFollowCode} lang="tsx" className="rounded-t-none" />
+          </div>
+
+          <div className="space-y-0">
+            <h3 className="text-xl font-medium mb-4">3D Tilt</h3>
+            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+              <TiltSpotlightCard className="w-full max-w-lg mx-auto p-6 h-64">
+                <h4 className="text-white font-medium mb-2">3D Tilt</h4>
+                <p className="text-neutral-400 text-sm">
+                  Perspective tilt with glare effect for depth
+                </p>
+              </TiltSpotlightCard>
+            </div>
+            <CodeBlock code={tiltSpotlightCode} lang="tsx" className="rounded-t-none" />
+          </div>
+
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8">
+      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="features" data-section-title="Features">
         <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
           Features
         </div>
@@ -271,7 +281,7 @@ export default function SpotlightCardPage(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[120px_1fr] gap-8">
+      <div className="grid md:grid-cols-[120px_1fr] gap-8" id="props" data-section-title="Props">
         <div className="text-xs uppercase tracking-widest text-muted-foreground pt-1">
           Props
         </div>
