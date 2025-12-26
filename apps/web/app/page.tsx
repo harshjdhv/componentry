@@ -4,6 +4,25 @@ import type React from "react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
+function NoiseOverlay() {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden mix-blend-overlay">
+      <svg className="absolute inset-0 h-full w-full opacity-[0.4] dark:opacity-[0.25]">
+        <filter id="noise">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.8"
+            numOctaves="4"
+            stitchTiles="stitch"
+          />
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noise)" />
+      </svg>
+    </div>
+  )
+}
+
 function GridBackground() {
   return (
     <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -73,6 +92,7 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
 export default function Page(): React.JSX.Element {
   return (
     <div className="min-h-svh flex flex-col relative">
+      <NoiseOverlay />
       <GridBackground />
 
       <FloatingCard className="top-[15%] left-[10%] hidden lg:block opacity-60" offset={0} />
