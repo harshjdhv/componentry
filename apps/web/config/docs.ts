@@ -28,6 +28,10 @@ export const docsConfig = {
           title: "Border Beam",
           href: "/docs/components/border-beam",
         },
+        {
+          title: "Circuit Board",
+          href: "/docs/components/circuit-board",
+        },
       ],
     },
   ],
