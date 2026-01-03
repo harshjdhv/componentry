@@ -22,33 +22,42 @@ const fontDisplay = Syne({
 })
 
 export const metadata: Metadata = {
-  title: "Component Playground",
-  description: "A personal workshop for handcrafted UI components.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || ""),
+  title: "Componentry - Premium UI Components",
+  description: "A curated collection of handcrafted React components. Meticulously designed, beautifully animated, and built for modern interfaces.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://componentry.dev"),
+  keywords: ["React", "UI Components", "Tailwind CSS", "TypeScript", "Framer Motion", "Next.js"],
+  authors: [{ name: "Harsh" }],
+  creator: "Harsh",
   openGraph: {
-    title: "Component Playground",
-    description: "A personal workshop for handcrafted UI components.",
-    siteName: "Component Playground",
+    type: "website",
+    locale: "en_US",
+    title: "Componentry - Premium UI Components",
+    description: "Handcrafted React components. Beautifully animated.",
+    siteName: "Componentry",
     images: [
       {
         url: "/preview.png",
         width: 1200,
         height: 630,
-        alt: "Component Playground Preview",
+        alt: "Componentry - Premium UI Components",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Component Playground",
-    description: "A personal workshop for handcrafted UI components.",
+    title: "Componentry - Premium UI Components",
+    description: "Handcrafted React components. Beautifully animated.",
     images: ["/preview.png"],
+    creator: "@harshjdhv",
   },
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
     apple: "/icon.svg",
+  },
+  other: {
+    "msapplication-TileImage": "/preview.png",
   },
 }
 
