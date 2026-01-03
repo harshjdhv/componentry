@@ -67,7 +67,7 @@ export function CommandMenu() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
                 onClick={() => setOpen(false)}
               />
               <motion.div
@@ -134,9 +134,9 @@ export function CommandMenu() {
                           onSelect={() => {
                             runCommand(() => router.push(navItem.href))
                           }}
-                          className="group/item relative flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                          className="group/item relative flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors hover:bg-accent/70 hover:text-accent-foreground aria-[selected='true']:bg-accent aria-[selected='true']:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50"
                         >
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground group-aria-selected/item:bg-primary/10 group-aria-selected/item:text-primary transition-colors">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground group-aria-[selected='true']/item:bg-primary/10 group-aria-[selected='true']/item:text-primary transition-colors">
                             {group.title === "Getting Started" ? (
                               <FileText className="h-4 w-4" />
                             ) : (
