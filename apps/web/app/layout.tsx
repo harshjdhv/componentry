@@ -94,7 +94,7 @@ export const metadata: Metadata = {
     siteName: "Componentry",
     images: [
       {
-        url: "/preview.png",
+        url: `${siteUrl}/preview.png`,
         width: 1200,
         height: 630,
         alt: "Componentry - Premium React UI Component Library",
@@ -106,7 +106,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Componentry - Premium React UI Component Library",
     description: "Free, open-source React UI components by Harsh Jadhav. Beautiful, animated, copy-paste components.",
-    images: ["/preview.png"],
+    images: [`${siteUrl}/preview.png`],
     creator: "@harshjdhv",
     site: "@harshjdhv",
   },
