@@ -22,7 +22,7 @@ const fontDisplay = Syne({
   variable: "--font-display",
 })
 
-const siteUrl = "https://componentry.fun"
+const siteUrl = "https://www.componentry.fun"
 
 export const viewport: Viewport = {
   width: "device-width",
