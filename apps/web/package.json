@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "@workspace/ui": "workspace:*",
     "cmdk": "^1.1.1",
     "framer-motion": "^12.23.26",

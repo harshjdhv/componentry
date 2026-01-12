@@ -1,7 +1,7 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Instrument_Serif, Syne } from "next/font/google"
-
+import { Analytics } from "@vercel/analytics/next"
 import "@workspace/ui/globals.css"
 import { Providers } from "@/components/providers"
 import { JsonLd } from "@/components/seo/json-ld"
@@ -153,6 +153,7 @@ export default function RootLayout({
 }>): React.JSX.Element {
   return (
     <html lang="en" suppressHydrationWarning>
+      <Analytics />
       <head>
         <JsonLd />
       </head>
