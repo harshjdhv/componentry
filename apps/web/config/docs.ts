@@ -36,6 +36,10 @@ export const docsConfig = {
           title: "Command Menu",
           href: "/docs/components/command-menu",
         },
+        {
+          title: "Magnetic Dock",
+          href: "/docs/components/magnetic-dock",
+        },
       ],
     },
     {
