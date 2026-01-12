@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Instrument_Serif, Syne } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "@workspace/ui/globals.css"
 import { Providers } from "@/components/providers"
 import { JsonLd } from "@/components/seo/json-ld"
@@ -161,6 +162,7 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontSerif.variable} ${fontDisplay.variable} font-sans antialiased`}
       >
         <Providers>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   )
