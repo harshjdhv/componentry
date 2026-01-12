@@ -153,7 +153,6 @@ export default function RootLayout({
 }>): React.JSX.Element {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Analytics />
       <head>
         <JsonLd />
       </head>
@@ -161,6 +160,7 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontSerif.variable} ${fontDisplay.variable} font-sans antialiased`}
       >
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   )
