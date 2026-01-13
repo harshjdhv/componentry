@@ -304,7 +304,7 @@ function AlphabetLetter({
     )
 }
 
-// Christmas light bulb with glow
+// Christmas light bulb with diffused glow
 function ChristmasLightBulb({
     position,
     color,
@@ -318,8 +318,6 @@ function ChristmasLightBulb({
     isLit: boolean
     flickerSeed: number
 }) {
-    const lightRef = useRef<THREE.PointLight>(null)
-    const bulbRef = useRef<THREE.Mesh>(null)
     const [currentIntensity, setCurrentIntensity] = useState(intensity)
 
     // Flicker effect
@@ -332,58 +330,108 @@ function ChristmasLightBulb({
         // Perlin-like noise for natural flicker
         const time = clock.getElapsedTime()
         const noise =
-            Math.sin(time * 2 + flickerSeed) * 0.1 +
-            Math.sin(time * 5 + flickerSeed * 2) * 0.05 +
-            Math.sin(time * 11 + flickerSeed * 3) * 0.03
+            Math.sin(time * 2.3 + flickerSeed) * 0.08 +
+            Math.sin(time * 4.7 + flickerSeed * 2.1) * 0.04 +
+            Math.sin(time * 9.3 + flickerSeed * 3.2) * 0.02
 
-        const flicker = intensity * (0.85 + noise + Math.random() * 0.05)
-        setCurrentIntensity(Math.max(0.1, flicker))
+        const flicker = intensity * (0.9 + noise)
+        setCurrentIntensity(Math.max(0.2, flicker))
     })
 
     const bulbColor = useMemo(() => new THREE.Color(color), [color])
-    const emissiveIntensity = isLit ? currentIntensity * 2 : 0
+    const emissiveIntensity = isLit ? currentIntensity * 3 : 0
+
+    // Create a radial gradient texture for soft glow
+    const glowTexture = useMemo(() => {
+        const canvas = document.createElement("canvas")
+        canvas.width = 64
+        canvas.height = 64
+        const ctx = canvas.getContext("2d")!
+
+        // Radial gradient for soft, round glow
+        const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32)
+        gradient.addColorStop(0, "rgba(255, 255, 255, 1)")
+        gradient.addColorStop(0.2, "rgba(255, 255, 255, 0.8)")
+        gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.3)")
+        gradient.addColorStop(0.8, "rgba(255, 255, 255, 0.1)")
+        gradient.addColorStop(1, "rgba(255, 255, 255, 0)")
+
+        ctx.fillStyle = gradient
+        ctx.fillRect(0, 0, 64, 64)
+
+        const texture = new THREE.CanvasTexture(canvas)
+        texture.needsUpdate = true
+        return texture
+    }, [])
 
     return (
         <group position={position}>
-            {/* Bulb glass */}
-            <mesh ref={bulbRef} castShadow>
-                <sphereGeometry args={[0.035, 12, 12]} />
+            {/* Bulb glass - classic Christmas light shape */}
+            <mesh>
+                <sphereGeometry args={[0.032, 16, 16]} />
                 <meshStandardMaterial
                     color={bulbColor}
                     emissive={bulbColor}
                     emissiveIntensity={emissiveIntensity}
                     transparent
-                    opacity={0.9}
-                    roughness={0.2}
-                    metalness={0.1}
+                    opacity={isLit ? 0.95 : 0.6}
+                    roughness={0.15}
+                    metalness={0.05}
                 />
             </mesh>
 
-            {/* Bulb socket */}
-            <mesh position={[0, 0.04, 0]} castShadow>
-                <cylinderGeometry args={[0.015, 0.02, 0.03, 8]} />
-                <meshStandardMaterial color="#2A2A2A" roughness={0.8} metalness={0.3} />
+            {/* Bulb socket/cap */}
+            <mesh position={[0, 0.038, 0]}>
+                <cylinderGeometry args={[0.012, 0.016, 0.025, 8]} />
+                <meshStandardMaterial color="#1A1A1A" roughness={0.7} metalness={0.2} />
             </mesh>
 
-            {/* Point light */}
+            {/* Point light for illumination */}
             {isLit && (
                 <pointLight
-                    ref={lightRef}
                     color={color}
-                    intensity={currentIntensity * 0.3}
-                    distance={1.5}
+                    intensity={currentIntensity * 0.5}
+                    distance={2}
                     decay={2}
-                    castShadow={false}
                 />
             )}
 
-            {/* Glow sprite */}
+            {/* Inner bright glow - small and intense */}
             {isLit && (
-                <sprite scale={[0.15 + currentIntensity * 0.1, 0.15 + currentIntensity * 0.1, 1]}>
+                <sprite scale={[0.1 * currentIntensity, 0.1 * currentIntensity, 1]}>
                     <spriteMaterial
+                        map={glowTexture}
                         color={color}
                         transparent
-                        opacity={0.3 + currentIntensity * 0.2}
+                        opacity={0.9}
+                        blending={THREE.AdditiveBlending}
+                        depthWrite={false}
+                    />
+                </sprite>
+            )}
+
+            {/* Middle glow layer - softer spread */}
+            {isLit && (
+                <sprite scale={[0.2 * currentIntensity, 0.2 * currentIntensity, 1]}>
+                    <spriteMaterial
+                        map={glowTexture}
+                        color={color}
+                        transparent
+                        opacity={0.5}
+                        blending={THREE.AdditiveBlending}
+                        depthWrite={false}
+                    />
+                </sprite>
+            )}
+
+            {/* Outer glow layer - very soft ambient */}
+            {isLit && (
+                <sprite scale={[0.35 * currentIntensity, 0.35 * currentIntensity, 1]}>
+                    <spriteMaterial
+                        map={glowTexture}
+                        color={color}
+                        transparent
+                        opacity={0.25}
                         blending={THREE.AdditiveBlending}
                         depthWrite={false}
                     />
@@ -415,16 +463,17 @@ function LightWire({
 function AlphabetWall() {
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-    // Hand-painted color palette (reds, blues, greens, yellows - vintage paint)
+    // Hand-painted color palette - VERY dark, nearly black like original Stranger Things
+    // Joyce painted these in the dark with old paint - they should be scary and almost invisible
     const paintColors = [
-        "rgb(180, 50, 50)",    // faded red
-        "rgb(50, 80, 140)",    // dusty blue
-        "rgb(60, 110, 60)",    // muted green
-        "rgb(170, 140, 50)",   // ochre yellow
-        "rgb(140, 60, 90)",    // mauve
-        "rgb(80, 60, 120)",    // dusty purple
-        "rgb(160, 90, 50)",    // rust orange
-        "rgb(50, 100, 100)",   // teal
+        "rgb(20, 15, 12)",     // almost black
+        "rgb(25, 15, 15)",     // black with hint of red
+        "rgb(15, 18, 25)",     // black with hint of blue
+        "rgb(22, 18, 14)",     // charcoal black
+        "rgb(28, 12, 15)",     // very dark dried blood
+        "rgb(18, 15, 22)",     // black with purple tint
+        "rgb(30, 18, 12)",     // very dark rust black
+        "rgb(15, 22, 22)",     // black with teal hint
     ]
 
     // Christmas light colors (warm tungsten variations)
@@ -439,142 +488,277 @@ function AlphabetWall() {
         "#FFAA00", // amber
     ]
 
-    // Letter positions - uneven, hand-painted style
-    const letterPositions = useMemo(() => {
-        const positions: { letter: string; pos: [number, number, number]; color: string }[] = []
+    // Define stable random offsets using seeded approach (deterministic based on index)
+    const seededRandom = (seed: number) => {
+        const x = Math.sin(seed * 12.9898) * 43758.5453
+        return x - Math.floor(x)
+    }
 
-        // First row: A-I
+    // Letter positions organized by rows
+    const letterData = useMemo(() => {
+        const row1: { letter: string; pos: [number, number, number]; color: string }[] = []
+        const row2: { letter: string; pos: [number, number, number]; color: string }[] = []
+        const row3: { letter: string; pos: [number, number, number]; color: string }[] = []
+
+        // Row 1: A-I (9 letters)
         for (let i = 0; i <= 8; i++) {
-            const x = -3.5 + i * 0.8 + (Math.random() - 0.5) * 0.1
-            const y = 1.2 + (Math.random() - 0.5) * 0.08
-            positions.push({
-                letter: alphabet[i],
-                pos: [x, y, -5.95],
-                color: paintColors[i % paintColors.length],
+            const x = -3.2 + i * 0.72
+            const y = 1.1 + (seededRandom(i * 3.7) - 0.5) * 0.06
+            row1.push({
+                letter: alphabet[i] || '',
+                pos: [x, y, -5.94],
+                color: paintColors[i % paintColors.length] || paintColors[0],
             })
         }
 
-        // Second row: J-Q
-        for (let i = 9; i <= 16; i++) {
-            const x = -3.2 + (i - 9) * 0.8 + (Math.random() - 0.5) * 0.1
-            const y = 0.5 + (Math.random() - 0.5) * 0.08
-            positions.push({
-                letter: alphabet[i],
-                pos: [x, y, -5.95],
-                color: paintColors[i % paintColors.length],
+        // Row 2: J-Q (8 letters)
+        for (let i = 0; i <= 7; i++) {
+            const letterIndex = 9 + i
+            const x = -2.9 + i * 0.72
+            const y = 0.45 + (seededRandom(letterIndex * 4.3) - 0.5) * 0.06
+            row2.push({
+                letter: alphabet[letterIndex] || '',
+                pos: [x, y, -5.94],
+                color: paintColors[letterIndex % paintColors.length] || paintColors[0],
             })
         }
 
-        // Third row: R-Z
-        for (let i = 17; i <= 25; i++) {
-            const x = -3.5 + (i - 17) * 0.8 + (Math.random() - 0.5) * 0.1
-            const y = -0.2 + (Math.random() - 0.5) * 0.08
-            positions.push({
-                letter: alphabet[i],
-                pos: [x, y, -5.95],
-                color: paintColors[i % paintColors.length],
+        // Row 3: R-Z (9 letters)
+        for (let i = 0; i <= 8; i++) {
+            const letterIndex = 17 + i
+            const x = -3.2 + i * 0.72
+            const y = -0.2 + (seededRandom(letterIndex * 5.1) - 0.5) * 0.06
+            row3.push({
+                letter: alphabet[letterIndex] || '',
+                pos: [x, y, -5.94],
+                color: paintColors[letterIndex % paintColors.length] || paintColors[0],
             })
         }
 
-        return positions
+        return { row1, row2, row3 }
     }, [])
 
-    // Light positions above letters with sagging wire effect
-    const lightBulbs = useMemo(() => {
-        const bulbs: {
-            position: [number, number, number]
-            color: string
-            intensity: number
-            flickerSeed: number
-        }[] = []
+    // Generate light bulbs per row
+    const lightBulbsData = useMemo(() => {
+        const createRowBulbs = (
+            row: typeof letterData.row1,
+            rowIndex: number
+        ) => {
+            return row.map((letter, i) => ({
+                position: [
+                    letter.pos[0],
+                    letter.pos[1] + 0.22,
+                    letter.pos[2] + 0.03
+                ] as [number, number, number],
+                color: lightColors[(rowIndex * 3 + i) % lightColors.length] || lightColors[0],
+                intensity: 0.7 + seededRandom(rowIndex * 10 + i) * 0.3,
+                flickerSeed: rowIndex * 100 + i * 7.3,
+            }))
+        }
 
-        letterPositions.forEach((letterData, index) => {
-            const [x, y, z] = letterData.pos
-            // Position light above letter with slight sag
-            const sagAmount = Math.sin(index * 0.5) * 0.08
-            bulbs.push({
-                position: [x + (Math.random() - 0.5) * 0.1, y + 0.25 + sagAmount, z + 0.05],
-                color: lightColors[index % lightColors.length],
-                intensity: 0.6 + Math.random() * 0.4,
-                flickerSeed: index * 7.3,
-            })
-        })
+        return {
+            row1Bulbs: createRowBulbs(letterData.row1, 0),
+            row2Bulbs: createRowBulbs(letterData.row2, 1),
+            row3Bulbs: createRowBulbs(letterData.row3, 2),
+        }
+    }, [letterData])
 
-        return bulbs
-    }, [letterPositions])
-
-    // Generate wire paths
+    // Generate a single serpentine wire path flowing through all rows
+    // Pattern: Left→Right (A-I), drop down, Right→Left (Q-J), drop down, Left→Right (R-Z)
     const wirePaths = useMemo(() => {
-        const paths: THREE.Vector3[][] = []
+        const wire: THREE.Vector3[] = []
 
-        // Main wire connecting all lights with sag
-        const mainWire: THREE.Vector3[] = []
+        const row1 = lightBulbsData.row1Bulbs // A-I, left to right
+        const row2 = [...lightBulbsData.row2Bulbs].reverse() // Q-J, right to left (reversed)
+        const row3 = lightBulbsData.row3Bulbs // R-Z, left to right
 
-        // Start from left wall
-        mainWire.push(new THREE.Vector3(-5.5, 2, -5.9))
+        // Helper to add messy sag points between bulbs
+        const addBulbConnection = (
+            prevPos: [number, number, number],
+            currPos: [number, number, number],
+            index: number
+        ) => {
+            // Messy sag - varies quite a bit
+            const sagAmount = 0.03 + seededRandom(index * 3.14) * 0.06
+            const midX = (prevPos[0] + currPos[0]) / 2 + (seededRandom(index * 7.7) - 0.5) * 0.08
+            const midY = Math.min(prevPos[1], currPos[1]) - sagAmount
 
-        lightBulbs.forEach((bulb, i) => {
-            // Add slight randomness and sag between bulbs
-            if (i > 0) {
-                const prevBulb = lightBulbs[i - 1]
-                const midX = (prevBulb.position[0] + bulb.position[0]) / 2
-                const midY = Math.min(prevBulb.position[1], bulb.position[1]) - 0.05 - Math.random() * 0.08
-                mainWire.push(new THREE.Vector3(midX, midY, -5.9))
-            }
-            mainWire.push(new THREE.Vector3(bulb.position[0], bulb.position[1] + 0.04, bulb.position[2]))
-        })
+            // Add sag point
+            wire.push(new THREE.Vector3(midX, midY, -5.92 + (seededRandom(index) - 0.5) * 0.02))
 
-        // End at right wall
-        mainWire.push(new THREE.Vector3(5, 1.5, -5.9))
+            // Add bulb position
+            wire.push(new THREE.Vector3(
+                currPos[0] + (seededRandom(index * 2.3) - 0.5) * 0.02,
+                currPos[1] + 0.035,
+                -5.92
+            ))
+        }
 
-        paths.push(mainWire)
+        // === START: Wire comes in from the left wall ===
+        wire.push(new THREE.Vector3(-5.8, 1.6, -5.92)) // enters from left, high
+        wire.push(new THREE.Vector3(-5.2, 1.45 + seededRandom(0.1) * 0.1, -5.92)) // droop down
+        wire.push(new THREE.Vector3(-4.5, 1.38, -5.92)) // slight sag
 
-        // Add some tangled extra wires
-        for (let i = 0; i < 3; i++) {
-            const tangledWire: THREE.Vector3[] = []
-            const startIndex = Math.floor(Math.random() * (lightBulbs.length - 3))
-            for (let j = 0; j < 4; j++) {
-                const bulb = lightBulbs[startIndex + j]
-                if (bulb) {
-                    tangledWire.push(
-                        new THREE.Vector3(
-                            bulb.position[0] + (Math.random() - 0.5) * 0.3,
-                            bulb.position[1] + 0.04 + (Math.random() - 0.5) * 0.15,
-                            bulb.position[2] + 0.02
-                        )
-                    )
+        // === ROW 1: A to I (left to right) ===
+        if (row1.length > 0 && row1[0]) {
+            // Connect to first bulb (A)
+            wire.push(new THREE.Vector3(
+                row1[0].position[0],
+                row1[0].position[1] + 0.035,
+                -5.92
+            ))
+
+            // Go through A-I
+            for (let i = 1; i < row1.length; i++) {
+                const prev = row1[i - 1]
+                const curr = row1[i]
+                if (prev && curr) {
+                    addBulbConnection(prev.position, curr.position, i)
                 }
-            }
-            if (tangledWire.length >= 2) {
-                paths.push(tangledWire)
             }
         }
 
-        return paths
-    }, [lightBulbs])
+        // === TRANSITION: Drop from I (row1 end) to Q (row2 start, which is rightmost) ===
+        const row1Last = row1[row1.length - 1]
+        const row2First = row2[0] // This is Q (rightmost of second row)
 
-    // Lit state for each bulb (some random flickering off)
+        if (row1Last && row2First) {
+            // Messy drop down - wire sags and curves
+            const dropMidX = (row1Last.position[0] + row2First.position[0]) / 2 + (seededRandom(100) - 0.5) * 0.15
+            const dropMidY = (row1Last.position[1] + row2First.position[1]) / 2 + 0.05
+
+            wire.push(new THREE.Vector3(
+                row1Last.position[0] + 0.1,
+                row1Last.position[1] - 0.05,
+                -5.91
+            ))
+            wire.push(new THREE.Vector3(
+                dropMidX + 0.15,
+                dropMidY + (seededRandom(101) - 0.5) * 0.1,
+                -5.90
+            ))
+            wire.push(new THREE.Vector3(
+                row2First.position[0] + 0.05,
+                row2First.position[1] + 0.1,
+                -5.91
+            ))
+            wire.push(new THREE.Vector3(
+                row2First.position[0],
+                row2First.position[1] + 0.035,
+                -5.92
+            ))
+        }
+
+        // === ROW 2: Q to J (right to left) ===
+        for (let i = 1; i < row2.length; i++) {
+            const prev = row2[i - 1]
+            const curr = row2[i]
+            if (prev && curr) {
+                addBulbConnection(prev.position, curr.position, 20 + i)
+            }
+        }
+
+        // === TRANSITION: Drop from J (row2 end, leftmost) to R (row3 start, leftmost) ===
+        const row2Last = row2[row2.length - 1] // This is J (leftmost of second row)
+        const row3First = row3[0] // This is R (leftmost of third row)
+
+        if (row2Last && row3First) {
+            // Messy drop down to third row
+            const drop2MidY = (row2Last.position[1] + row3First.position[1]) / 2 + 0.08
+
+            wire.push(new THREE.Vector3(
+                row2Last.position[0] - 0.08,
+                row2Last.position[1] - 0.06,
+                -5.91
+            ))
+            wire.push(new THREE.Vector3(
+                row2Last.position[0] - 0.2 + (seededRandom(200) - 0.5) * 0.1,
+                drop2MidY + (seededRandom(201) - 0.5) * 0.12,
+                -5.90
+            ))
+            wire.push(new THREE.Vector3(
+                row3First.position[0] - 0.1,
+                row3First.position[1] + 0.12,
+                -5.91
+            ))
+            wire.push(new THREE.Vector3(
+                row3First.position[0],
+                row3First.position[1] + 0.035,
+                -5.92
+            ))
+        }
+
+        // === ROW 3: R to Z (left to right) ===
+        for (let i = 1; i < row3.length; i++) {
+            const prev = row3[i - 1]
+            const curr = row3[i]
+            if (prev && curr) {
+                addBulbConnection(prev.position, curr.position, 40 + i)
+            }
+        }
+
+        // === END: Wire exits or dangles after Z ===
+        const row3Last = row3[row3.length - 1]
+        if (row3Last) {
+            // Wire droops and dangles off after Z
+            wire.push(new THREE.Vector3(
+                row3Last.position[0] + 0.15,
+                row3Last.position[1] - 0.08,
+                -5.91
+            ))
+            wire.push(new THREE.Vector3(
+                row3Last.position[0] + 0.35,
+                row3Last.position[1] - 0.2,
+                -5.90
+            ))
+            wire.push(new THREE.Vector3(
+                row3Last.position[0] + 0.5,
+                row3Last.position[1] - 0.35,
+                -5.89
+            ))
+        }
+
+        return [wire]
+    }, [lightBulbsData])
+
+    // Combine all bulbs for rendering
+    const allBulbs = useMemo(() => [
+        ...lightBulbsData.row1Bulbs,
+        ...lightBulbsData.row2Bulbs,
+        ...lightBulbsData.row3Bulbs,
+    ], [lightBulbsData])
+
+    const allLetters = useMemo(() => [
+        ...letterData.row1,
+        ...letterData.row2,
+        ...letterData.row3,
+    ], [letterData])
+
+    // Lit state for each bulb
     const [litBulbs, setLitBulbs] = useState<boolean[]>(
-        () => lightBulbs.map(() => Math.random() > 0.1)
+        () => allBulbs.map(() => true)
     )
 
-    // Random flicker effect - some bulbs occasionally go out
+    // Random flicker effect - occasional bulbs flicker
     useEffect(() => {
         const interval = setInterval(() => {
-            setLitBulbs((prev) =>
-                prev.map((isLit, i) => {
-                    if (Math.random() < 0.02) return !isLit // 2% chance to toggle
+            setLitBulbs(prev =>
+                prev.map((isLit, idx) => {
+                    // Small chance to toggle
+                    if (seededRandom(Date.now() / 1000 + idx) < 0.03) {
+                        return !isLit
+                    }
                     return isLit
                 })
             )
-        }, 200)
+        }, 300)
         return () => clearInterval(interval)
     }, [])
 
     return (
         <group>
             {/* Letters */}
-            {letterPositions.map((data, i) => (
+            {allLetters.map((data) => (
                 <AlphabetLetter
                     key={data.letter}
                     letter={data.letter}
@@ -583,25 +767,27 @@ function AlphabetWall() {
                 />
             ))}
 
-            {/* Wires */}
+            {/* Wires - 3 separate rows */}
             {wirePaths.map((points, i) => (
-                <LightWire key={i} points={points} />
+                <LightWire key={`wire-${i}`} points={points} />
             ))}
 
             {/* Light bulbs */}
-            {lightBulbs.map((bulb, i) => (
+            {allBulbs.map((bulb, i) => (
                 <ChristmasLightBulb
-                    key={i}
+                    key={`bulb-${i}`}
                     position={bulb.position}
                     color={bulb.color}
                     intensity={bulb.intensity}
-                    isLit={litBulbs[i]}
+                    isLit={litBulbs[i] ?? true}
                     flickerSeed={bulb.flickerSeed}
                 />
             ))}
         </group>
     )
 }
+
+
 
 // Worn wooden floor
 function WornFloor() {
