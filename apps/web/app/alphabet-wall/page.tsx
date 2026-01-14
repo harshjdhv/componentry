@@ -84,44 +84,38 @@ function FloatingParticles() {
 
 function CinematicIntro({ onComplete, onStart }: { onComplete: () => void, onStart: () => void }) {
     const [step, setStep] = useState<'start' | 'intro'>('start')
-    const [introOpacity, setIntroOpacity] = useState(0)
+    const [textOpacity, setTextOpacity] = useState(0)
+    const [subTextOpacity, setSubTextOpacity] = useState(0)
 
-    // Intro sequence states
-    const [showHawkins, setShowHawkins] = useState(false)
-    const [showDate, setShowDate] = useState(false)
-
-    // Mount animation for start screen
-    useEffect(() => {
-        if (step === 'start') {
-            requestAnimationFrame(() => setIntroOpacity(1))
-        }
-    }, [step])
+    // Logic adapted to prevent flash: We keep background black until component unmounts
+    // const [finalFade, setFinalFade] = useState(false) 
 
     const handleStart = () => {
-        setIntroOpacity(0) // Fade out start screen
+        onStart() // Trigger audio
+        setStep('intro')
+        // Request fullscreen
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch((err) => {
+                console.log("Fullscreen request denied:", err)
+            })
+        }
 
+        // Animation Timeline
+        // 0s: Start
+        // 1s: Hawkins fade in
+        setTimeout(() => setTextOpacity(1), 1000)
+        // 2.5s: Subtext fade in
+        setTimeout(() => setSubTextOpacity(1), 2500)
+        // 5s: Fade out everything (Text Only)
         setTimeout(() => {
-            onStart()
-            setStep('intro')
-            setIntroOpacity(1) // Fade in intro container
-
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => { })
-            }
-
-            // Timeline
-            setTimeout(() => setShowHawkins(true), 1500)
-            setTimeout(() => setShowDate(true), 4000)
-
-            // Exit sequence
-            setTimeout(() => {
-                setShowHawkins(false)
-                setShowDate(false)
-                setIntroOpacity(0) // Fade to black
-            }, 8000)
-
-            setTimeout(onComplete, 9500)
-        }, 1000) // Wait for start screen fade out
+            setTextOpacity(0)
+            setSubTextOpacity(0)
+            // setFinalFade(true) // DISABLED to prevent flash of room before eyes open
+        }, 5500)
+        // 7s: Complete
+        setTimeout(() => {
+            onComplete()
+        }, 7000)
     }
 
     // Noise/Grain Overlay Component
@@ -137,7 +131,6 @@ function CinematicIntro({ onComplete, onStart }: { onComplete: () => void, onSta
         return (
             <div className="fixed inset-0 z-50 bg-[#050505] flex flex-col items-center justify-center p-6 overflow-hidden select-none">
                 <GrainOverlay />
-                <FloatingParticles />
 
                 {/* Background Atmosphere */}
                 <div className="absolute inset-0 z-0">
@@ -147,11 +140,7 @@ function CinematicIntro({ onComplete, onStart }: { onComplete: () => void, onSta
                 </div>
 
                 <div
-                    className="relative z-10 max-w-4xl w-full text-center flex flex-col items-center transition-all duration-[1500ms] ease-out"
-                    style={{
-                        opacity: introOpacity,
-                        transform: `scale(${0.95 + (introOpacity * 0.05)}) translateZ(0)`
-                    }}
+                    className="relative z-10 max-w-4xl w-full text-center flex flex-col items-center animate-in fade-in duration-1000"
                 >
                     <div className="mb-8 tracking-[0.4em] text-red-500/50 font-serif text-xs md:text-sm uppercase animate-pulse flex flex-col items-center gap-2">
                         A Componentry Original
@@ -225,48 +214,50 @@ function CinematicIntro({ onComplete, onStart }: { onComplete: () => void, onSta
     }
 
     return (
-        <div
-            className="fixed inset-0 z-50 bg-black flex items-center justify-center transition-opacity duration-[2000ms] ease-in-out cursor-none"
-            style={{ opacity: introOpacity }}
-        >
-            <GrainOverlay />
-
-            {/* Scene Background - The Void */}
-            <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,_#4a0000_0%,_#000000_70%)] opacity-30 transition-opacity duration-[4000ms] ${showHawkins ? 'opacity-30' : 'opacity-0'}`} />
-
-            <div className="relative z-10 text-center mix-blend-screen px-4">
-                {/* Location */}
-                <h2
-                    className="text-4xl md:text-7xl font-bold text-zinc-100 uppercase tracking-widest transition-all duration-[3000ms] ease-out"
+        <div className={`absolute inset-0 z-50 bg-black flex items-center justify-center transition-opacity duration-1000 opacity-100`}>
+            {/* Background Atmosphere */}
+            <div className="absolute inset-0 overflow-hidden">
+                {/* Red Pulse from Center - 'The Rift' */}
+                <div
+                    className="absolute inset-0 opacity-20 animate-pulse"
                     style={{
-                        fontFamily: 'serif',
-                        opacity: showHawkins ? 0.9 : 0,
-                        transform: showHawkins ? 'scale(1) translateY(0)' : 'scale(1.1) translateY(30px)',
-                        textShadow: '0 0 30px rgba(220, 20, 20, 0.4)'
+                        background: 'radial-gradient(circle at center, #8B0000 0%, #000000 70%)',
+                        animationDuration: '4s'
+                    }}
+                />
+
+                {/* Subtle Scanlines */}
+                <div
+                    className="absolute inset-0 opacity-10 pointer-events-none"
+                    style={{
+                        background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
+                        backgroundSize: '100% 2px, 3px 100%'
+                    }}
+                />
+            </div>
+
+            <div className="text-center relative z-10">
+                <h1
+                    className="text-amber-500/90 text-4xl md:text-6xl font-bold font-serif tracking-widest uppercase mb-4 transition-all duration-[4000ms] ease-out"
+                    style={{
+                        opacity: textOpacity,
+                        textShadow: "0 0 20px rgba(180, 50, 20, 0.5), 0 0 40px rgba(180, 50, 20, 0.2)",
+                        transform: textOpacity ? 'scale(1.1)' : 'scale(0.9)',
+                        letterSpacing: textOpacity ? '0.2em' : '0.1em'
                     }}
                 >
                     Hawkins, Indiana
-                </h2>
-
-                {/* Date */}
-                <div
-                    className="mt-8 transition-all duration-[3000ms] ease-out flex flex-col items-center gap-2"
-                    style={{
-                        opacity: showDate ? 1 : 0,
-                        transform: showDate ? 'translateY(0)' : 'translateY(20px)',
-                    }}
+                </h1>
+                <p
+                    className="text-white/60 text-lg md:text-xl font-serif tracking-[0.5em] uppercase transition-all duration-[2000ms]"
+                    style={{ opacity: subTextOpacity }}
                 >
-                    <div className="w-12 h-0.5 bg-red-600/50 mb-4" />
-                    <h3
-                        className="text-xl md:text-3xl text-zinc-400 font-serif tracking-[0.3em] uppercase"
-                    >
-                        November 6, 1983
-                    </h3>
-                </div>
+                    November 6th, 1983
+                </p>
             </div>
 
-            {/* Recording Light */}
-            <div className={`absolute bottom-12 right-12 flex items-center gap-3 transition-opacity duration-1000 ${showDate ? 'opacity-100' : 'opacity-0'}`}>
+            {/* Loading Spinner / Recorder Light */}
+            <div className="absolute bottom-12 right-12 transition-opacity duration-500 flex items-center gap-3" style={{ opacity: subTextOpacity }}>
                 <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_#ff0000]" />
                 <span className="text-red-500/50 text-xs tracking-widest font-mono">REC</span>
             </div>
@@ -300,14 +291,16 @@ function CameraController() {
     const { camera, gl } = useThree()
     const isDragging = useRef(false)
     const previousMousePosition = useRef({ x: 0, y: 0 })
-    const spherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
-    const targetSpherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
+    const spherical = useRef(new THREE.Spherical(1, Math.PI / 2, Math.PI))
+    const targetSpherical = useRef(new THREE.Spherical(1, Math.PI / 2, Math.PI))
 
     // Get context for camera effects
     const { demogorgonMode, impactMoment, upsideDownMode, transitionPhase } = useKeyboard()
 
     // Track when we entered Upside Down for animation timing
     const upsideDownStartRef = useRef(0)
+    // Track when we entered Demogorgon Mode for delay
+    const demoStartRef = useRef(0)
 
     // Reset view and start timer when entering Upside Down
     useEffect(() => {
@@ -327,7 +320,7 @@ function CameraController() {
     // Restore dragging functionality
     useEffect(() => {
         const handleDown = (e: MouseEvent | TouchEvent) => {
-            if (demogorgonMode || transitionPhase !== 'none') return // Disable control during events
+            if (transitionPhase !== 'none') return // Disable control only during transition events
             isDragging.current = true
             const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
             const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
@@ -349,7 +342,7 @@ function CameraController() {
 
             // Update target rotation
             targetSpherical.current.theta -= deltaMove.x * 0.002
-            targetSpherical.current.phi -= deltaMove.y * 0.002
+            targetSpherical.current.phi += deltaMove.y * 0.002
 
             // Clamp vertical rotation (phi)
             targetSpherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, targetSpherical.current.phi))
@@ -400,20 +393,33 @@ function CameraController() {
         // === DEMOGORGON MODE - Desperate search ===
         else if (demogorgonMode) {
             const time = state.clock.getElapsedTime()
+            if (demoStartRef.current === 0) demoStartRef.current = time
 
-            // DESPERATE SEARCH: Wide, smooth sweeps (Looking "here and there")
-            const lookX = Math.sin(time * 3) * 0.8 + Math.sin(time * 1.5) * 1.2
-            const lookY = Math.cos(time * 2.5) * 0.5 + Math.sin(time * 1) * 0.3
+            const elapsed = time - demoStartRef.current
+            const delay = 2.5 // 2.5s delay before panic sets in
 
-            lookAt.x += lookX
-            lookAt.y += lookY
+            if (elapsed > delay) {
+                const shakeTime = elapsed - delay
+                // Fade in shake over 2 seconds (0 to 1)
+                const intensity = Math.min(1, shakeTime / 2.0)
 
-            // Body Sway
-            posX = Math.sin(time * 2) * 0.1
-            posY = Math.cos(time * 1.5) * 0.05
+                // DESPERATE SEARCH: Wide, smooth sweeps (Looking "here and there")
+                // Use shakeTime so waves start at 0 (sin(0)=0) to blend from current position
+                // Note: We use sin for both to ensure they start at 0.
+                const lookX = (Math.sin(shakeTime * 3) * 0.8 + Math.sin(shakeTime * 1.5) * 1.2) * intensity
+                const lookY = (Math.sin(shakeTime * 2.5) * 0.5 + Math.sin(shakeTime * 1) * 0.3) * intensity
+
+                lookAt.x += lookX
+                lookAt.y += lookY
+
+                // Body Sway - naturally low at 0
+                posX = Math.sin(shakeTime * 2) * 0.1 * intensity
+                posY = Math.sin(shakeTime * 1.5) * 0.05 * intensity
+            }
 
             camera.rotation.z = 0
         } else {
+            demoStartRef.current = 0
             camera.rotation.z = 0
         }
 
@@ -1958,7 +1964,7 @@ function VintageFloorLamp() {
                 <meshStandardMaterial
                     color={demogorgonMode ? "#FFB347" : "#E2D4B7"} // Aged parchment
                     emissive={demogorgonMode ? "#FF6B6B" : "#FF9E5E"} // Slight warm emission always
-                    emissiveIntensity={demogorgonMode ? flicker * 0.5 : 0.1} // Gentle self-illumination
+                    emissiveIntensity={demogorgonMode ? flicker * 0.5 : 0.3} // Gentle self-illumination
                     roughness={0.9}
                     side={THREE.DoubleSide}
                     transparent
@@ -1968,7 +1974,7 @@ function VintageFloorLamp() {
             {/* Warm light - flickers in demogorgon mode */}
             <pointLight
                 position={[0, 1.4, 0]}
-                intensity={demogorgonMode ? flicker * 0.6 : 0.35}
+                intensity={demogorgonMode ? flicker * 0.6 : 0.8}
                 color={demogorgonMode ? "#FF6B6B" : "#FFD0A0"} // Soft warm light
                 distance={6}
                 decay={2}
@@ -2526,14 +2532,14 @@ function RoomLighting() {
         <>
             {/* Minimal ambient - Cool-neutral shadows as per grading brief (not warm beige) */}
             <ambientLight
-                intensity={demogorgonMode ? flicker1 * 0.15 : 0.8}
+                intensity={demogorgonMode ? flicker1 * 0.15 : 2.5}
                 color={demogorgonMode ? "#FF4444" : "#14161A"} // Cool dark grey-blue
             />
 
             {/* Subtle fill light from the side - Warm Incandescent but soft (not orange) */}
             <pointLight
                 position={[4, 1, 0]}
-                intensity={demogorgonMode ? flicker2 * 0.25 : 1.2}
+                intensity={demogorgonMode ? flicker2 * 0.25 : 3.5}
                 color={demogorgonMode ? "#FF6B6B" : "#FFD8B0"} // Softer warm
                 distance={15}
                 decay={2}
@@ -3041,6 +3047,12 @@ export default function RoomPage() {
                         activeSourcesRef.current = []; // Clear list
                         if (bgAudioRef.current) bgAudioRef.current.pause();
 
+                        // FINAL THUMP - The knockout blow
+                        // Played AFTER others are cut so it rings into the silence
+                        if (punchBufferRef.current) {
+                            playBuffer(punchBufferRef.current, 1.5, false);
+                        }
+
                         setTransitionPhase('flip'); // Triggers fade to black (eyes closing)
                         setLightsFlickering(false);
                         setShowAttackRed(false); // Remove "RUN" overlay instantly for pitch black
@@ -3118,7 +3130,14 @@ export default function RoomPage() {
                 {!introFinished && (
                     <CinematicIntro
                         onStart={playIntroDrone}
-                        onComplete={() => setIntroFinished(true)}
+                        onComplete={() => {
+                            setIntroFinished(true)
+                            // Trigger "Wake Up" eyes effect
+                            setTransitionPhase('reveal')
+                            setTimeout(() => {
+                                setTransitionPhase('none')
+                            }, 4000)
+                        }}
                     />
                 )}
 
