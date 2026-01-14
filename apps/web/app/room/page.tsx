@@ -535,7 +535,7 @@ function UpsideDownVines() {
                 const move = currentDir.clone().multiplyScalar(stepSize)
                 currentPos.add(move)
 
-                // 3D Depth noise - REMOVED for strict wall adherence
+                // 3D Depth noise - REMOVED for strictly flat on wall
                 // const depthOffset = wallNormal.clone().multiplyScalar(Math.sin(i * 0.6) * 0.01)
 
                 points.push(currentPos.clone())
@@ -574,7 +574,7 @@ function UpsideDownVines() {
             wallU: THREE.Vector3,
             wallV: THREE.Vector3
         ) => {
-            // Spawn 1-2 main arteries (More spread out)
+            // Spawn 1-2 main arteries (Reduced density)
             const arteryCount = 1 + Math.floor(Math.random() * 2)
 
             // Floor vines shouldn't grow as long to avoid crossing center
@@ -586,25 +586,46 @@ function UpsideDownVines() {
                     .addScaledVector(wallU, Math.cos(angle))
                     .addScaledVector(wallV, Math.sin(angle))
 
-                // Thinner main vines (0.06 instead of 0.1)
-                growVein(center, dir, wallNormal, wallU, wallV, 3, 0.06, growLength)
+                // Thinner main vines (0.05 instead of 0.1)
+                growVein(center, dir, wallNormal, wallU, wallV, 3, 0.05, growLength)
             }
         }
 
-        // BACK WALL (Z = -6) - Split Top/Bottom to avoid middle text row
-        // Top Spawn
-        spawnWebNode(
-            new THREE.Vector3(-2 + Math.random() * 4, 2.5, -5.9),
+        // BACK WALL (Z = -6) - EDGE ONLY (Keep center text clean)
+        // Top Corners
+        growVein(
+            new THREE.Vector3(-4, 2.2, -5.9),
+            new THREE.Vector3(1, -0.2, 0).normalize(), // Grow right/down slightly
             new THREE.Vector3(0, 0, 1),
             new THREE.Vector3(1, 0, 0),
-            new THREE.Vector3(0, 1, 0)
+            new THREE.Vector3(0, 1, 0),
+            3, 0.05, 3.5
         )
-        // Bottom Spawn
-        spawnWebNode(
-            new THREE.Vector3(-2 + Math.random() * 4, -2.0, -5.9),
+        growVein(
+            new THREE.Vector3(4, 2.2, -5.9),
+            new THREE.Vector3(-1, -0.2, 0).normalize(), // Grow left/down slightly
             new THREE.Vector3(0, 0, 1),
             new THREE.Vector3(1, 0, 0),
-            new THREE.Vector3(0, 1, 0)
+            new THREE.Vector3(0, 1, 0),
+            3, 0.05, 3.5
+        )
+
+        // Bottom Corners
+        growVein(
+            new THREE.Vector3(-4, -1.8, -5.9),
+            new THREE.Vector3(1, 0.2, 0).normalize(), // Grow right/up slightly
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 1, 0),
+            3, 0.05, 3.0
+        )
+        growVein(
+            new THREE.Vector3(4, -1.8, -5.9),
+            new THREE.Vector3(-1, 0.2, 0).normalize(), // Grow left/up slightly
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 1, 0),
+            3, 0.05, 3.0
         )
 
         // LEFT WALL (X = -6) - Avoid deep back corner (Z=-6)
@@ -617,18 +638,18 @@ function UpsideDownVines() {
             )
         }
 
-        // RIGHT WALL (X = 6) - Avoid deep back corner
+        // RIGHT WALL (X = 6) - Keep it simple
         for (let i = 0; i < 2; i++) {
             spawnWebNode(
-                new THREE.Vector3(5.9, -1 + Math.random() * 6, -2 + Math.random() * 6), // Z from -2 to +4
+                new THREE.Vector3(5.9, -1 + Math.random() * 6, -2 + Math.random() * 6),
                 new THREE.Vector3(-1, 0, 0),
                 new THREE.Vector3(0, 0, -1),
                 new THREE.Vector3(0, 1, 0)
             )
         }
 
-        // FLOOR (Y = 0) - Only far end, away from corners and camera
-        for (let i = 0; i < 2; i++) { // Reduced count
+        // FLOOR (Y = 0) - Only far end
+        for (let i = 0; i < 1; i++) { // Reduced count
             spawnWebNode(
                 new THREE.Vector3(-3 + Math.random() * 6, 0.05, -3.5 - Math.random() * 1.5), // Z: -3.5 to -5.0
                 new THREE.Vector3(0, 1, 0),
