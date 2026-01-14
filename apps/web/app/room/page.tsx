@@ -535,10 +535,10 @@ function UpsideDownVines() {
                 const move = currentDir.clone().multiplyScalar(stepSize)
                 currentPos.add(move)
 
-                // 3D Depth noise (mostly flat on wall)
-                const depthOffset = wallNormal.clone().multiplyScalar(Math.sin(i * 0.6) * 0.01)
+                // 3D Depth noise - REMOVED for strict wall adherence
+                // const depthOffset = wallNormal.clone().multiplyScalar(Math.sin(i * 0.6) * 0.01)
 
-                points.push(currentPos.clone().add(depthOffset))
+                points.push(currentPos.clone())
 
                 // BRANCHING (The "Spider Web" effect)
                 // Middle generations branch often
@@ -574,8 +574,8 @@ function UpsideDownVines() {
             wallU: THREE.Vector3,
             wallV: THREE.Vector3
         ) => {
-            // Spawn 2-3 main arteries
-            const arteryCount = 2 + Math.floor(Math.random() * 2)
+            // Spawn 1-2 main arteries (More spread out)
+            const arteryCount = 1 + Math.floor(Math.random() * 2)
 
             // Floor vines shouldn't grow as long to avoid crossing center
             const growLength = center.y < 0.5 ? 2.5 : 5.0
@@ -586,19 +586,26 @@ function UpsideDownVines() {
                     .addScaledVector(wallU, Math.cos(angle))
                     .addScaledVector(wallV, Math.sin(angle))
 
-                growVein(center, dir, wallNormal, wallU, wallV, 3, 0.1, growLength)
+                // Thinner main vines (0.06 instead of 0.1)
+                growVein(center, dir, wallNormal, wallU, wallV, 3, 0.06, growLength)
             }
         }
 
-        // BACK WALL (Z = -6) - Keep central, avoid corners
-        for (let i = 0; i < 2; i++) {
-            spawnWebNode(
-                new THREE.Vector3(-2 + Math.random() * 4, -1 + Math.random() * 6, -5.9),
-                new THREE.Vector3(0, 0, 1),
-                new THREE.Vector3(1, 0, 0),
-                new THREE.Vector3(0, 1, 0)
-            )
-        }
+        // BACK WALL (Z = -6) - Split Top/Bottom to avoid middle text row
+        // Top Spawn
+        spawnWebNode(
+            new THREE.Vector3(-2 + Math.random() * 4, 2.5, -5.9),
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 1, 0)
+        )
+        // Bottom Spawn
+        spawnWebNode(
+            new THREE.Vector3(-2 + Math.random() * 4, -2.0, -5.9),
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 1, 0)
+        )
 
         // LEFT WALL (X = -6) - Avoid deep back corner (Z=-6)
         for (let i = 0; i < 2; i++) {
@@ -792,35 +799,35 @@ function AlphabetWall({ isUpsideDown = false }: { isUpsideDown?: boolean }) {
                     points.push(new THREE.Vector3(
                         attachPoint.x + 0.4,
                         attachPoint.y - 0.1, // Start dropping earlier
-                        attachPoint.z
+                        attachPoint.z + 0.02 // Stay on wall
                     ))
 
                     // 2. Loop Out and Down
                     points.push(new THREE.Vector3(
                         attachPoint.x + 0.8, // Far right
                         gutterY - 0.1, // Lower start of loop
-                        attachPoint.z + 0.2
+                        attachPoint.z + 0.02 // Stay on wall
                     ))
 
-                    // 3. Traverse Left across the room (hanging VERY low)
+                    // 3. Traverse Left across the room (hanging LOW but ON WALL)
                     points.push(new THREE.Vector3(
-                        0, // Center of room
+                        0, // Center of room x-wise
                         gutterY - 0.45, // Significantly lower to clear text
-                        attachPoint.z + 0.4 // Hanging away from wall
+                        attachPoint.z + 0.05 // Tiny offset to avoid z-fighting
                     ))
 
                     // 4. Loop Far Left (past the target)
                     points.push(new THREE.Vector3(
                         nextAttach.x - 0.8, // Far left
                         gutterY - 0.05, // Start coming up
-                        nextAttach.z + 0.2
+                        nextAttach.z + 0.02 // Stay on wall
                     ))
 
                     // 5. Hook into the new bulb from left
                     points.push(new THREE.Vector3(
                         nextAttach.x - 0.4,
                         nextAttach.y,
-                        nextAttach.z + 0.1
+                        nextAttach.z + 0.02
                     ))
 
                 } else {
