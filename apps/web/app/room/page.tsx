@@ -1,12 +1,8 @@
 "use client"
 
 import { Suspense, useRef, useState, useEffect, useMemo, createContext, useContext, useCallback } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import {
-    PerspectiveCamera,
-    Html,
-    useProgress,
-} from "@react-three/drei"
+import { Canvas, useFrame } from '@react-three/fiber'
+import { PerspectiveCamera, OrbitControls, useProgress, Html } from '@react-three/drei'
 import * as THREE from "three"
 
 // Keyboard context for letter activation
@@ -22,7 +18,7 @@ const KeyboardContext = createContext<KeyboardContextType>({
     typedSequence: "",
 })
 
-const useKeyboard = () => useContext(KeyboardContext)
+export const useKeyboard = () => useContext(KeyboardContext)
 
 // Loading screen component
 function Loader() {
@@ -44,130 +40,61 @@ function Loader() {
     )
 }
 
-// Camera controller for mouse-based look around
-function CameraController() {
-    const { camera, gl } = useThree()
-    const isDragging = useRef(false)
-    const previousMousePosition = useRef({ x: 0, y: 0 })
-    const spherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
-    const targetSpherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
+// Scene Camera with Shake Effect
+function SceneCamera({ lightsFlickering }: { lightsFlickering?: boolean }) {
+    const cameraRef = useRef<THREE.Group>(null)
 
-    useEffect(() => {
-        const domElement = gl.domElement
+    // Shake animation
+    useFrame((state) => {
+        if (!cameraRef.current) return
 
-        const handleMouseDown = (e: MouseEvent) => {
-            isDragging.current = true
-            previousMousePosition.current = { x: e.clientX, y: e.clientY }
-            domElement.style.cursor = "grabbing"
+        if (lightsFlickering) {
+            // Violent earthquake shake using pseudo-random noise
+            const time = state.clock.getElapsedTime()
+            const intensity = 0.8 // High intensity shake
+
+            // Jitter rotation slightly on all axes
+            cameraRef.current.rotation.x = (Math.sin(time * 25) + Math.cos(time * 35)) * 0.02 * intensity
+            cameraRef.current.rotation.y = (Math.cos(time * 30) + Math.sin(time * 40)) * 0.02 * intensity
+            cameraRef.current.rotation.z = (Math.sin(time * 50)) * 0.01 * intensity
+
+            // Jitter position slightly
+            cameraRef.current.position.y = (Math.sin(time * 60)) * 0.05 * intensity
+            cameraRef.current.position.x = (Math.cos(time * 45)) * 0.05 * intensity
+        } else {
+            // Smoothly recover to original state (damped spring-like)
+            cameraRef.current.rotation.x = THREE.MathUtils.lerp(cameraRef.current.rotation.x, 0, 0.1)
+            cameraRef.current.rotation.y = THREE.MathUtils.lerp(cameraRef.current.rotation.y, 0, 0.1)
+            cameraRef.current.rotation.z = THREE.MathUtils.lerp(cameraRef.current.rotation.z, 0, 0.1)
+            cameraRef.current.position.y = THREE.MathUtils.lerp(cameraRef.current.position.y, 0, 0.1)
+            cameraRef.current.position.x = THREE.MathUtils.lerp(cameraRef.current.position.x, 0, 0.1)
         }
-
-        const handleMouseUp = () => {
-            isDragging.current = false
-            domElement.style.cursor = "grab"
-        }
-
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!isDragging.current) return
-
-            const deltaX = e.clientX - previousMousePosition.current.x
-            const deltaY = e.clientY - previousMousePosition.current.y
-
-            const rotationSpeed = 0.003
-
-            targetSpherical.current.theta -= deltaX * rotationSpeed
-            targetSpherical.current.phi += deltaY * rotationSpeed
-
-            targetSpherical.current.phi = Math.max(
-                0.1,
-                Math.min(Math.PI - 0.1, targetSpherical.current.phi)
-            )
-
-            previousMousePosition.current = { x: e.clientX, y: e.clientY }
-        }
-
-        const handleTouchStart = (e: TouchEvent) => {
-            const touch = e.touches[0]
-            if (e.touches.length === 1 && touch) {
-                isDragging.current = true
-                previousMousePosition.current = {
-                    x: touch.clientX,
-                    y: touch.clientY,
-                }
-            }
-        }
-
-        const handleTouchEnd = () => {
-            isDragging.current = false
-        }
-
-        const handleTouchMove = (e: TouchEvent) => {
-            const touch = e.touches[0]
-            if (!isDragging.current || e.touches.length !== 1 || !touch) return
-
-            const deltaX = touch.clientX - previousMousePosition.current.x
-            const deltaY = touch.clientY - previousMousePosition.current.y
-
-            const rotationSpeed = 0.003
-
-            targetSpherical.current.theta -= deltaX * rotationSpeed
-            targetSpherical.current.phi += deltaY * rotationSpeed
-
-            targetSpherical.current.phi = Math.max(
-                0.1,
-                Math.min(Math.PI - 0.1, targetSpherical.current.phi)
-            )
-
-            previousMousePosition.current = {
-                x: touch.clientX,
-                y: touch.clientY,
-            }
-        }
-
-        domElement.style.cursor = "grab"
-        domElement.addEventListener("mousedown", handleMouseDown)
-        domElement.addEventListener("mouseup", handleMouseUp)
-        domElement.addEventListener("mouseleave", handleMouseUp)
-        domElement.addEventListener("mousemove", handleMouseMove)
-        domElement.addEventListener("touchstart", handleTouchStart)
-        domElement.addEventListener("touchend", handleTouchEnd)
-        domElement.addEventListener("touchmove", handleTouchMove)
-
-        return () => {
-            domElement.removeEventListener("mousedown", handleMouseDown)
-            domElement.removeEventListener("mouseup", handleMouseUp)
-            domElement.removeEventListener("mouseleave", handleMouseUp)
-            domElement.removeEventListener("mousemove", handleMouseMove)
-            domElement.removeEventListener("touchstart", handleTouchStart)
-            domElement.removeEventListener("touchend", handleTouchEnd)
-            domElement.removeEventListener("touchmove", handleTouchMove)
-        }
-    }, [gl])
-
-    useFrame(() => {
-        spherical.current.theta +=
-            (targetSpherical.current.theta - spherical.current.theta) * 0.08
-        spherical.current.phi +=
-            (targetSpherical.current.phi - spherical.current.phi) * 0.08
-
-        const lookAt = new THREE.Vector3()
-        lookAt.setFromSpherical(spherical.current)
-
-        camera.position.set(0, 0, 0)
-        camera.lookAt(lookAt)
     })
 
-    return null
+    return (
+        <group ref={cameraRef}>
+            <PerspectiveCamera makeDefault position={[0, 1.5, 2.5]} fov={50} />
+            <OrbitControls
+                enableZoom={false}
+                enablePan={false}
+                target={[0, 0.5, -5]}
+                maxPolarAngle={Math.PI / 1.8}
+                minPolarAngle={Math.PI / 2.5}
+                maxAzimuthAngle={Math.PI / 4}
+                minAzimuthAngle={-Math.PI / 4}
+                rotateSpeed={0.5}
+            />
+        </group>
+    )
 }
 
 // Worn wall with imperfections
 function WornWall({
     position,
     rotation,
-    isAlphabetWall = false,
 }: {
     position: [number, number, number]
     rotation: [number, number, number]
-    isAlphabetWall?: boolean
 }) {
     const meshRef = useRef<THREE.Mesh>(null)
 
@@ -321,58 +248,35 @@ function AlphabetLetter({
     )
 }
 
-// Christmas light bulb with diffused glow
+// ChristmasLightBulb component (individual light)
 function ChristmasLightBulb({
     position,
     color,
-    intensity,
+    intensity = 1.0,
     isLit,
     flickerSeed,
 }: {
     position: [number, number, number]
     color: string
-    intensity: number
+    intensity?: number
     isLit: boolean
     flickerSeed: number
 }) {
-    const [currentIntensity, setCurrentIntensity] = useState(intensity)
-
-    // Flicker effect
-    useFrame(({ clock }) => {
-        if (!isLit) {
-            setCurrentIntensity(0)
-            return
-        }
-
-        // Perlin-like noise for natural flicker
-        const time = clock.getElapsedTime()
-        const noise =
-            Math.sin(time * 2.3 + flickerSeed) * 0.08 +
-            Math.sin(time * 4.7 + flickerSeed * 2.1) * 0.04 +
-            Math.sin(time * 9.3 + flickerSeed * 3.2) * 0.02
-
-        const flicker = intensity * (0.9 + noise)
-        setCurrentIntensity(Math.max(0.2, flicker))
-    })
-
-    const bulbColor = useMemo(() => new THREE.Color(color), [color])
-    const emissiveIntensity = isLit ? currentIntensity * 3 : 0
-
-    // Create a radial gradient texture for soft glow
+    // Generate glow texture programmatically
     const glowTexture = useMemo(() => {
         const canvas = document.createElement("canvas")
         canvas.width = 64
         canvas.height = 64
         const ctx = canvas.getContext("2d")!
 
-        // Radial gradient for soft, round glow
+        // Radial gradient for soft glow
         const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32)
         gradient.addColorStop(0, "rgba(255, 255, 255, 1)")
         gradient.addColorStop(0.2, "rgba(255, 255, 255, 0.8)")
-        gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.3)")
-        gradient.addColorStop(0.8, "rgba(255, 255, 255, 0.1)")
-        gradient.addColorStop(1, "rgba(255, 255, 255, 0)")
+        gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.2)")
+        gradient.addColorStop(1, "rgba(0, 0, 0, 0)") // Transparent
 
+        ctx.clearRect(0, 0, 64, 64)
         ctx.fillStyle = gradient
         ctx.fillRect(0, 0, 64, 64)
 
@@ -381,458 +285,228 @@ function ChristmasLightBulb({
         return texture
     }, [])
 
+    const [currentIntensity, setCurrentIntensity] = useState(intensity)
+    const { demogorgonMode } = useKeyboard()
+
+    useFrame((state) => {
+        if (!isLit) {
+            setCurrentIntensity(0)
+            return
+        }
+
+        // Base flicker calculation
+        const time = state.clock.elapsedTime
+        let flicker = 1.0
+
+        if (demogorgonMode) {
+            // Chaotic violent flicker
+            const noise = Math.sin(time * 50 + flickerSeed * 13.0)
+                + Math.sin(time * 30 + flickerSeed * 29.0) * 0.5
+            flicker = 2.0 + noise // Much brighter base
+        } else {
+            // Gentle hum
+            const noise = Math.sin(time * 3 + flickerSeed) * 0.1
+            flicker = 1.0 + noise
+        }
+
+        setCurrentIntensity(Math.max(0.1, intensity * flicker))
+    })
+
     return (
         <group position={position}>
-            {/* Bulb glass - classic Christmas light shape */}
+            {/* Bulb mesh */}
             <mesh>
-                <sphereGeometry args={[0.032, 16, 16]} />
+                <sphereGeometry args={[0.035, 16, 16]} />
                 <meshStandardMaterial
-                    color={bulbColor}
-                    emissive={bulbColor}
-                    emissiveIntensity={emissiveIntensity}
-                    transparent
-                    opacity={isLit ? 0.95 : 0.6}
-                    roughness={0.15}
-                    metalness={0.05}
+                    color={isLit ? color : "#222"}
+                    emissive={isLit ? color : "#000"}
+                    emissiveIntensity={isLit ? currentIntensity : 0}
+                    roughness={0.2}
+                    metalness={0.1}
                 />
             </mesh>
 
-            {/* Bulb socket/cap */}
-            <mesh position={[0, 0.038, 0]}>
-                <cylinderGeometry args={[0.012, 0.016, 0.025, 8]} />
-                <meshStandardMaterial color="#1A1A1A" roughness={0.7} metalness={0.2} />
-            </mesh>
-
-            {/* Point light for illumination */}
+            {/* Glow sprite */}
+            {isLit && (
+                <sprite scale={[0.15 * currentIntensity, 0.15 * currentIntensity, 1]}>
+                    <spriteMaterial
+                        map={glowTexture}
+                        color={color}
+                        transparent
+                        opacity={demogorgonMode ? 0.9 : 0.6}
+                        blending={THREE.AdditiveBlending}
+                        depthWrite={false}
+                    />
+                </sprite>
+            )}
             {isLit && (
                 <pointLight
                     color={color}
-                    intensity={currentIntensity * 0.5}
-                    distance={2}
+                    intensity={currentIntensity * 0.3}
+                    distance={1.5}
                     decay={2}
                 />
-            )}
-
-            {/* Inner bright glow - small and intense */}
-            {isLit && (
-                <sprite scale={[0.1 * currentIntensity, 0.1 * currentIntensity, 1]}>
-                    <spriteMaterial
-                        map={glowTexture}
-                        color={color}
-                        transparent
-                        opacity={0.9}
-                        blending={THREE.AdditiveBlending}
-                        depthWrite={false}
-                    />
-                </sprite>
-            )}
-
-            {/* Middle glow layer - softer spread */}
-            {isLit && (
-                <sprite scale={[0.2 * currentIntensity, 0.2 * currentIntensity, 1]}>
-                    <spriteMaterial
-                        map={glowTexture}
-                        color={color}
-                        transparent
-                        opacity={0.5}
-                        blending={THREE.AdditiveBlending}
-                        depthWrite={false}
-                    />
-                </sprite>
-            )}
-
-            {/* Outer glow layer - very soft ambient */}
-            {isLit && (
-                <sprite scale={[0.35 * currentIntensity, 0.35 * currentIntensity, 1]}>
-                    <spriteMaterial
-                        map={glowTexture}
-                        color={color}
-                        transparent
-                        opacity={0.25}
-                        blending={THREE.AdditiveBlending}
-                        depthWrite={false}
-                    />
-                </sprite>
             )}
         </group>
     )
 }
 
 // Christmas light wire
-function LightWire({
-    points,
-}: {
-    points: THREE.Vector3[]
-}) {
+function LightWire({ points }: { points: THREE.Vector3[] }) {
     const curve = useMemo(() => {
-        return new THREE.CatmullRomCurve3(points)
+        if (points.length < 2) return null
+        return new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.2)
     }, [points])
+
+    if (!curve) return null
 
     return (
         <mesh>
             <tubeGeometry args={[curve, 64, 0.008, 8, false]} />
-            <meshStandardMaterial color="#1A1A1A" roughness={0.9} metalness={0.1} />
+            <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
         </mesh>
     )
 }
 
+// Hand-painted color palette
+const paintColors = [
+    "rgb(20, 15, 12)",     // almost black
+    "rgb(25, 15, 15)",     // black with hint of red
+    "rgb(15, 18, 25)",     // black with hint of blue
+]
+
+// Bulb Colors
+const bulbColors = [
+    "#FFB347", "#FFCC66", "#FF6B6B", "#77DD77", "#89CFF0", "#FFD700", "#FF9966", "#FFAA00"
+]
+
 // Complete alphabet wall with lights
 function AlphabetWall() {
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    const { activeLetter, demogorgonMode } = useKeyboard()
 
-    // Hand-painted color palette - VERY dark, nearly black like original Stranger Things
-    // Joyce painted these in the dark with old paint - they should be scary and almost invisible
-    const paintColors = [
-        "rgb(20, 15, 12)",     // almost black
-        "rgb(25, 15, 15)",     // black with hint of red
-        "rgb(15, 18, 25)",     // black with hint of blue
-        "rgb(22, 18, 14)",     // charcoal black
-        "rgb(28, 12, 15)",     // very dark dried blood
-        "rgb(18, 15, 22)",     // black with purple tint
-        "rgb(30, 18, 12)",     // very dark rust black
-        "rgb(15, 22, 22)",     // black with teal hint
-    ]
-
-    // Christmas light colors (warm tungsten variations)
-    const lightColors = [
-        "#FFB347", // warm orange
-        "#FFCC66", // yellow
-        "#FF6B6B", // soft red
-        "#77DD77", // soft green
-        "#89CFF0", // soft blue
-        "#FFD700", // gold
-        "#FF9966", // peach
-        "#FFAA00", // amber
-    ]
-
-    // Define stable random offsets using seeded approach (deterministic based on index)
     const seededRandom = (seed: number) => {
         const x = Math.sin(seed * 12.9898) * 43758.5453
         return x - Math.floor(x)
     }
 
-    // Letter positions organized by rows
-    const letterData = useMemo(() => {
-        const row1: { letter: string; pos: [number, number, number]; color: string }[] = []
-        const row2: { letter: string; pos: [number, number, number]; color: string }[] = []
-        const row3: { letter: string; pos: [number, number, number]; color: string }[] = []
+    // Generate Layout Data once
+    const layoutData = useMemo(() => {
+        const letters: { letter: string; pos: [number, number, number]; color: string; bulbPos: [number, number, number]; bulbColor: string }[] = []
 
-        // Row 1: A-I (9 letters)
-        for (let i = 0; i <= 8; i++) {
-            const x = -3.2 + i * 0.72
-            const y = 1.1 + (seededRandom(i * 3.7) - 0.5) * 0.06
-            row1.push({
-                letter: alphabet[i] ?? '',
-                pos: [x, y, -5.94],
-                color: paintColors[i % paintColors.length] ?? 'rgb(20, 15, 12)',
+        // Rows configuration
+        const rows = [
+            { chars: "ABCDEFGH", y: 0.8, xStart: -1.8, space: 0.55 },
+            { chars: "IJKLMNOP", y: 0.0, xStart: -1.75, space: 0.55 }, // Offset slightly
+            { chars: "QRSTUVWXYZ", y: -0.8, xStart: -2.0, space: 0.52 }
+        ]
+
+        let globalIndex = 0
+        rows.forEach((row) => {
+            row.chars.split('').forEach((char, i) => {
+                const xBase = row.xStart + i * row.space
+                // Humanize positions
+                const x = xBase + (seededRandom(globalIndex * 13.2) - 0.5) * 0.1
+                const y = row.y + (seededRandom(globalIndex * 17.5) - 0.5) * 0.15
+
+                letters.push({
+                    letter: char,
+                    pos: [x, y, -5.94], // On wall
+                    color: paintColors[globalIndex % paintColors.length] ?? '#000000',
+                    bulbPos: [x, y + 0.25, -5.92], // Bulb above letter
+                    bulbColor: bulbColors[globalIndex % bulbColors.length] ?? '#FFB347'
+                })
+                globalIndex++
             })
-        }
-
-        // Row 2: J-Q (8 letters)
-        for (let i = 0; i <= 7; i++) {
-            const letterIndex = 9 + i
-            const x = -2.9 + i * 0.72
-            const y = 0.45 + (seededRandom(letterIndex * 4.3) - 0.5) * 0.06
-            row2.push({
-                letter: alphabet[letterIndex] ?? '',
-                pos: [x, y, -5.94],
-                color: paintColors[letterIndex % paintColors.length] ?? 'rgb(20, 15, 12)',
-            })
-        }
-
-        // Row 3: R-Z (9 letters)
-        for (let i = 0; i <= 8; i++) {
-            const letterIndex = 17 + i
-            const x = -3.2 + i * 0.72
-            const y = -0.2 + (seededRandom(letterIndex * 5.1) - 0.5) * 0.06
-            row3.push({
-                letter: alphabet[letterIndex] ?? '',
-                pos: [x, y, -5.94],
-                color: paintColors[letterIndex % paintColors.length] ?? 'rgb(20, 15, 12)',
-            })
-        }
-
-        return { row1, row2, row3 }
+        })
+        return letters
     }, [])
 
-    // Generate light bulbs per row
-    const lightBulbsData = useMemo(() => {
-        const createRowBulbs = (
-            row: typeof letterData.row1,
-            rowIndex: number
-        ) => {
-            return row.map((letter, i) => ({
-                position: [
-                    letter.pos[0],
-                    letter.pos[1] + 0.22,
-                    letter.pos[2] + 0.03
-                ] as [number, number, number],
-                color: lightColors[(rowIndex * 3 + i) % lightColors.length] ?? '#FFB347',
-                intensity: 0.7 + seededRandom(rowIndex * 10 + i) * 0.3,
-                flickerSeed: rowIndex * 100 + i * 7.3,
-            }))
-        }
+    // Generate Wires separately based on bulb positions
+    const wirePath = useMemo(() => {
+        const points: THREE.Vector3[] = []
+        // Start off-screen left
+        points.push(new THREE.Vector3(-4, 1.5, -5.9))
 
-        return {
-            row1Bulbs: createRowBulbs(letterData.row1, 0),
-            row2Bulbs: createRowBulbs(letterData.row2, 1),
-            row3Bulbs: createRowBulbs(letterData.row3, 2),
-        }
-    }, [letterData])
+        layoutData.forEach((item, i) => {
+            // Bulb location
+            points.push(new THREE.Vector3(...item.bulbPos))
 
-    // Generate a single serpentine wire path flowing through all rows
-    // Pattern: Left→Right (A-I), drop down, Right→Left (Q-J), drop down, Left→Right (R-Z)
-    const wirePaths = useMemo(() => {
-        const wire: THREE.Vector3[] = []
+            // Interaction: Loop/sag between bulbs
+            if (i < layoutData.length - 1) {
+                const next = layoutData[i + 1]
+                const curr = item
 
-        const row1 = lightBulbsData.row1Bulbs // A-I, left to right
-        const row2 = [...lightBulbsData.row2Bulbs].reverse() // Q-J, right to left (reversed)
-        const row3 = lightBulbsData.row3Bulbs // R-Z, left to right
+                if (!next) return
 
-        // Helper to add messy sag points between bulbs
-        const addBulbConnection = (
-            prevPos: [number, number, number],
-            currPos: [number, number, number],
-            index: number
-        ) => {
-            // Messy sag - varies quite a bit
-            const sagAmount = 0.03 + seededRandom(index * 3.14) * 0.06
-            const midX = (prevPos[0] + currPos[0]) / 2 + (seededRandom(index * 7.7) - 0.5) * 0.08
-            const midY = Math.min(prevPos[1], currPos[1]) - sagAmount
+                // If dropping to new row, drape longer
+                const isNewRow = Math.abs(curr.bulbPos[1] - next.bulbPos[1]) > 0.4
 
-            // Add sag point
-            wire.push(new THREE.Vector3(midX, midY, -5.92 + (seededRandom(index) - 0.5) * 0.02))
-
-            // Add bulb position
-            wire.push(new THREE.Vector3(
-                currPos[0] + (seededRandom(index * 2.3) - 0.5) * 0.02,
-                currPos[1] + 0.035,
-                -5.92
-            ))
-        }
-
-        // === START: Wire comes in from the left wall ===
-        wire.push(new THREE.Vector3(-5.8, 1.6, -5.92)) // enters from left, high
-        wire.push(new THREE.Vector3(-5.2, 1.45 + seededRandom(0.1) * 0.1, -5.92)) // droop down
-        wire.push(new THREE.Vector3(-4.5, 1.38, -5.92)) // slight sag
-
-        // === ROW 1: A to I (left to right) ===
-        if (row1.length > 0 && row1[0]) {
-            // Connect to first bulb (A)
-            wire.push(new THREE.Vector3(
-                row1[0].position[0],
-                row1[0].position[1] + 0.035,
-                -5.92
-            ))
-
-            // Go through A-I
-            for (let i = 1; i < row1.length; i++) {
-                const prev = row1[i - 1]
-                const curr = row1[i]
-                if (prev && curr) {
-                    addBulbConnection(prev.position, curr.position, i)
+                if (isNewRow) {
+                    // Drape down
+                    points.push(new THREE.Vector3(
+                        (curr.bulbPos[0] + next.bulbPos[0]) * 0.5,
+                        Math.min(curr.bulbPos[1], next.bulbPos[1]) + 0.1, // Loop up then down? No, just drape
+                        -5.9
+                    ))
+                } else {
+                    // Small sag
+                    points.push(new THREE.Vector3(
+                        (curr.bulbPos[0] + next.bulbPos[0]) * 0.5,
+                        curr.bulbPos[1] - 0.1, // Sag down
+                        -5.88 // Come out from wall slightly
+                    ))
                 }
             }
-        }
-
-        // === TRANSITION: Drop from I (row1 end) to Q (row2 start, which is rightmost) ===
-        const row1Last = row1[row1.length - 1]
-        const row2First = row2[0] // This is Q (rightmost of second row)
-
-        if (row1Last && row2First) {
-            // Messy drop down - wire sags and curves
-            const dropMidX = (row1Last.position[0] + row2First.position[0]) / 2 + (seededRandom(100) - 0.5) * 0.15
-            const dropMidY = (row1Last.position[1] + row2First.position[1]) / 2 + 0.05
-
-            wire.push(new THREE.Vector3(
-                row1Last.position[0] + 0.1,
-                row1Last.position[1] - 0.05,
-                -5.91
-            ))
-            wire.push(new THREE.Vector3(
-                dropMidX + 0.15,
-                dropMidY + (seededRandom(101) - 0.5) * 0.1,
-                -5.90
-            ))
-            wire.push(new THREE.Vector3(
-                row2First.position[0] + 0.05,
-                row2First.position[1] + 0.1,
-                -5.91
-            ))
-            wire.push(new THREE.Vector3(
-                row2First.position[0],
-                row2First.position[1] + 0.035,
-                -5.92
-            ))
-        }
-
-        // === ROW 2: Q to J (right to left) ===
-        for (let i = 1; i < row2.length; i++) {
-            const prev = row2[i - 1]
-            const curr = row2[i]
-            if (prev && curr) {
-                addBulbConnection(prev.position, curr.position, 20 + i)
-            }
-        }
-
-        // === TRANSITION: Drop from J (row2 end, leftmost) to R (row3 start, leftmost) ===
-        const row2Last = row2[row2.length - 1] // This is J (leftmost of second row)
-        const row3First = row3[0] // This is R (leftmost of third row)
-
-        if (row2Last && row3First) {
-            // Messy drop down to third row
-            const drop2MidY = (row2Last.position[1] + row3First.position[1]) / 2 + 0.08
-
-            wire.push(new THREE.Vector3(
-                row2Last.position[0] - 0.08,
-                row2Last.position[1] - 0.06,
-                -5.91
-            ))
-            wire.push(new THREE.Vector3(
-                row2Last.position[0] - 0.2 + (seededRandom(200) - 0.5) * 0.1,
-                drop2MidY + (seededRandom(201) - 0.5) * 0.12,
-                -5.90
-            ))
-            wire.push(new THREE.Vector3(
-                row3First.position[0] - 0.1,
-                row3First.position[1] + 0.12,
-                -5.91
-            ))
-            wire.push(new THREE.Vector3(
-                row3First.position[0],
-                row3First.position[1] + 0.035,
-                -5.92
-            ))
-        }
-
-        // === ROW 3: R to Z (left to right) ===
-        for (let i = 1; i < row3.length; i++) {
-            const prev = row3[i - 1]
-            const curr = row3[i]
-            if (prev && curr) {
-                addBulbConnection(prev.position, curr.position, 40 + i)
-            }
-        }
-
-        // === END: Wire exits or dangles after Z ===
-        const row3Last = row3[row3.length - 1]
-        if (row3Last) {
-            // Wire droops and dangles off after Z
-            wire.push(new THREE.Vector3(
-                row3Last.position[0] + 0.15,
-                row3Last.position[1] - 0.08,
-                -5.91
-            ))
-            wire.push(new THREE.Vector3(
-                row3Last.position[0] + 0.35,
-                row3Last.position[1] - 0.2,
-                -5.90
-            ))
-            wire.push(new THREE.Vector3(
-                row3Last.position[0] + 0.5,
-                row3Last.position[1] - 0.35,
-                -5.89
-            ))
-        }
-
-        return [wire]
-    }, [lightBulbsData])
-
-    // Combine all bulbs for rendering
-    const allBulbs = useMemo(() => [
-        ...lightBulbsData.row1Bulbs,
-        ...lightBulbsData.row2Bulbs,
-        ...lightBulbsData.row3Bulbs,
-    ], [lightBulbsData])
-
-    const allLetters = useMemo(() => [
-        ...letterData.row1,
-        ...letterData.row2,
-        ...letterData.row3,
-    ], [letterData])
-
-    // Get keyboard context
-    const { activeLetter, demogorgonMode } = useKeyboard()
-
-    // Map letters to bulb indices
-    const letterToBulbIndex = useMemo(() => {
-        const map: Record<string, number> = {}
-        allLetters.forEach((data, idx) => {
-            map[data.letter] = idx
         })
-        return map
-    }, [allLetters])
 
-    // Demogorgon mode flickering state
-    const [demogorgonFlicker, setDemogorgonFlicker] = useState<boolean[]>(
-        () => allBulbs.map(() => false)
-    )
+        // End off-screen right
+        points.push(new THREE.Vector3(4, -1, -5.9))
 
-    // Demogorgon chaotic flickering effect
+        return points
+    }, [layoutData])
+
+    // Demogorgon flicker Logic
+    const [demoFlickerState, setDemoFlickerState] = useState<boolean[]>(new Array(26).fill(false))
+
     useEffect(() => {
-        if (!demogorgonMode) {
-            setDemogorgonFlicker(allBulbs.map(() => false))
-            return
-        }
+        if (!demogorgonMode) return
 
-        // Chaotic, rapid flickering when Demogorgon is coming!
         const interval = setInterval(() => {
-            setDemogorgonFlicker(
-                allBulbs.map(() => Math.random() > 0.3) // 70% chance each bulb is lit
-            )
-        }, 50) // Very fast flickering
-
+            // Randomly light up 50% of bulbs every 50ms
+            setDemoFlickerState(prev => prev.map(() => Math.random() > 0.5))
+        }, 50)
         return () => clearInterval(interval)
-    }, [demogorgonMode, allBulbs])
-
-    // Calculate which bulbs should be lit
-    const litBulbs = useMemo(() => {
-        if (demogorgonMode) {
-            return demogorgonFlicker
-        }
-
-        // Normal mode - only the typed letter lights up
-        return allBulbs.map((_, idx) => {
-            if (activeLetter) {
-                const letterIdx = letterToBulbIndex[activeLetter.toUpperCase()]
-                return letterIdx === idx
-            }
-            return false // All off by default
-        })
-    }, [activeLetter, demogorgonMode, demogorgonFlicker, allBulbs, letterToBulbIndex])
+    }, [demogorgonMode])
 
     return (
         <group>
-            {/* Letters */}
-            {allLetters.map((data) => (
-                <AlphabetLetter
-                    key={data.letter}
-                    letter={data.letter}
-                    position={data.pos}
-                    color={data.color}
-                />
-            ))}
+            {/* Wires */}
+            <LightWire points={wirePath} />
 
-            {/* Wires - 3 separate rows */}
-            {wirePaths.map((points, i) => (
-                <LightWire key={`wire-${i}`} points={points} />
-            ))}
+            {layoutData.map((item, idx) => {
+                const isLit = demogorgonMode
+                    ? demoFlickerState[idx]
+                    : activeLetter === item.letter
 
-            {/* Light bulbs */}
-            {allBulbs.map((bulb, i) => (
-                <ChristmasLightBulb
-                    key={`bulb-${i}`}
-                    position={bulb.position}
-                    color={bulb.color}
-                    intensity={demogorgonMode ? 1.5 : bulb.intensity}
-                    isLit={litBulbs[i] ?? false}
-                    flickerSeed={bulb.flickerSeed}
-                />
-            ))}
+                return (
+                    <group key={item.letter}>
+                        <AlphabetLetter
+                            letter={item.letter}
+                            position={item.pos}
+                            color={item.color}
+                        />
+                        <ChristmasLightBulb
+                            position={item.bulbPos}
+                            color={item.bulbColor}
+                            isLit={!!isLit}
+                            flickerSeed={idx * 123.4}
+                        />
+                    </group>
+                )
+            })}
         </group>
     )
 }
-
 
 
 // Worn wooden floor
@@ -1569,7 +1243,7 @@ function JoyceBayersRoom() {
     return (
         <group>
             {/* Walls */}
-            <WornWall position={[0, 0.25, -6]} rotation={[0, 0, 0]} isAlphabetWall />
+            <WornWall position={[0, 0.25, -6]} rotation={[0, 0, 0]} />
             <WornWall position={[0, 0.25, 6]} rotation={[0, Math.PI, 0]} />
             <WornWall position={[-6, 0.25, 0]} rotation={[0, Math.PI / 2, 0]} />
             <WornWall position={[6, 0.25, 0]} rotation={[0, -Math.PI / 2, 0]} />
@@ -1692,6 +1366,8 @@ function UIOverlay() {
         </div>
     )
 }
+
+
 
 export default function RoomPage() {
     const [activeLetter, setActiveLetter] = useState<string | null>(null)
@@ -1867,13 +1543,12 @@ export default function RoomPage() {
                     setLightsFlickering(true)
 
                     // TIMELINE
-                    // T=0: Flicker Starts
+                    // T=0: Flicker Starts + Camera Shake
                     // T=1s: Vecna Audio Starts
                     // T=(1s + VecnaDuration - 2s): Punch Audio + Red Screen
 
                     const vecnaDuration = vecnaBufferRef.current?.duration || 5;
-                    const punchTimeRaw = vecnaDuration - 1.8; // ~2s before end (tweaked slightly)
-                    const punchDelay = Math.max(0, punchTimeRaw) * 1000;
+
 
                     // 1. Play Vecna Audio after 1s
                     setTimeout(() => {
@@ -1884,13 +1559,6 @@ export default function RoomPage() {
                     }, 1000)
 
                     // 2. Schedule Punch + Red Screen
-                    // Note: calculate relative to T=0. 
-                    // Vecna starts at T=1000. So punch relative to T=0 is 1000 + punchDelay in secs? 
-                    // No, punchDelay is calculated from duration. 
-                    // Wait, if I want it 2s before end of Vecna:
-                    // Vecna End = T+1000 + (Duration*1000)
-                    // Punch Start = Vecna End - 2000
-
                     const triggerTime = 1000 + (vecnaDuration * 1000) - 2000;
 
                     setTimeout(() => {
@@ -1945,16 +1613,18 @@ export default function RoomPage() {
         }
     }, [showTyped, typedSequence])
 
-    // Context value - Map lightsFlickering to demogorgonMode for 3D components
-    const keyboardValue = useMemo(() => ({
-        activeLetter,
-        demogorgonMode: lightsFlickering, // 3D lamps use this to flicker
-        typedSequence,
-    }), [activeLetter, lightsFlickering, typedSequence])
+
 
     return (
-        <KeyboardContext.Provider value={keyboardValue}>
-            <div className="relative w-full h-screen bg-[#0a0a0a] overflow-hidden" tabIndex={0}>
+        <KeyboardContext.Provider
+            value={{
+                activeLetter,
+                typedSequence,
+                demogorgonMode: lightsFlickering, // Map lightsFlickering to demogorgonMode for context consumers
+            }}
+        >
+            <div className="w-full h-screen bg-black relative overflow-hidden select-none cursor-grab active:cursor-grabbing">
+                {/* Vintage overlay effects */}
                 <FilmGrain />
                 <Vignette />
                 <UIOverlay />
@@ -2011,16 +1681,7 @@ export default function RoomPage() {
 
                 <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
                     <Suspense fallback={<Loader />}>
-                        <PerspectiveCamera
-                            makeDefault
-                            position={[0, 0, 0]}
-                            fov={70}
-                            near={0.1}
-                            far={100}
-                        />
-                        <CameraController />
-
-                        {/* The room */}
+                        <SceneCamera lightsFlickering={lightsFlickering} />
                         <JoyceBayersRoom />
 
                         {/* Fog for atmosphere */}
