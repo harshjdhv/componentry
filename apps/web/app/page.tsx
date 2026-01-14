@@ -46,19 +46,19 @@ function NoiseOverlay() {
 function GradientOrbs() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <motion.div 
+      <motion.div
         className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full"
         style={{ background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)" }}
         animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.8, 0.5] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute -bottom-60 -left-60 w-[800px] h-[800px] rounded-full"
         style={{ background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)" }}
         animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.6, 0.3] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full"
         style={{ background: "radial-gradient(circle, rgba(255,255,255,0.015) 0%, transparent 50%)" }}
         animate={{ rotate: 360 }}
@@ -119,8 +119,8 @@ function OrbitingElement({ className = "", duration = 20, radius = 300, startAng
   return (
     <motion.div
       className={`absolute ${className}`}
-      style={{ 
-        left: "50%", 
+      style={{
+        left: "50%",
         top: "50%",
       }}
       animate={{
@@ -133,7 +133,7 @@ function OrbitingElement({ className = "", duration = 20, radius = 300, startAng
       }}
     >
       <motion.div
-        style={{ 
+        style={{
           x: radius,
           rotate: startAngle,
         }}
@@ -151,7 +151,7 @@ function CodePreviewCard({ className = "", delay = 0 }: { className?: string; de
       transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
-      <motion.div 
+      <motion.div
         className="w-64 rounded-xl border border-border/30 bg-card/40 backdrop-blur-md shadow-2xl shadow-black/5 dark:shadow-white/5 overflow-hidden"
         animate={{ y: [-5, 5, -5] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
@@ -195,7 +195,7 @@ function ComponentPreviewCard({ className = "", delay = 0 }: { className?: strin
       transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
-      <motion.div 
+      <motion.div
         className="w-56 rounded-xl border border-border/30 bg-card/40 backdrop-blur-md shadow-2xl shadow-black/5 dark:shadow-white/5 overflow-hidden"
         animate={{ y: [5, -5, 5] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -323,7 +323,7 @@ function InfiniteMarquee() {
     "TypeScript first",
     "Tailwind powered",
   ]
-  
+
   return (
     <div className="relative overflow-hidden py-4">
       <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
@@ -344,7 +344,7 @@ function InfiniteMarquee() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, description, delay = 0 }: { icon: React.ElementType; title: string; description: string; delay?: number }) {
+function FeatureCard({ icon: Icon, title, description, delay = 0 }: { icon: React.ComponentType<{ className?: string }>; title: string; description: string; delay?: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -412,7 +412,7 @@ function AnimatedCounter({ value, suffix = "", prefix = "" }: { value: number; s
   )
 }
 
-function StatCard({ icon: Icon, value, suffix, label, delay = 0 }: { icon: React.ElementType; value: number; suffix?: string; label: string; delay?: number }) {
+function StatCard({ icon: Icon, value, suffix, label, delay = 0 }: { icon: React.ComponentType<{ className?: string }>; value: number; suffix?: string; label: string; delay?: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -467,7 +467,7 @@ export default function Page(): React.JSX.Element {
   const { scrollYProgress } = useScroll()
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95])
-  
+
   return (
     <div className="min-h-svh relative">
       <NoiseOverlay />
@@ -475,7 +475,7 @@ export default function Page(): React.JSX.Element {
       <GradientOrbs />
 
       {/* Navigation */}
-      <motion.nav 
+      <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
@@ -489,8 +489,8 @@ export default function Page(): React.JSX.Element {
             <span className="font-semibold tracking-tight hidden sm:block">Componentry</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link 
-              href="/docs" 
+            <Link
+              href="/docs"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
             >
               Components
@@ -509,7 +509,7 @@ export default function Page(): React.JSX.Element {
       </motion.nav>
 
       {/* Hero Section */}
-      <motion.section 
+      <motion.section
         style={{ opacity: heroOpacity, scale: heroScale }}
         className="min-h-svh flex flex-col items-center justify-center px-6 pt-20 pb-12 relative"
       >
@@ -529,7 +529,7 @@ export default function Page(): React.JSX.Element {
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.9] mb-8" style={{ fontFamily: "var(--font-serif)" }}>
             <AnimatedText text="Premium UI" />
             <br />
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
@@ -539,17 +539,17 @@ export default function Page(): React.JSX.Element {
             </motion.span>
           </h1>
 
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10"
           >
-            A curated collection of handcrafted React components. Meticulously designed, 
+            A curated collection of handcrafted React components. Meticulously designed,
             beautifully animated, and built for modern interfaces.
           </motion.p>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.2 }}
@@ -635,7 +635,7 @@ export default function Page(): React.JSX.Element {
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             className="w-6 h-10 rounded-full border-2 border-border/50 flex items-start justify-center p-2"
           >
-            <motion.div 
+            <motion.div
               className="w-1 h-2 bg-muted-foreground/50 rounded-full"
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}

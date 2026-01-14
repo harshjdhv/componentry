@@ -87,6 +87,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.7)
+      '@types/three':
+        specifier: ^0.182.0
+        version: 0.182.0
       '@workspace/eslint-config':
         specifier: workspace:^
         version: link:../../packages/eslint-config

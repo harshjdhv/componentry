@@ -18,15 +18,15 @@ function NoiseOverlay() {
 function GradientOrbs() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div 
+      <div
         className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full"
         style={{ background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)" }}
       />
-      <div 
+      <div
         className="absolute -bottom-60 -left-60 w-[800px] h-[800px] rounded-full"
         style={{ background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)" }}
       />
-      <div 
+      <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full"
         style={{ background: "radial-gradient(circle, rgba(255,255,255,0.015) 0%, transparent 50%)" }}
       />
@@ -125,7 +125,7 @@ function FloatingBadge({ text, className = "" }: { text: string; className?: str
   )
 }
 
-function FloatingIcon({ icon: Icon, className = "" }: { icon: React.ElementType; className?: string }) {
+function FloatingIcon({ icon: Icon, className = "" }: { icon: React.ComponentType<{ className?: string }>; className?: string }) {
   return (
     <div className={className}>
       <div className="w-16 h-16 rounded-2xl border-2 border-white/15 bg-white/5 backdrop-blur-sm flex items-center justify-center">
@@ -158,9 +158,9 @@ export default function PreviewPage(): React.JSX.Element {
       <div className="absolute inset-6 border border-white/10 rounded-3xl pointer-events-none z-20" />
 
       {/* Heading Glow */}
-      <div 
+      <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] pointer-events-none z-0"
-        style={{ 
+        style={{
           background: "radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 60%)",
         }}
       />
@@ -177,11 +177,11 @@ export default function PreviewPage(): React.JSX.Element {
           </div>
 
           {/* Heading */}
-          <h1 
+          <h1
             className="text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] tracking-tight leading-[0.85] mb-6"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            <span 
+            <span
               className="bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent"
             >
               Premium

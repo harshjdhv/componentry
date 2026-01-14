@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useRef, useState, useEffect, useMemo } from "react"
+import { Suspense, useRef, useState, useEffect, useMemo, createContext, useContext, useCallback } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import {
     PerspectiveCamera,
@@ -8,6 +8,21 @@ import {
     useProgress,
 } from "@react-three/drei"
 import * as THREE from "three"
+
+// Keyboard context for letter activation
+interface KeyboardContextType {
+    activeLetter: string | null
+    demogorgonMode: boolean
+    typedSequence: string
+}
+
+const KeyboardContext = createContext<KeyboardContextType>({
+    activeLetter: null,
+    demogorgonMode: false,
+    typedSequence: "",
+})
+
+const useKeyboard = () => useContext(KeyboardContext)
 
 // Loading screen component
 function Loader() {
@@ -71,11 +86,12 @@ function CameraController() {
         }
 
         const handleTouchStart = (e: TouchEvent) => {
-            if (e.touches.length === 1) {
+            const touch = e.touches[0]
+            if (e.touches.length === 1 && touch) {
                 isDragging.current = true
                 previousMousePosition.current = {
-                    x: e.touches[0].clientX,
-                    y: e.touches[0].clientY,
+                    x: touch.clientX,
+                    y: touch.clientY,
                 }
             }
         }
@@ -85,10 +101,11 @@ function CameraController() {
         }
 
         const handleTouchMove = (e: TouchEvent) => {
-            if (!isDragging.current || e.touches.length !== 1) return
+            const touch = e.touches[0]
+            if (!isDragging.current || e.touches.length !== 1 || !touch) return
 
-            const deltaX = e.touches[0].clientX - previousMousePosition.current.x
-            const deltaY = e.touches[0].clientY - previousMousePosition.current.y
+            const deltaX = touch.clientX - previousMousePosition.current.x
+            const deltaY = touch.clientY - previousMousePosition.current.y
 
             const rotationSpeed = 0.003
 
@@ -101,8 +118,8 @@ function CameraController() {
             )
 
             previousMousePosition.current = {
-                x: e.touches[0].clientX,
-                y: e.touches[0].clientY,
+                x: touch.clientX,
+                y: touch.clientY,
             }
         }
 
@@ -505,9 +522,9 @@ function AlphabetWall() {
             const x = -3.2 + i * 0.72
             const y = 1.1 + (seededRandom(i * 3.7) - 0.5) * 0.06
             row1.push({
-                letter: alphabet[i] || '',
+                letter: alphabet[i] ?? '',
                 pos: [x, y, -5.94],
-                color: paintColors[i % paintColors.length] || paintColors[0],
+                color: paintColors[i % paintColors.length] ?? 'rgb(20, 15, 12)',
             })
         }
 
@@ -517,9 +534,9 @@ function AlphabetWall() {
             const x = -2.9 + i * 0.72
             const y = 0.45 + (seededRandom(letterIndex * 4.3) - 0.5) * 0.06
             row2.push({
-                letter: alphabet[letterIndex] || '',
+                letter: alphabet[letterIndex] ?? '',
                 pos: [x, y, -5.94],
-                color: paintColors[letterIndex % paintColors.length] || paintColors[0],
+                color: paintColors[letterIndex % paintColors.length] ?? 'rgb(20, 15, 12)',
             })
         }
 
@@ -529,9 +546,9 @@ function AlphabetWall() {
             const x = -3.2 + i * 0.72
             const y = -0.2 + (seededRandom(letterIndex * 5.1) - 0.5) * 0.06
             row3.push({
-                letter: alphabet[letterIndex] || '',
+                letter: alphabet[letterIndex] ?? '',
                 pos: [x, y, -5.94],
-                color: paintColors[letterIndex % paintColors.length] || paintColors[0],
+                color: paintColors[letterIndex % paintColors.length] ?? 'rgb(20, 15, 12)',
             })
         }
 
@@ -550,7 +567,7 @@ function AlphabetWall() {
                     letter.pos[1] + 0.22,
                     letter.pos[2] + 0.03
                 ] as [number, number, number],
-                color: lightColors[(rowIndex * 3 + i) % lightColors.length] || lightColors[0],
+                color: lightColors[(rowIndex * 3 + i) % lightColors.length] ?? '#FFB347',
                 intensity: 0.7 + seededRandom(rowIndex * 10 + i) * 0.3,
                 flickerSeed: rowIndex * 100 + i * 7.3,
             }))
@@ -734,26 +751,55 @@ function AlphabetWall() {
         ...letterData.row3,
     ], [letterData])
 
-    // Lit state for each bulb
-    const [litBulbs, setLitBulbs] = useState<boolean[]>(
-        () => allBulbs.map(() => true)
+    // Get keyboard context
+    const { activeLetter, demogorgonMode } = useKeyboard()
+
+    // Map letters to bulb indices
+    const letterToBulbIndex = useMemo(() => {
+        const map: Record<string, number> = {}
+        allLetters.forEach((data, idx) => {
+            map[data.letter] = idx
+        })
+        return map
+    }, [allLetters])
+
+    // Demogorgon mode flickering state
+    const [demogorgonFlicker, setDemogorgonFlicker] = useState<boolean[]>(
+        () => allBulbs.map(() => false)
     )
 
-    // Random flicker effect - occasional bulbs flicker
+    // Demogorgon chaotic flickering effect
     useEffect(() => {
+        if (!demogorgonMode) {
+            setDemogorgonFlicker(allBulbs.map(() => false))
+            return
+        }
+
+        // Chaotic, rapid flickering when Demogorgon is coming!
         const interval = setInterval(() => {
-            setLitBulbs(prev =>
-                prev.map((isLit, idx) => {
-                    // Small chance to toggle
-                    if (seededRandom(Date.now() / 1000 + idx) < 0.03) {
-                        return !isLit
-                    }
-                    return isLit
-                })
+            setDemogorgonFlicker(
+                allBulbs.map(() => Math.random() > 0.3) // 70% chance each bulb is lit
             )
-        }, 300)
+        }, 50) // Very fast flickering
+
         return () => clearInterval(interval)
-    }, [])
+    }, [demogorgonMode, allBulbs])
+
+    // Calculate which bulbs should be lit
+    const litBulbs = useMemo(() => {
+        if (demogorgonMode) {
+            return demogorgonFlicker
+        }
+
+        // Normal mode - only the typed letter lights up
+        return allBulbs.map((_, idx) => {
+            if (activeLetter) {
+                const letterIdx = letterToBulbIndex[activeLetter.toUpperCase()]
+                return letterIdx === idx
+            }
+            return false // All off by default
+        })
+    }, [activeLetter, demogorgonMode, demogorgonFlicker, allBulbs, letterToBulbIndex])
 
     return (
         <group>
@@ -778,8 +824,8 @@ function AlphabetWall() {
                     key={`bulb-${i}`}
                     position={bulb.position}
                     color={bulb.color}
-                    intensity={bulb.intensity}
-                    isLit={litBulbs[i] ?? true}
+                    intensity={demogorgonMode ? 1.5 : bulb.intensity}
+                    isLit={litBulbs[i] ?? false}
                     flickerSeed={bulb.flickerSeed}
                 />
             ))}
@@ -957,12 +1003,12 @@ function CRTTelevision() {
                 <meshStandardMaterial color="#2D2D2D" roughness={0.8} />
             </mesh>
             {/* Knobs */}
-            <mesh position={[0.35, -0.15, 0.36]} castShadow>
-                <cylinderGeometry args={[0.04, 0.04, 0.03, 12]} rotation={[Math.PI / 2, 0, 0]} />
+            <mesh position={[0.35, -0.15, 0.36]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+                <cylinderGeometry args={[0.04, 0.04, 0.03, 12]} />
                 <meshStandardMaterial color="#1A1A1A" roughness={0.5} />
             </mesh>
-            <mesh position={[0.35, -0.25, 0.36]} castShadow>
-                <cylinderGeometry args={[0.04, 0.04, 0.03, 12]} rotation={[Math.PI / 2, 0, 0]} />
+            <mesh position={[0.35, -0.25, 0.36]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+                <cylinderGeometry args={[0.04, 0.04, 0.03, 12]} />
                 <meshStandardMaterial color="#1A1A1A" roughness={0.5} />
             </mesh>
             {/* TV stand */}
@@ -1081,8 +1127,22 @@ function VintageBookshelf() {
     )
 }
 
-// Floor lamp (vintage)
+// Floor lamp (vintage) - responds to demogorgon mode
 function VintageFloorLamp() {
+    const { demogorgonMode } = useKeyboard()
+    const [flicker, setFlicker] = useState(1)
+
+    useEffect(() => {
+        if (demogorgonMode) {
+            const interval = setInterval(() => {
+                setFlicker(Math.random() > 0.3 ? Math.random() * 2 : 0)
+            }, 50)
+            return () => clearInterval(interval)
+        } else {
+            setFlicker(1)
+        }
+    }, [demogorgonMode])
+
     return (
         <group position={[-4, -2, -3]}>
             {/* Base */}
@@ -1095,22 +1155,24 @@ function VintageFloorLamp() {
                 <cylinderGeometry args={[0.02, 0.02, 1.5]} />
                 <meshStandardMaterial color="#B8860B" roughness={0.5} metalness={0.4} />
             </mesh>
-            {/* Shade */}
+            {/* Shade - glows during demogorgon */}
             <mesh position={[0, 1.5, 0]} castShadow>
                 <cylinderGeometry args={[0.12, 0.25, 0.3, 12, 1, true]} />
                 <meshStandardMaterial
-                    color="#E8DCC8"
+                    color={demogorgonMode ? "#FFB347" : "#E8DCC8"}
+                    emissive={demogorgonMode ? "#FF6B6B" : "#000000"}
+                    emissiveIntensity={demogorgonMode ? flicker * 0.5 : 0}
                     roughness={0.95}
                     side={THREE.DoubleSide}
                     transparent
                     opacity={0.85}
                 />
             </mesh>
-            {/* Warm light */}
+            {/* Warm light - flickers in demogorgon mode */}
             <pointLight
                 position={[0, 1.4, 0]}
-                intensity={0.4}
-                color="#FFD4A3"
+                intensity={demogorgonMode ? flicker * 0.6 : 0.4}
+                color={demogorgonMode ? "#FF6B6B" : "#FFD4A3"}
                 distance={5}
                 decay={2}
             />
@@ -1201,11 +1263,304 @@ function WindowWithCurtains() {
                 <meshStandardMaterial color="#4A3728" roughness={0.95} />
             </mesh>
             {/* Curtain rod */}
-            <mesh position={[-0.08, 1.05, 0]} castShadow>
-                <cylinderGeometry args={[0.015, 0.015, 1.6]} rotation={[0, 0, Math.PI / 2]} />
+            <mesh position={[-0.08, 1.05, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+                <cylinderGeometry args={[0.015, 0.015, 1.6]} />
                 <meshStandardMaterial color="#B8860B" roughness={0.4} metalness={0.5} />
             </mesh>
         </group>
+    )
+}
+
+// Dark doorway - pitch black void inside
+function DarkDoorway({ position, side }: { position: [number, number, number], side: 'left' | 'right' }) {
+    return (
+        <group position={position}>
+            {/* Door frame - worn white painted wood */}
+            {/* Top frame */}
+            <mesh position={[0, 1.1, 0]} castShadow>
+                <boxGeometry args={[0.9, 0.1, 0.15]} />
+                <meshStandardMaterial color="#D4C4A8" roughness={0.9} />
+            </mesh>
+            {/* Left frame */}
+            <mesh position={[-0.4, 0, 0]} castShadow>
+                <boxGeometry args={[0.1, 2.2, 0.15]} />
+                <meshStandardMaterial color="#D4C4A8" roughness={0.9} />
+            </mesh>
+            {/* Right frame */}
+            <mesh position={[0.4, 0, 0]} castShadow>
+                <boxGeometry args={[0.1, 2.2, 0.15]} />
+                <meshStandardMaterial color="#D4C4A8" roughness={0.9} />
+            </mesh>
+            {/* Pitch black void inside - the darkness */}
+            <mesh position={[0, 0, 0.05]}>
+                <planeGeometry args={[0.7, 2.1]} />
+                <meshBasicMaterial color="#000000" />
+            </mesh>
+            {/* Subtle depth illusion - darker gradient */}
+            <mesh position={[0, 0, 0.03]}>
+                <planeGeometry args={[0.72, 2.12]} />
+                <meshBasicMaterial color="#050505" />
+            </mesh>
+        </group>
+    )
+}
+
+// Plaid armchair - 80s style
+function PlaidArmchair() {
+    return (
+        <group position={[3.5, -1.4, 1.5]} rotation={[0, -0.8, 0]}>
+            {/* Seat */}
+            <mesh castShadow receiveShadow>
+                <boxGeometry args={[0.8, 0.25, 0.7]} />
+                <meshStandardMaterial color="#4A3A2A" roughness={0.95} />
+            </mesh>
+            {/* Back */}
+            <mesh position={[0, 0.5, -0.28]} castShadow>
+                <boxGeometry args={[0.8, 0.75, 0.15]} />
+                <meshStandardMaterial color="#3D3020" roughness={0.95} />
+            </mesh>
+            {/* Arms */}
+            <mesh position={[-0.35, 0.2, 0]} castShadow>
+                <boxGeometry args={[0.12, 0.35, 0.7]} />
+                <meshStandardMaterial color="#3D3020" roughness={0.95} />
+            </mesh>
+            <mesh position={[0.35, 0.2, 0]} castShadow>
+                <boxGeometry args={[0.12, 0.35, 0.7]} />
+                <meshStandardMaterial color="#3D3020" roughness={0.95} />
+            </mesh>
+            {/* Cushion */}
+            <mesh position={[0, 0.18, 0.05]} castShadow>
+                <boxGeometry args={[0.65, 0.08, 0.55]} />
+                <meshStandardMaterial color="#5C4A38" roughness={0.98} />
+            </mesh>
+        </group>
+    )
+}
+
+// Side table with rotary phone
+function SideTableWithPhone() {
+    return (
+        <group position={[-4.5, -1.5, 1]}>
+            {/* Table */}
+            <mesh castShadow receiveShadow>
+                <boxGeometry args={[0.5, 0.05, 0.4]} />
+                <meshStandardMaterial color="#5C4033" roughness={0.8} />
+            </mesh>
+            {/* Legs */}
+            {[[-0.2, -0.25, -0.15], [0.2, -0.25, -0.15], [-0.2, -0.25, 0.15], [0.2, -0.25, 0.15]].map((pos, i) => (
+                <mesh key={i} position={pos as [number, number, number]} castShadow>
+                    <boxGeometry args={[0.04, 0.45, 0.04]} />
+                    <meshStandardMaterial color="#4A3728" roughness={0.8} />
+                </mesh>
+            ))}
+            {/* Rotary phone */}
+            <group position={[0, 0.12, 0]}>
+                <mesh castShadow>
+                    <boxGeometry args={[0.2, 0.08, 0.25]} />
+                    <meshStandardMaterial color="#2A2A2A" roughness={0.6} />
+                </mesh>
+                {/* Dial */}
+                <mesh position={[0, 0.05, 0.03]} rotation={[-Math.PI / 2, 0, 0]} castShadow>
+                    <cylinderGeometry args={[0.06, 0.06, 0.02, 16]} />
+                    <meshStandardMaterial color="#D4C4A8" roughness={0.7} />
+                </mesh>
+                {/* Handset */}
+                <mesh position={[0, 0.08, 0]} rotation={[0, 0.2, 0]} castShadow>
+                    <boxGeometry args={[0.22, 0.04, 0.05]} />
+                    <meshStandardMaterial color="#2A2A2A" roughness={0.6} />
+                </mesh>
+            </group>
+            {/* Lamp - handled by TableLamp component */}
+            <TableLamp position={[0.15, 0.25, -0.1]} />
+        </group>
+    )
+}
+
+// Scattered newspapers and magazines
+function ScatteredPapers() {
+    return (
+        <group>
+            {/* Newspaper on floor */}
+            <mesh position={[-1, -1.98, 1.5]} rotation={[-Math.PI / 2, 0, 0.3]} receiveShadow>
+                <planeGeometry args={[0.4, 0.55]} />
+                <meshStandardMaterial color="#E8E0D0" roughness={0.95} />
+            </mesh>
+            {/* Magazine */}
+            <mesh position={[-0.5, -1.97, 2]} rotation={[-Math.PI / 2, 0, -0.2]} receiveShadow>
+                <planeGeometry args={[0.25, 0.35]} />
+                <meshStandardMaterial color="#A0522D" roughness={0.9} />
+            </mesh>
+            {/* Another paper */}
+            <mesh position={[0.8, -1.97, 1.8]} rotation={[-Math.PI / 2, 0, 0.8]} receiveShadow>
+                <planeGeometry args={[0.3, 0.4]} />
+                <meshStandardMaterial color="#D4C4A8" roughness={0.95} />
+            </mesh>
+        </group>
+    )
+}
+
+// Wood stove - 80s heating
+function WoodStove() {
+    return (
+        <group position={[-4.5, -1.3, -3]}>
+            {/* Main body */}
+            <mesh castShadow receiveShadow>
+                <boxGeometry args={[0.8, 0.9, 0.6]} />
+                <meshStandardMaterial color="#1A1A1A" roughness={0.7} metalness={0.3} />
+            </mesh>
+            {/* Door */}
+            <mesh position={[0, -0.1, 0.31]} castShadow>
+                <boxGeometry args={[0.35, 0.4, 0.02]} />
+                <meshStandardMaterial color="#2A2A2A" roughness={0.6} metalness={0.4} />
+            </mesh>
+            {/* Handle */}
+            <mesh position={[0.12, -0.1, 0.33]} castShadow>
+                <boxGeometry args={[0.08, 0.03, 0.02]} />
+                <meshStandardMaterial color="#4A4A4A" roughness={0.5} metalness={0.6} />
+            </mesh>
+            {/* Chimney pipe */}
+            <mesh position={[0, 0.7, 0]} castShadow>
+                <cylinderGeometry args={[0.08, 0.08, 0.6]} />
+                <meshStandardMaterial color="#2A2A2A" roughness={0.6} metalness={0.4} />
+            </mesh>
+            {/* Pipe going to wall */}
+            <mesh position={[0, 1.1, -0.3]} rotation={[Math.PI / 4, 0, 0]} castShadow>
+                <cylinderGeometry args={[0.08, 0.08, 0.8]} />
+                <meshStandardMaterial color="#2A2A2A" roughness={0.6} metalness={0.4} />
+            </mesh>
+            {/* Legs */}
+            {[[-0.3, -0.55, -0.2], [0.3, -0.55, -0.2], [-0.3, -0.55, 0.2], [0.3, -0.55, 0.2]].map((pos, i) => (
+                <mesh key={i} position={pos as [number, number, number]} castShadow>
+                    <cylinderGeometry args={[0.03, 0.03, 0.2]} />
+                    <meshStandardMaterial color="#1A1A1A" roughness={0.7} metalness={0.3} />
+                </mesh>
+            ))}
+            {/* Subtle warm glow from fire inside */}
+            <pointLight position={[0, -0.1, 0.4]} intensity={0.1} color="#FF6B35" distance={2} decay={2} />
+        </group>
+    )
+}
+
+// Blanket draped over couch
+function DrapedBlanket() {
+    return (
+        <group position={[-2, -0.85, 2.3]}>
+            {/* Main blanket body */}
+            <mesh rotation={[0.3, 0.1, 0.05]} castShadow>
+                <boxGeometry args={[1.2, 0.04, 0.8]} />
+                <meshStandardMaterial color="#8B4513" roughness={0.98} />
+            </mesh>
+            {/* Draped edge */}
+            <mesh position={[0.5, -0.15, 0.3]} rotation={[0.5, 0.2, 0.3]} castShadow>
+                <boxGeometry args={[0.4, 0.03, 0.5]} />
+                <meshStandardMaterial color="#7A3D12" roughness={0.98} />
+            </mesh>
+        </group>
+    )
+}
+
+// Table lamp component - responds to demogorgon mode
+function TableLamp({ position }: { position: [number, number, number] }) {
+    const { demogorgonMode } = useKeyboard()
+    const [flicker, setFlicker] = useState(1)
+
+    useEffect(() => {
+        if (demogorgonMode) {
+            const interval = setInterval(() => {
+                setFlicker(Math.random() > 0.4 ? Math.random() * 1.5 : 0)
+            }, 60)
+            return () => clearInterval(interval)
+        } else {
+            setFlicker(1)
+        }
+    }, [demogorgonMode])
+
+    return (
+        <group position={position}>
+            <mesh castShadow>
+                <cylinderGeometry args={[0.03, 0.05, 0.06, 12]} />
+                <meshStandardMaterial color="#B8860B" roughness={0.5} metalness={0.4} />
+            </mesh>
+            <mesh position={[0, 0.12, 0]} castShadow>
+                <cylinderGeometry args={[0.01, 0.01, 0.2]} />
+                <meshStandardMaterial color="#B8860B" roughness={0.5} metalness={0.4} />
+            </mesh>
+            <mesh position={[0, 0.25, 0]} castShadow>
+                <cylinderGeometry args={[0.08, 0.12, 0.15, 12, 1, true]} />
+                <meshStandardMaterial
+                    color={demogorgonMode ? "#FFB347" : "#E8DCC8"}
+                    emissive={demogorgonMode ? "#FF6B6B" : "#000000"}
+                    emissiveIntensity={demogorgonMode ? flicker * 0.4 : 0}
+                    roughness={0.95}
+                    side={THREE.DoubleSide}
+                />
+            </mesh>
+            <pointLight
+                position={[0, 0.2, 0]}
+                intensity={demogorgonMode ? flicker * 0.3 : 0.2}
+                color={demogorgonMode ? "#FF6B6B" : "#FFD4A3"}
+                distance={3}
+                decay={2}
+            />
+        </group>
+    )
+}
+
+// Room lighting - all ambient lights respond to demogorgon mode
+function RoomLighting() {
+    const { demogorgonMode } = useKeyboard()
+    const [flicker1, setFlicker1] = useState(1)
+    const [flicker2, setFlicker2] = useState(1)
+
+    useEffect(() => {
+        if (demogorgonMode) {
+            const interval = setInterval(() => {
+                setFlicker1(Math.random() > 0.3 ? Math.random() * 1.5 : 0.1)
+                setFlicker2(Math.random() > 0.25 ? Math.random() * 2 : 0)
+            }, 40)
+            return () => clearInterval(interval)
+        } else {
+            setFlicker1(1)
+            setFlicker2(1)
+        }
+    }, [demogorgonMode])
+
+    return (
+        <>
+            {/* Minimal ambient - flickers red in demogorgon mode */}
+            <ambientLight
+                intensity={demogorgonMode ? flicker1 * 0.15 : 0.08}
+                color={demogorgonMode ? "#FF4444" : "#E8DCC8"}
+            />
+
+            {/* Subtle fill light from the side - flickers */}
+            <pointLight
+                position={[4, 1, 0]}
+                intensity={demogorgonMode ? flicker2 * 0.25 : 0.15}
+                color={demogorgonMode ? "#FF6B6B" : "#FFD4A3"}
+                distance={8}
+                decay={2}
+            />
+
+            {/* Extra flickering red light during demogorgon mode */}
+            {demogorgonMode && (
+                <>
+                    <pointLight
+                        position={[-3, 1, -4]}
+                        intensity={flicker1 * 0.4}
+                        color="#FF0000"
+                        distance={10}
+                        decay={2}
+                    />
+                    <pointLight
+                        position={[3, 0, 2]}
+                        intensity={flicker2 * 0.3}
+                        color="#880000"
+                        distance={8}
+                        decay={2}
+                    />
+                </>)}
+        </>
     )
 }
 
@@ -1223,29 +1578,29 @@ function JoyceBayersRoom() {
             <StainedCeiling />
             <WornRug />
 
+            {/* Dark doorways on either side of alphabet wall */}
+            <DarkDoorway position={[-4, -0.9, -5.93]} side="left" />
+            <DarkDoorway position={[4, -0.9, -5.93]} side="right" />
+
             {/* The iconic alphabet wall with lights */}
             <AlphabetWall />
 
-            {/* Furniture */}
+            {/* Authentic 80s Byers home furniture */}
             <VintageCouch />
+            <PlaidArmchair />
             <CRTTelevision />
             <ClutteredCoffeeTable />
+            <SideTableWithPhone />
             <VintageBookshelf />
             <VintageFloorLamp />
+            <WoodStove />
             <WindowWithCurtains />
             <WallPhone />
+            <ScatteredPapers />
+            <DrapedBlanket />
 
-            {/* Minimal ambient - very dim room */}
-            <ambientLight intensity={0.08} color="#E8DCC8" />
-
-            {/* Subtle fill light from the side */}
-            <pointLight
-                position={[4, 1, 0]}
-                intensity={0.15}
-                color="#FFD4A3"
-                distance={8}
-                decay={2}
-            />
+            {/* Room lighting - responds to demogorgon mode */}
+            <RoomLighting />
         </group>
     )
 }
@@ -1339,29 +1694,214 @@ function UIOverlay() {
 }
 
 export default function RoomPage() {
+    const [activeLetter, setActiveLetter] = useState<string | null>(null)
+    const [typedSequence, setTypedSequence] = useState("")
+    const [demogorgonMode, setDemogorgonMode] = useState(false)
+    const [showTyped, setShowTyped] = useState(false)
+
+    // Handle keyboard events
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        const key = e.key.toUpperCase()
+
+        // Only respond to alphabet keys
+        if (/^[A-Z]$/.test(key)) {
+            setActiveLetter(key)
+            setShowTyped(true)
+
+            // Add to typed sequence (keep last 10 chars)
+            setTypedSequence(prev => {
+                const newSeq = (prev + key).slice(-10)
+
+                // Check for "RUN" sequence
+                if (newSeq.includes("RUN")) {
+                    setDemogorgonMode(true)
+                    // Demogorgon mode lasts 5 seconds
+                    setTimeout(() => {
+                        setDemogorgonMode(false)
+                        setTypedSequence("")
+                    }, 5000)
+                }
+
+                return newSeq
+            })
+        }
+    }, [])
+
+    const handleKeyUp = useCallback((e: KeyboardEvent) => {
+        const key = e.key.toUpperCase()
+        if (/^[A-Z]$/.test(key) && activeLetter === key) {
+            // Keep the letter lit for a moment after release
+            setTimeout(() => {
+                setActiveLetter(null)
+            }, 400)
+        }
+    }, [activeLetter])
+
+    // Set up keyboard listeners
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyDown)
+        window.addEventListener("keyup", handleKeyUp)
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown)
+            window.removeEventListener("keyup", handleKeyUp)
+        }
+    }, [handleKeyDown, handleKeyUp])
+
+    // Hide typed message after inactivity
+    useEffect(() => {
+        if (showTyped) {
+            const timer = setTimeout(() => setShowTyped(false), 3000)
+            return () => clearTimeout(timer)
+        }
+    }, [showTyped, typedSequence])
+
+    // Scary sound effect for Demogorgon mode
+    const audioContextRef = useRef<AudioContext | null>(null)
+
+    useEffect(() => {
+        if (demogorgonMode) {
+            // Create scary sound using Web Audio API
+            try {
+                if (!audioContextRef.current) {
+                    audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+                }
+                const ctx = audioContextRef.current
+
+                // Create oscillators for scary rumbling sound
+                const oscillator1 = ctx.createOscillator()
+                const oscillator2 = ctx.createOscillator()
+                const oscillator3 = ctx.createOscillator()
+                const gainNode = ctx.createGain()
+
+                // Low ominous rumble
+                oscillator1.type = 'sine'
+                oscillator1.frequency.value = 40 // Very low rumble
+
+                // Unsettling mid-frequency
+                oscillator2.type = 'sawtooth'
+                oscillator2.frequency.value = 80
+
+                // High eerie tone
+                oscillator3.type = 'sine'
+                oscillator3.frequency.value = 220
+
+                // Connect and set gain
+                oscillator1.connect(gainNode)
+                oscillator2.connect(gainNode)
+                oscillator3.connect(gainNode)
+                gainNode.connect(ctx.destination)
+
+                // Scary crescendo effect
+                gainNode.gain.setValueAtTime(0, ctx.currentTime)
+                gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.5)
+                gainNode.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 2)
+                gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 3)
+                gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 5)
+
+                // Add frequency modulation for eeriness
+                oscillator1.frequency.linearRampToValueAtTime(30, ctx.currentTime + 2)
+                oscillator1.frequency.linearRampToValueAtTime(50, ctx.currentTime + 4)
+                oscillator2.frequency.linearRampToValueAtTime(60, ctx.currentTime + 1)
+                oscillator2.frequency.linearRampToValueAtTime(100, ctx.currentTime + 3)
+                oscillator3.frequency.linearRampToValueAtTime(180, ctx.currentTime + 2)
+                oscillator3.frequency.linearRampToValueAtTime(260, ctx.currentTime + 4)
+
+                // Start and stop
+                oscillator1.start(ctx.currentTime)
+                oscillator2.start(ctx.currentTime)
+                oscillator3.start(ctx.currentTime)
+                oscillator1.stop(ctx.currentTime + 5)
+                oscillator2.stop(ctx.currentTime + 5)
+                oscillator3.stop(ctx.currentTime + 5)
+            } catch (e) {
+                console.log('Audio not available:', e)
+            }
+        }
+    }, [demogorgonMode])
+
+    const keyboardValue = useMemo(() => ({
+        activeLetter,
+        demogorgonMode,
+        typedSequence,
+    }), [activeLetter, demogorgonMode, typedSequence])
+
     return (
-        <div className="relative w-full h-screen bg-[#0a0a0a] overflow-hidden">
-            <FilmGrain />
-            <Vignette />
-            <UIOverlay />
-            <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
-                <Suspense fallback={<Loader />}>
-                    <PerspectiveCamera
-                        makeDefault
-                        position={[0, 0, 0]}
-                        fov={70}
-                        near={0.1}
-                        far={100}
-                    />
-                    <CameraController />
+        <KeyboardContext.Provider value={keyboardValue}>
+            <div className="relative w-full h-screen bg-[#0a0a0a] overflow-hidden" tabIndex={0}>
+                <FilmGrain />
+                <Vignette />
+                <UIOverlay />
 
-                    {/* The room */}
-                    <JoyceBayersRoom />
+                {/* Typed message display - positioned lower on screen */}
+                {showTyped && typedSequence && !demogorgonMode && (
+                    <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+                        <p
+                            className="text-amber-300/70 text-3xl tracking-[0.4em] font-serif animate-pulse"
+                            style={{ textShadow: "0 0 30px rgba(255, 180, 100, 0.6)" }}
+                        >
+                            {typedSequence}
+                        </p>
+                    </div>
+                )}
 
-                    {/* Fog for atmosphere */}
-                    <fog attach="fog" args={["#1a1510", 3, 12]} />
-                </Suspense>
-            </Canvas>
-        </div>
+                {/* DEMOGORGON WARNING */}
+                {demogorgonMode && (
+                    <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center">
+                        <div className="text-center animate-pulse">
+                            <p
+                                className="text-red-500 text-6xl font-bold tracking-[0.3em] font-serif mb-4"
+                                style={{
+                                    textShadow: "0 0 40px rgba(255, 0, 0, 0.8), 0 0 80px rgba(255, 0, 0, 0.4)",
+                                    animation: "pulse 0.1s infinite"
+                                }}
+                            >
+                                RUN
+                            </p>
+                            <p
+                                className="text-red-400/70 text-xl tracking-wider font-serif"
+                                style={{ textShadow: "0 0 20px rgba(255, 0, 0, 0.5)" }}
+                            >
+                                THE DEMOGORGON IS COMING
+                            </p>
+                        </div>
+                        {/* Red vignette overlay during demogorgon mode */}
+                        <div
+                            className="absolute inset-0"
+                            style={{
+                                background: "radial-gradient(ellipse at center, transparent 20%, rgba(139, 0, 0, 0.4) 100%)",
+                                animation: "pulse 0.15s infinite"
+                            }}
+                        />
+                    </div>
+                )}
+
+                {/* Type hint */}
+                <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                    <p className="text-amber-200/40 text-xs tracking-wider font-serif text-center">
+                        Type letters to communicate • Type &quot;RUN&quot; for a surprise
+                    </p>
+                </div>
+
+                <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
+                    <Suspense fallback={<Loader />}>
+                        <PerspectiveCamera
+                            makeDefault
+                            position={[0, 0, 0]}
+                            fov={70}
+                            near={0.1}
+                            far={100}
+                        />
+                        <CameraController />
+
+                        {/* The room */}
+                        <JoyceBayersRoom />
+
+                        {/* Fog for atmosphere */}
+                        <fog attach="fog" args={["#1a1510", 3, 12]} />
+                    </Suspense>
+                </Canvas>
+            </div>
+        </KeyboardContext.Provider>
     )
 }
