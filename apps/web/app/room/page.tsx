@@ -535,8 +535,8 @@ function UpsideDownVines() {
                 const move = currentDir.clone().multiplyScalar(stepSize)
                 currentPos.add(move)
 
-                // 3D Depth noise (undulate off wall slightly)
-                const depthOffset = wallNormal.clone().multiplyScalar(Math.sin(i * 0.5) * 0.05)
+                // 3D Depth noise (mostly flat on wall)
+                const depthOffset = wallNormal.clone().multiplyScalar(Math.sin(i * 0.6) * 0.01)
 
                 points.push(currentPos.clone().add(depthOffset))
 
@@ -567,62 +567,64 @@ function UpsideDownVines() {
         }
 
         // --- SPAWN CENTERS ---
-        // We create "nodes" on the walls from which webs spread
+        // We create "nodes" on the surfaces from which webs spread
         const spawnWebNode = (
             center: THREE.Vector3,
             wallNormal: THREE.Vector3,
             wallU: THREE.Vector3,
             wallV: THREE.Vector3
         ) => {
-            // Spawn 1-3 main arteries radiating from this center (Sparse)
-            const arteryCount = 1 + Math.floor(Math.random() * 2)
+            // Spawn 2-3 main arteries
+            const arteryCount = 2 + Math.floor(Math.random() * 2)
+
+            // Floor vines shouldn't grow as long to avoid crossing center
+            const growLength = center.y < 0.5 ? 2.5 : 5.0
+
             for (let i = 0; i < arteryCount; i++) {
-                // Radial direction
-                const angle = (i / arteryCount) * Math.PI * 2 + (Math.random() * 0.5)
+                const angle = (i / arteryCount) * Math.PI * 2 + (Math.random() * 1.0)
                 const dir = new THREE.Vector3()
                     .addScaledVector(wallU, Math.cos(angle))
                     .addScaledVector(wallV, Math.sin(angle))
 
-                growVein(center, dir, wallNormal, wallU, wallV, 3, 0.12, 3.5)
+                growVein(center, dir, wallNormal, wallU, wallV, 3, 0.1, growLength)
             }
         }
 
-        // BACK WALL (Z = -6)
-        // Spread nodes across the surface
+        // BACK WALL (Z = -6) - Keep central, avoid corners
         for (let i = 0; i < 2; i++) {
             spawnWebNode(
-                new THREE.Vector3(-4 + Math.random() * 8, -1 + Math.random() * 6, -5.9),
+                new THREE.Vector3(-2 + Math.random() * 4, -1 + Math.random() * 6, -5.9),
                 new THREE.Vector3(0, 0, 1),
                 new THREE.Vector3(1, 0, 0),
                 new THREE.Vector3(0, 1, 0)
             )
         }
 
-        // LEFT WALL (X = -6)
+        // LEFT WALL (X = -6) - Avoid deep back corner (Z=-6)
         for (let i = 0; i < 2; i++) {
             spawnWebNode(
-                new THREE.Vector3(-5.9, -1 + Math.random() * 6, -4 + Math.random() * 8),
+                new THREE.Vector3(-5.9, -1 + Math.random() * 6, -2 + Math.random() * 6), // Z from -2 to +4
                 new THREE.Vector3(1, 0, 0),
                 new THREE.Vector3(0, 0, 1),
                 new THREE.Vector3(0, 1, 0)
             )
         }
 
-        // RIGHT WALL (X = 6)
+        // RIGHT WALL (X = 6) - Avoid deep back corner
         for (let i = 0; i < 2; i++) {
             spawnWebNode(
-                new THREE.Vector3(5.9, -1 + Math.random() * 6, -4 + Math.random() * 8),
+                new THREE.Vector3(5.9, -1 + Math.random() * 6, -2 + Math.random() * 6), // Z from -2 to +4
                 new THREE.Vector3(-1, 0, 0),
                 new THREE.Vector3(0, 0, -1),
                 new THREE.Vector3(0, 1, 0)
             )
         }
 
-        // CEILING (Y = 6) - Massive web above
-        for (let i = 0; i < 2; i++) {
+        // FLOOR (Y = 0) - Only far end, away from corners and camera
+        for (let i = 0; i < 2; i++) { // Reduced count
             spawnWebNode(
-                new THREE.Vector3(-3 + Math.random() * 6, 5.9, -3 + Math.random() * 6),
-                new THREE.Vector3(0, -1, 0),
+                new THREE.Vector3(-3 + Math.random() * 6, 0.05, -3.5 - Math.random() * 1.5), // Z: -3.5 to -5.0
+                new THREE.Vector3(0, 1, 0),
                 new THREE.Vector3(1, 0, 0),
                 new THREE.Vector3(0, 0, 1)
             )
