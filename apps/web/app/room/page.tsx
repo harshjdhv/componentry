@@ -22,6 +22,138 @@ const KeyboardContext = createContext<KeyboardContextType>({
 
 export const useKeyboard = () => useContext(KeyboardContext)
 
+// Development flag to skip intro
+const SKIP_INTRO = false
+
+function CinematicIntro({ onComplete, onStart }: { onComplete: () => void, onStart: () => void }) {
+    const [step, setStep] = useState<'start' | 'intro'>('start')
+    const [textOpacity, setTextOpacity] = useState(0)
+    const [subTextOpacity, setSubTextOpacity] = useState(0)
+    const [finalFade, setFinalFade] = useState(false)
+
+    const handleStart = () => {
+        onStart() // Trigger audio
+        setStep('intro')
+        // Request fullscreen
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch((err) => {
+                console.log("Fullscreen request denied:", err)
+            })
+        }
+
+        // Animation Timeline
+        // 0s: Start
+        // 1s: Hawkins fade in
+        setTimeout(() => setTextOpacity(1), 1000)
+        // 2.5s: Subtext fade in
+        setTimeout(() => setSubTextOpacity(1), 2500)
+        // 5s: Fade out everything
+        setTimeout(() => {
+            setTextOpacity(0)
+            setSubTextOpacity(0)
+            setFinalFade(true)
+        }, 5500)
+        // 7s: Complete
+        setTimeout(() => {
+            onComplete()
+        }, 7000)
+    }
+
+    if (step === 'start') {
+        return (
+            <div className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
+                <div className="max-w-md w-full text-center space-y-8 animate-in fade-in duration-1000">
+                    <div className="space-y-2">
+                        <h1 className="text-amber-500 text-sm tracking-[0.3em] font-serif uppercase opacity-80">
+                            Immersive Experience
+                        </h1>
+                        <h2 className="text-4xl md:text-5xl font-bold font-serif text-white tracking-tighter"
+                            style={{ textShadow: "0 0 30px rgba(200, 50, 50, 0.4)" }}>
+                            STRANGER THINGS
+                        </h2>
+                    </div>
+
+                    <div className="p-6 border border-white/10 bg-white/5 backdrop-blur-sm rounded-sm">
+                        <div className="flex items-center justify-center gap-4 mb-4 text-white/60">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                            <span className="text-sm tracking-widest uppercase">Use Headphones</span>
+                        </div>
+                        <p className="text-xs text-white/40 leading-relaxed font-serif tracking-wide">
+                            This experience works best in a dark room with audio enabled.
+                            Application will request fullscreen mode.
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={handleStart}
+                        className="group relative px-8 py-3 bg-transparent overflow-hidden rounded-sm transition-all"
+                    >
+                        <div className="absolute inset-0 border border-amber-600/50 group-hover:border-amber-500 transition-colors" />
+                        <div className="absolute inset-0 bg-amber-900/20 group-hover:bg-amber-900/40 transition-colors" />
+                        <span className="relative text-amber-100 font-serif tracking-[0.2em] text-sm group-hover:text-white transition-colors uppercase">
+                            Enter The Upside Down
+                        </span>
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className={`absolute inset-0 z-50 bg-black flex items-center justify-center transition-opacity duration-1000 ${finalFade ? 'opacity-0' : 'opacity-100'}`}>
+            {/* Background Atmosphere */}
+            <div className="absolute inset-0 overflow-hidden">
+                {/* Red Pulse from Center - 'The Rift' */}
+                <div
+                    className="absolute inset-0 opacity-20 animate-pulse"
+                    style={{
+                        background: 'radial-gradient(circle at center, #8B0000 0%, #000000 70%)',
+                        animationDuration: '4s'
+                    }}
+                />
+
+                {/* Subtle Scanlines */}
+                <div
+                    className="absolute inset-0 opacity-10 pointer-events-none"
+                    style={{
+                        background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
+                        backgroundSize: '100% 2px, 3px 100%'
+                    }}
+                />
+            </div>
+
+            <div className="text-center relative z-10">
+                <h1
+                    className="text-amber-500/90 text-4xl md:text-6xl font-bold font-serif tracking-widest uppercase mb-4 transition-all duration-[4000ms] ease-out"
+                    style={{
+                        opacity: textOpacity,
+                        textShadow: "0 0 20px rgba(180, 50, 20, 0.5), 0 0 40px rgba(180, 50, 20, 0.2)",
+                        transform: textOpacity ? 'scale(1.1)' : 'scale(0.9)',
+                        letterSpacing: textOpacity ? '0.2em' : '0.1em'
+                    }}
+                >
+                    Hawkins, Indiana
+                </h1>
+                <p
+                    className="text-white/60 text-lg md:text-xl font-serif tracking-[0.5em] uppercase transition-all duration-[2000ms]"
+                    style={{ opacity: subTextOpacity }}
+                >
+                    November 6th, 1983
+                </p>
+            </div>
+
+            {/* Loading Spinner / Recorder Light */}
+            <div className="absolute bottom-12 right-12 transition-opacity duration-500 flex items-center gap-3" style={{ opacity: subTextOpacity }}>
+                <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_#ff0000]" />
+                <span className="text-red-500/50 text-xs tracking-widest font-mono">REC</span>
+            </div>
+        </div>
+    )
+}
+
+
 // Loading screen component
 function Loader() {
     const { progress } = useProgress()
@@ -1818,6 +1950,7 @@ function UIOverlay() {
 
 
 export default function RoomPage() {
+    const [introFinished, setIntroFinished] = useState(SKIP_INTRO)
     const [activeLetter, setActiveLetter] = useState<string | null>(null)
     const [typedSequence, setTypedSequence] = useState("")
 
@@ -1933,6 +2066,59 @@ export default function RoomPage() {
         } catch (e) {
             console.error("⚡ Spark sound failed", e)
         }
+    }, [])
+
+    // Intro Synth Drone Generator (Deep 80s Horror Swell)
+    const playIntroDrone = useCallback(() => {
+        if (!audioContextRef.current) return
+        const ctx = audioContextRef.current
+        if (ctx.state === 'suspended') ctx.resume()
+
+        const t = ctx.currentTime
+
+        // 1. Low Drone (Sawtooth)
+        const osc1 = ctx.createOscillator()
+        osc1.type = 'sawtooth'
+        osc1.frequency.setValueAtTime(36.71, t) // D1
+
+        // 2. Detuned Oscillator for Thickness
+        const osc2 = ctx.createOscillator()
+        osc2.type = 'sawtooth'
+        osc2.frequency.setValueAtTime(36.71 * 1.01, t) // Detuned slightly
+
+        // 3. Sub Oscillator (Sine)
+        const subOsc = ctx.createOscillator()
+        subOsc.type = 'sine'
+        subOsc.frequency.setValueAtTime(36.71 / 2, t) // D0 (Sub)
+
+        // Filter Sweep (Lowpass opening up)
+        const filter = ctx.createBiquadFilter()
+        filter.type = 'lowpass'
+        filter.frequency.setValueAtTime(100, t)
+        filter.frequency.exponentialRampToValueAtTime(2000, t + 5) // Swell open over 5s
+
+        // Master Gain envelope
+        const gain = ctx.createGain()
+        gain.gain.setValueAtTime(0, t)
+        gain.gain.linearRampToValueAtTime(0.3, t + 2) // Fade in
+        gain.gain.setValueAtTime(0.3, t + 5)
+        gain.gain.linearRampToValueAtTime(0, t + 6.5) // Cut for transition
+
+        // Connections
+        osc1.connect(filter)
+        osc2.connect(filter)
+        subOsc.connect(gain) // Sub bypasses filter to keep bottom end
+        filter.connect(gain)
+        gain.connect(ctx.destination)
+
+        // Start/Stop
+        osc1.start(t)
+        osc1.stop(t + 7)
+        osc2.start(t)
+        osc2.stop(t + 7)
+        subOsc.start(t)
+        subOsc.stop(t + 7)
+
     }, [])
 
     // Play helper
@@ -2079,10 +2265,19 @@ export default function RoomPage() {
     return (
         <KeyboardContext.Provider value={contextValue}>
             <div className="w-full h-screen bg-black relative overflow-hidden select-none cursor-grab active:cursor-grabbing">
-                {/* Vintage overlay effects */}
-                <FilmGrain />
-                <Vignette />
-                <UIOverlay />
+                {!introFinished && (
+                    <CinematicIntro
+                        onStart={playIntroDrone}
+                        onComplete={() => setIntroFinished(true)}
+                    />
+                )}
+
+                {/* Vintage overlay effects - Only show after intro or fade them in */}
+                <div className={`transition-opacity duration-1000 ${introFinished ? 'opacity-100' : 'opacity-0'}`}>
+                    <FilmGrain />
+                    <Vignette />
+                    <UIOverlay />
+                </div>
 
                 {/* Typed message display - positioned lower on screen */}
                 {showTyped && typedSequence && !lightsFlickering && (

@@ -10,6 +10,15 @@ export const docsConfig = {
       ],
     },
     {
+      title: "Experiences",
+      items: [
+        {
+          title: "Stranger Things",
+          href: "/room",
+        },
+      ],
+    },
+    {
       title: "Components",
       items: [
         {
