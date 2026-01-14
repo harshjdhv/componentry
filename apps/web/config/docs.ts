@@ -13,8 +13,8 @@ export const docsConfig = {
       title: "Experiences",
       items: [
         {
-          title: "Stranger Things",
-          href: "/room",
+          title: "Alphabet Wall",
+          href: "/alphabet-wall",
         },
       ],
     },

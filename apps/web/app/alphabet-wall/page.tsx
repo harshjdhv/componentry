@@ -31,127 +31,276 @@ export const useKeyboard = () => useContext(KeyboardContext)
 // Development flag to skip intro
 const SKIP_INTRO = false
 
+// Audio Visualizer Component - Netflix style
+function AudioVisualizer({ isActive }: { isActive: boolean }) {
+    const [bars, setBars] = useState<number[]>(Array(24).fill(0.1))
+
+    useEffect(() => {
+        if (!isActive) return
+        const interval = setInterval(() => {
+            setBars(prev => prev.map((_, i) => {
+                const centerDistance = Math.abs(i - 11.5) / 12
+                const baseHeight = 0.2 + (1 - centerDistance) * 0.4
+                const randomVariation = Math.random() * 0.5
+                const wave = Math.sin(Date.now() / 200 + i * 0.3) * 0.2
+                return Math.min(1, Math.max(0.1, baseHeight + randomVariation + wave))
+            }))
+        }, 80)
+        return () => clearInterval(interval)
+    }, [isActive])
+
+    return (
+        <div className="flex items-end justify-center gap-[3px] h-12">
+            {bars.map((height, i) => (
+                <div
+                    key={i}
+                    className="w-[3px] rounded-full transition-all duration-100 ease-out"
+                    style={{
+                        height: `${height * 100}%`,
+                        background: `linear-gradient(to top, #E50914 0%, #ff4444 50%, #ff6666 100%)`,
+                        boxShadow: isActive ? `0 0 ${height * 10}px rgba(229, 9, 20, ${height * 0.6})` : 'none',
+                        opacity: isActive ? 0.8 + height * 0.2 : 0.3
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
+
+// Floating Particles Effect
+function FloatingParticles() {
+    const particles = useMemo(() =>
+        Array.from({ length: 30 }, (_, i) => ({
+            id: i,
+            x: Math.random() * 100,
+            y: Math.random() * 100,
+            size: Math.random() * 2 + 1,
+            duration: Math.random() * 10 + 15,
+            delay: Math.random() * 5,
+        })),
+        [])
+
+    useEffect(() => {
+        const styleId = 'floating-particles-keyframes'
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement('style')
+            style.id = styleId
+            style.textContent = `
+                @keyframes floatParticle {
+                    0%, 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
+                    25% { transform: translateY(-30px) translateX(10px) scale(1.2); opacity: 0.5; }
+                    50% { transform: translateY(-60px) translateX(-5px) scale(0.8); opacity: 0.3; }
+                    75% { transform: translateY(-30px) translateX(-15px) scale(1.1); opacity: 0.4; }
+                }
+            `
+            document.head.appendChild(style)
+        }
+    }, [])
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className="absolute rounded-full bg-red-500/20"
+                    style={{
+                        left: `${p.x}%`,
+                        top: `${p.y}%`,
+                        width: p.size,
+                        height: p.size,
+                        animation: `floatParticle ${p.duration}s ease-in-out ${p.delay}s infinite`,
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
+
 function CinematicIntro({ onComplete, onStart }: { onComplete: () => void, onStart: () => void }) {
     const [step, setStep] = useState<'start' | 'intro'>('start')
-    const [textOpacity, setTextOpacity] = useState(0)
-    const [subTextOpacity, setSubTextOpacity] = useState(0)
-    const [finalFade, setFinalFade] = useState(false)
+    const [introOpacity, setIntroOpacity] = useState(0)
+
+    // Intro sequence states
+    const [showHawkins, setShowHawkins] = useState(false)
+    const [showDate, setShowDate] = useState(false)
+
+    // Mount animation for start screen
+    useEffect(() => {
+        if (step === 'start') {
+            requestAnimationFrame(() => setIntroOpacity(1))
+        }
+    }, [step])
 
     const handleStart = () => {
-        onStart() // Trigger audio
-        setStep('intro')
-        // Request fullscreen
-        if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch((err) => {
-                console.log("Fullscreen request denied:", err)
-            })
-        }
+        setIntroOpacity(0) // Fade out start screen
 
-        // Animation Timeline
-        // 0s: Start
-        // 1s: Hawkins fade in
-        setTimeout(() => setTextOpacity(1), 1000)
-        // 2.5s: Subtext fade in
-        setTimeout(() => setSubTextOpacity(1), 2500)
-        // 5s: Fade out everything
         setTimeout(() => {
-            setTextOpacity(0)
-            setSubTextOpacity(0)
-            setFinalFade(true)
-        }, 5500)
-        // 7s: Complete
-        setTimeout(() => {
-            onComplete()
-        }, 7000)
+            onStart()
+            setStep('intro')
+            setIntroOpacity(1) // Fade in intro container
+
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => { })
+            }
+
+            // Timeline
+            setTimeout(() => setShowHawkins(true), 1500)
+            setTimeout(() => setShowDate(true), 4000)
+
+            // Exit sequence
+            setTimeout(() => {
+                setShowHawkins(false)
+                setShowDate(false)
+                setIntroOpacity(0) // Fade to black
+            }, 8000)
+
+            setTimeout(onComplete, 9500)
+        }, 1000) // Wait for start screen fade out
     }
+
+    // Noise/Grain Overlay Component
+    const GrainOverlay = () => (
+        <div className="fixed inset-0 pointer-events-none z-[60] opacity-[0.15] mix-blend-overlay"
+            style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            }}
+        />
+    )
 
     if (step === 'start') {
         return (
-            <div className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
-                <div className="max-w-md w-full text-center space-y-8 animate-in fade-in duration-1000">
-                    <div className="space-y-2">
-                        <h1 className="text-amber-500 text-sm tracking-[0.3em] font-serif uppercase opacity-80">
-                            Immersive Experience
-                        </h1>
-                        <h2 className="text-4xl md:text-5xl font-bold font-serif text-white tracking-tighter"
-                            style={{ textShadow: "0 0 30px rgba(200, 50, 50, 0.4)" }}>
+            <div className="fixed inset-0 z-50 bg-[#050505] flex flex-col items-center justify-center p-6 overflow-hidden select-none">
+                <GrainOverlay />
+                <FloatingParticles />
+
+                {/* Background Atmosphere */}
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 bg-gradient-to-t from-red-950/20 via-transparent to-transparent opacity-60" />
+                    <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/80 to-transparent" />
+                </div>
+
+                <div
+                    className="relative z-10 max-w-4xl w-full text-center flex flex-col items-center transition-all duration-[1500ms] ease-out"
+                    style={{
+                        opacity: introOpacity,
+                        transform: `scale(${0.95 + (introOpacity * 0.05)}) translateZ(0)`
+                    }}
+                >
+                    <div className="mb-8 tracking-[0.4em] text-red-500/50 font-serif text-xs md:text-sm uppercase animate-pulse flex flex-col items-center gap-2">
+                        A Componentry Original
+                    </div>
+
+                    {/* HERO TITLE */}
+                    <div className="relative mb-20 py-8 group cursor-default">
+                        {/* Shadow/Glow Layer */}
+                        <h1
+                            className="text-5xl md:text-8xl lg:text-9xl font-black tracking-tighter text-red-700/20 absolute inset-0 blur-xl scale-110 z-0 select-none"
+                            style={{ fontFamily: 'serif' }}
+                        >
                             STRANGER THINGS
-                        </h2>
-                    </div>
+                        </h1>
 
-                    <div className="p-6 border border-white/10 bg-white/5 backdrop-blur-sm rounded-sm">
-                        <div className="flex items-center justify-center gap-4 mb-4 text-white/60">
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                            </svg>
-                            <span className="text-sm tracking-widest uppercase">Use Headphones</span>
+                        <div className="relative z-10 flex flex-col items-center">
+                            <h1
+                                className="text-5xl md:text-8xl lg:text-9xl font-black tracking-tighter text-transparent relative z-10 scale-y-110"
+                                style={{
+                                    fontFamily: 'serif',
+                                    WebkitTextStroke: '2px #c21e1e',
+                                    textShadow: '0 0 20px rgba(194, 30, 30, 0.4)'
+                                }}
+                            >
+                                STRANGER
+                            </h1>
+                            <h1
+                                className="text-5xl md:text-8xl lg:text-9xl font-black tracking-tighter text-transparent relative z-10 -mt-2 md:-mt-6 scale-y-110"
+                                style={{
+                                    fontFamily: 'serif',
+                                    WebkitTextStroke: '2px #c21e1e',
+                                    textShadow: '0 0 20px rgba(194, 30, 30, 0.4)'
+                                }}
+                            >
+                                THINGS
+                            </h1>
                         </div>
-                        <p className="text-xs text-white/40 leading-relaxed font-serif tracking-wide">
-                            This experience works best in a dark room with audio enabled.
-                            Application will request fullscreen mode.
-                        </p>
+
+                        {/* Glow bloom behind text */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[120%] bg-red-600/10 blur-[80px] pointer-events-none rounded-full" />
                     </div>
 
+                    {/* Metadata / Instructions */}
+                    <div className="flex flex-col items-center justify-center gap-4 mb-16 text-zinc-500">
+                        <span className="text-xs tracking-[0.3em] uppercase text-zinc-500 hover:text-red-500/80 transition-colors">
+                            Immersive Audio
+                        </span>
+                    </div>
+
+                    {/* Play Button */}
                     <button
                         onClick={handleStart}
-                        className="group relative px-8 py-3 bg-transparent overflow-hidden rounded-sm transition-all"
+                        className="group relative flex items-center gap-4 px-12 py-4 bg-zinc-100 hover:bg-red-600 transition-all duration-500 rounded-sm overflow-hidden"
                     >
-                        <div className="absolute inset-0 border border-amber-600/50 group-hover:border-amber-500 transition-colors" />
-                        <div className="absolute inset-0 bg-amber-900/20 group-hover:bg-amber-900/40 transition-colors" />
-                        <span className="relative text-amber-100 font-serif tracking-[0.2em] text-sm group-hover:text-white transition-colors uppercase">
-                            Enter The Upside Down
-                        </span>
+                        <div className="relative z-10 flex items-center gap-4 text-black group-hover:text-white transition-colors duration-300">
+                            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                            <span className="font-bold tracking-[0.2em] text-sm uppercase">Play Experience</span>
+                        </div>
+                        {/* Button Glow on Hover */}
+                        <div className="absolute inset-0 bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
                     </button>
+
+                    <div className="mt-8 text-[10px] text-zinc-700 font-mono tracking-widest uppercase opacity-60">
+                        Recommended: Full Screen & Headphones
+                    </div>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className={`absolute inset-0 z-50 bg-black flex items-center justify-center transition-opacity duration-1000 ${finalFade ? 'opacity-0' : 'opacity-100'}`}>
-            {/* Background Atmosphere */}
-            <div className="absolute inset-0 overflow-hidden">
-                {/* Red Pulse from Center - 'The Rift' */}
-                <div
-                    className="absolute inset-0 opacity-20 animate-pulse"
-                    style={{
-                        background: 'radial-gradient(circle at center, #8B0000 0%, #000000 70%)',
-                        animationDuration: '4s'
-                    }}
-                />
+        <div
+            className="fixed inset-0 z-50 bg-black flex items-center justify-center transition-opacity duration-[2000ms] ease-in-out cursor-none"
+            style={{ opacity: introOpacity }}
+        >
+            <GrainOverlay />
 
-                {/* Subtle Scanlines */}
-                <div
-                    className="absolute inset-0 opacity-10 pointer-events-none"
-                    style={{
-                        background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
-                        backgroundSize: '100% 2px, 3px 100%'
-                    }}
-                />
-            </div>
+            {/* Scene Background - The Void */}
+            <div className={`absolute inset-0 bg-[radial-gradient(circle_at_center,_#4a0000_0%,_#000000_70%)] opacity-30 transition-opacity duration-[4000ms] ${showHawkins ? 'opacity-30' : 'opacity-0'}`} />
 
-            <div className="text-center relative z-10">
-                <h1
-                    className="text-amber-500/90 text-4xl md:text-6xl font-bold font-serif tracking-widest uppercase mb-4 transition-all duration-[4000ms] ease-out"
+            <div className="relative z-10 text-center mix-blend-screen px-4">
+                {/* Location */}
+                <h2
+                    className="text-4xl md:text-7xl font-bold text-zinc-100 uppercase tracking-widest transition-all duration-[3000ms] ease-out"
                     style={{
-                        opacity: textOpacity,
-                        textShadow: "0 0 20px rgba(180, 50, 20, 0.5), 0 0 40px rgba(180, 50, 20, 0.2)",
-                        transform: textOpacity ? 'scale(1.1)' : 'scale(0.9)',
-                        letterSpacing: textOpacity ? '0.2em' : '0.1em'
+                        fontFamily: 'serif',
+                        opacity: showHawkins ? 0.9 : 0,
+                        transform: showHawkins ? 'scale(1) translateY(0)' : 'scale(1.1) translateY(30px)',
+                        textShadow: '0 0 30px rgba(220, 20, 20, 0.4)'
                     }}
                 >
                     Hawkins, Indiana
-                </h1>
-                <p
-                    className="text-white/60 text-lg md:text-xl font-serif tracking-[0.5em] uppercase transition-all duration-[2000ms]"
-                    style={{ opacity: subTextOpacity }}
+                </h2>
+
+                {/* Date */}
+                <div
+                    className="mt-8 transition-all duration-[3000ms] ease-out flex flex-col items-center gap-2"
+                    style={{
+                        opacity: showDate ? 1 : 0,
+                        transform: showDate ? 'translateY(0)' : 'translateY(20px)',
+                    }}
                 >
-                    November 6th, 1983
-                </p>
+                    <div className="w-12 h-0.5 bg-red-600/50 mb-4" />
+                    <h3
+                        className="text-xl md:text-3xl text-zinc-400 font-serif tracking-[0.3em] uppercase"
+                    >
+                        November 6, 1983
+                    </h3>
+                </div>
             </div>
 
-            {/* Loading Spinner / Recorder Light */}
-            <div className="absolute bottom-12 right-12 transition-opacity duration-500 flex items-center gap-3" style={{ opacity: subTextOpacity }}>
+            {/* Recording Light */}
+            <div className={`absolute bottom-12 right-12 flex items-center gap-3 transition-opacity duration-1000 ${showDate ? 'opacity-100' : 'opacity-0'}`}>
                 <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_#ff0000]" />
                 <span className="text-red-500/50 text-xs tracking-widest font-mono">REC</span>
             </div>
