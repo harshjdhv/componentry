@@ -1,20 +1,22 @@
 "use client"
 
 import { Suspense, useRef, useState, useEffect, useMemo, createContext, useContext, useCallback } from "react"
-import { Canvas, useFrame } from '@react-three/fiber'
-import { PerspectiveCamera, OrbitControls, useProgress, Html } from '@react-three/drei'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { PerspectiveCamera, useProgress, Html, Text } from '@react-three/drei'
 import * as THREE from "three"
 
 // Keyboard context for letter activation
 interface KeyboardContextType {
     activeLetter: string | null
     demogorgonMode: boolean
+    upsideDownMode: boolean
     typedSequence: string
 }
 
 const KeyboardContext = createContext<KeyboardContextType>({
     activeLetter: null,
     demogorgonMode: false,
+    upsideDownMode: false,
     typedSequence: "",
 })
 
@@ -40,52 +42,157 @@ function Loader() {
     )
 }
 
-// Scene Camera with Shake Effect
-function SceneCamera({ lightsFlickering }: { lightsFlickering?: boolean }) {
-    const cameraRef = useRef<THREE.Group>(null)
+// Camera controller for mouse-based look around
+function CameraController() {
+    const { camera, gl } = useThree()
+    const isDragging = useRef(false)
+    const previousMousePosition = useRef({ x: 0, y: 0 })
+    const spherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
+    const targetSpherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
 
-    // Shake animation
-    useFrame((state) => {
-        if (!cameraRef.current) return
+    // Get demogorgon mode for shake effect
+    const { demogorgonMode } = useKeyboard()
 
-        if (lightsFlickering) {
-            // Violent earthquake shake using pseudo-random noise
-            const time = state.clock.getElapsedTime()
-            const intensity = 0.8 // High intensity shake
+    useEffect(() => {
+        const domElement = gl.domElement
 
-            // Jitter rotation slightly on all axes
-            cameraRef.current.rotation.x = (Math.sin(time * 25) + Math.cos(time * 35)) * 0.02 * intensity
-            cameraRef.current.rotation.y = (Math.cos(time * 30) + Math.sin(time * 40)) * 0.02 * intensity
-            cameraRef.current.rotation.z = (Math.sin(time * 50)) * 0.01 * intensity
-
-            // Jitter position slightly
-            cameraRef.current.position.y = (Math.sin(time * 60)) * 0.05 * intensity
-            cameraRef.current.position.x = (Math.cos(time * 45)) * 0.05 * intensity
-        } else {
-            // Smoothly recover to original state (damped spring-like)
-            cameraRef.current.rotation.x = THREE.MathUtils.lerp(cameraRef.current.rotation.x, 0, 0.1)
-            cameraRef.current.rotation.y = THREE.MathUtils.lerp(cameraRef.current.rotation.y, 0, 0.1)
-            cameraRef.current.rotation.z = THREE.MathUtils.lerp(cameraRef.current.rotation.z, 0, 0.1)
-            cameraRef.current.position.y = THREE.MathUtils.lerp(cameraRef.current.position.y, 0, 0.1)
-            cameraRef.current.position.x = THREE.MathUtils.lerp(cameraRef.current.position.x, 0, 0.1)
+        const handleMouseDown = (e: MouseEvent) => {
+            isDragging.current = true
+            previousMousePosition.current = { x: e.clientX, y: e.clientY }
+            domElement.style.cursor = "grabbing"
         }
+
+        const handleMouseUp = () => {
+            isDragging.current = false
+            domElement.style.cursor = "grab"
+        }
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDragging.current) return
+
+            const deltaX = e.clientX - previousMousePosition.current.x
+            const deltaY = e.clientY - previousMousePosition.current.y
+
+            const rotationSpeed = 0.003
+
+            targetSpherical.current.theta -= deltaX * rotationSpeed
+            targetSpherical.current.phi += deltaY * rotationSpeed
+
+            targetSpherical.current.phi = Math.max(
+                0.1,
+                Math.min(Math.PI - 0.1, targetSpherical.current.phi)
+            )
+
+            previousMousePosition.current = { x: e.clientX, y: e.clientY }
+        }
+
+        const handleTouchStart = (e: TouchEvent) => {
+            const touch = e.touches[0]
+            if (e.touches.length === 1 && touch) {
+                isDragging.current = true
+                previousMousePosition.current = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                }
+            }
+        }
+
+        const handleTouchEnd = () => {
+            isDragging.current = false
+        }
+
+        const handleTouchMove = (e: TouchEvent) => {
+            const touch = e.touches[0]
+            if (!isDragging.current || e.touches.length !== 1 || !touch) return
+
+            const deltaX = touch.clientX - previousMousePosition.current.x
+            const deltaY = touch.clientY - previousMousePosition.current.y
+
+            const rotationSpeed = 0.003
+
+            targetSpherical.current.theta -= deltaX * rotationSpeed
+            targetSpherical.current.phi += deltaY * rotationSpeed
+
+            targetSpherical.current.phi = Math.max(
+                0.1,
+                Math.min(Math.PI - 0.1, targetSpherical.current.phi)
+            )
+
+            previousMousePosition.current = {
+                x: touch.clientX,
+                y: touch.clientY,
+            }
+        }
+
+        domElement.style.cursor = "grab"
+        domElement.addEventListener("mousedown", handleMouseDown)
+        domElement.addEventListener("mouseup", handleMouseUp)
+        domElement.addEventListener("mouseleave", handleMouseUp)
+        domElement.addEventListener("mousemove", handleMouseMove)
+        domElement.addEventListener("touchstart", handleTouchStart)
+        domElement.addEventListener("touchend", handleTouchEnd)
+        domElement.addEventListener("touchmove", handleTouchMove)
+
+        return () => {
+            domElement.removeEventListener("mousedown", handleMouseDown)
+            domElement.removeEventListener("mouseup", handleMouseUp)
+            domElement.removeEventListener("mouseleave", handleMouseUp)
+            domElement.removeEventListener("mousemove", handleMouseMove)
+            domElement.removeEventListener("touchstart", handleTouchStart)
+            domElement.removeEventListener("touchend", handleTouchEnd)
+            domElement.removeEventListener("touchmove", handleTouchMove)
+        }
+    }, [gl])
+
+    useFrame((state) => {
+        spherical.current.theta +=
+            (targetSpherical.current.theta - spherical.current.theta) * 0.08
+        spherical.current.phi +=
+            (targetSpherical.current.phi - spherical.current.phi) * 0.08
+
+        const lookAt = new THREE.Vector3()
+        lookAt.setFromSpherical(spherical.current)
+
+        let posX = 0
+        let posY = 0
+        let posZ = 0
+
+        // Handle Shake Effect
+        if (demogorgonMode) {
+            const time = state.clock.getElapsedTime()
+
+            // DESPERATE SEARCH: Wide, smooth sweeps (Looking "here and there")
+            // Not violent shaking, but active, large head movements.
+
+            // 1. Look/Head Movement (The primary effect)
+            // We use lower frequencies but LARGE amplitudes to simulate turning the head.
+            // "Going from here and there"
+
+            // Sweep Left/Right (Dominant)
+            // Complex wave to avoid perfect pendulum feel
+            const lookX = Math.sin(time * 3) * 0.8 + Math.sin(time * 1.5) * 1.2
+
+            // Sweep Up/Down (Secondary)
+            const lookY = Math.cos(time * 2.5) * 0.5 + Math.sin(time * 1) * 0.3
+
+            lookAt.x += lookX
+            lookAt.y += lookY
+
+            // 2. Body Sway (Minimal, just to keep it organic)
+            // No violent vibration. Just shifting weight.
+            posX = Math.sin(time * 2) * 0.1
+            posY = Math.cos(time * 1.5) * 0.05
+            posZ = 0
+
+            // No roll
+            lookAt.z += 0
+        }
+
+        camera.position.set(posX, posY, posZ)
+        camera.lookAt(lookAt)
     })
 
-    return (
-        <group ref={cameraRef}>
-            <PerspectiveCamera makeDefault position={[0, 1.5, 2.5]} fov={50} />
-            <OrbitControls
-                enableZoom={false}
-                enablePan={false}
-                target={[0, 0.5, -5]}
-                maxPolarAngle={Math.PI / 1.8}
-                minPolarAngle={Math.PI / 2.5}
-                maxAzimuthAngle={Math.PI / 4}
-                minAzimuthAngle={-Math.PI / 4}
-                rotateSpeed={0.5}
-            />
-        </group>
-    )
+    return null
 }
 
 // Worn wall with imperfections
@@ -314,8 +421,20 @@ function ChristmasLightBulb({
 
     return (
         <group position={position}>
+            {/* Socket Base */}
+            <mesh position={[0, 0.05, 0]}>
+                <cylinderGeometry args={[0.015, 0.02, 0.06, 8]} />
+                <meshStandardMaterial color="#111" roughness={0.8} />
+            </mesh>
+
+            {/* Socket Connector */}
+            <mesh position={[0, 0.025, 0]}>
+                <cylinderGeometry args={[0.022, 0.02, 0.03, 8]} />
+                <meshStandardMaterial color="#0a3a2a" roughness={0.6} />
+            </mesh>
+
             {/* Bulb mesh */}
-            <mesh>
+            <mesh position={[0, -0.01, 0]}>
                 <sphereGeometry args={[0.035, 16, 16]} />
                 <meshStandardMaterial
                     color={isLit ? color : "#222"}
@@ -355,15 +474,16 @@ function ChristmasLightBulb({
 function LightWire({ points }: { points: THREE.Vector3[] }) {
     const curve = useMemo(() => {
         if (points.length < 2) return null
-        return new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.2)
+        // Tighter curve tension for more detailed twists
+        return new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.1)
     }, [points])
 
     if (!curve) return null
 
     return (
         <mesh>
-            <tubeGeometry args={[curve, 64, 0.008, 8, false]} />
-            <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+            <tubeGeometry args={[curve, 300, 0.007, 8, false]} />
+            <meshStandardMaterial color="#111" roughness={0.9} />
         </mesh>
     )
 }
@@ -381,7 +501,134 @@ const bulbColors = [
 ]
 
 // Complete alphabet wall with lights
-function AlphabetWall() {
+// --- UPSIDE DOWN VISUALS ---
+
+function UpsideDownVines() {
+    // Generate some "vines" crawling on the wall/ceiling
+    // We use a few fixed paths for performance and aesthetic control
+    const vinePaths = useMemo(() => {
+        const paths = []
+
+        // Vine 1: Traversing the alphabet wall
+        const curve1 = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-5, -2, -6),
+            new THREE.Vector3(-3, 0, -5.8),
+            new THREE.Vector3(-1, 2, -5.9),
+            new THREE.Vector3(2, 1, -5.8),
+            new THREE.Vector3(5, -1, -5.9)
+        ])
+
+        // Vine 2: Ceiling dangle
+        const curve2 = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-2, 3, -4),
+            new THREE.Vector3(-1, 2, -4),
+            new THREE.Vector3(0, 2.5, -4),
+            new THREE.Vector3(2, 1.8, -4),
+            new THREE.Vector3(2.5, 3, -4)
+        ])
+
+        // Vine 3: Corner creep
+        const curve3 = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-5.9, -2, 5),
+            new THREE.Vector3(-5.8, 1, 0),
+            new THREE.Vector3(-5.9, 2.5, -5)
+        ])
+
+        paths.push(curve1, curve2, curve3)
+        return paths
+    }, [])
+
+    return (
+        <group>
+            {vinePaths.map((curve, i) => (
+                <mesh key={i}>
+                    <tubeGeometry args={[curve, 64, 0.08, 8, false]} />
+                    <meshStandardMaterial
+                        color="#050505"
+                        roughness={0.9}
+                        metalness={0.1}
+                        emissive="#0a0a0a" // Faint dark glow
+                    />
+                </mesh>
+            ))}
+            {/* Add some "slime" nodes */}
+            <mesh position={[0, 1, -5.8]}>
+                <sphereGeometry args={[0.3, 16, 16]} />
+                <meshStandardMaterial color="#000" roughness={0.2} />
+            </mesh>
+            <mesh position={[-3, -1, -5.8]}>
+                <sphereGeometry args={[0.2, 16, 16]} />
+                <meshStandardMaterial color="#000" roughness={0.2} />
+            </mesh>
+        </group>
+    )
+}
+
+function UpsideDownParticles() {
+    // Floating "ash" / spores
+    const count = 300
+    const mesh = useRef<THREE.InstancedMesh>(null!)
+    const dummy = useMemo(() => new THREE.Object3D(), [])
+    const particles = useMemo(() => {
+        const temp = []
+        for (let i = 0; i < count; i++) {
+            const t = Math.random() * 100
+            const factor = 20 + Math.random() * 100
+            const speed = 0.01 + Math.random() / 200
+            const xFactor = -5 + Math.random() * 10
+            const yFactor = -5 + Math.random() * 10
+            const zFactor = -5 + Math.random() * 10
+            temp.push({ t, factor, speed, xFactor, yFactor, zFactor, mx: 0, my: 0 })
+        }
+        return temp
+    }, [count])
+
+    useFrame((state) => {
+        if (!mesh.current) return
+
+        particles.forEach((particle, i) => {
+            let { t, factor, speed, xFactor, yFactor, zFactor } = particle
+            t = particle.t += speed / 2
+            const a = Math.cos(t) + Math.sin(t * 1) / 10
+            const b = Math.sin(t) + Math.cos(t * 2) / 10
+            const s = Math.cos(t)
+
+            // Gentle floating motion
+            dummy.position.set(
+                (particle.mx / 10) * a + xFactor + Math.cos((t / 10) * factor) + (Math.sin(t * 1) * factor) / 10,
+                (particle.my / 10) * b + yFactor + Math.sin((t / 10) * factor) + (Math.cos(t * 2) * factor) / 10,
+                (particle.my / 10) * b + zFactor + Math.cos((t / 10) * factor) + (Math.sin(t * 3) * factor) / 10
+            )
+
+            // Constrain to room bounds broadly
+            dummy.position.x = (dummy.position.x % 12)
+            dummy.position.y = (dummy.position.y % 6)
+            dummy.position.z = (dummy.position.z % 12)
+
+            dummy.scale.setScalar(0.02 + Math.random() * 0.01) // Varying small sizes
+            dummy.rotation.set(s * 5, s * 5, s * 5)
+            dummy.updateMatrix()
+            mesh.current.setMatrixAt(i, dummy.matrix)
+        })
+        mesh.current.instanceMatrix.needsUpdate = true
+    })
+
+    return (
+        <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+            <dodecahedronGeometry args={[0.2, 0]} />
+            <meshStandardMaterial
+                color="#8899aa"
+                transparent
+                opacity={0.6}
+                roughness={1}
+                blending={THREE.AdditiveBlending}
+            />
+        </instancedMesh>
+    )
+}
+
+
+function AlphabetWall({ isUpsideDown = false }: { isUpsideDown?: boolean }) {
     const { activeLetter, demogorgonMode } = useKeyboard()
 
     const seededRandom = (seed: number) => {
@@ -421,46 +668,112 @@ function AlphabetWall() {
         return letters
     }, [])
 
-    // Generate Wires separately based on bulb positions
+    // Generate MESSY Wires connected to bulbs
     const wirePath = useMemo(() => {
         const points: THREE.Vector3[] = []
-        // Start off-screen left
-        points.push(new THREE.Vector3(-4, 1.5, -5.9))
+
+        // Start off-screen left, draped over something maybe
+        points.push(new THREE.Vector3(-4, 1.5, -5.85))
+        points.push(new THREE.Vector3(-3, 1.2, -5.88))
 
         layoutData.forEach((item, i) => {
-            // Bulb location
-            points.push(new THREE.Vector3(...item.bulbPos))
+            // Calculate "socket top" attachment point
+            const attachPoint = new THREE.Vector3(
+                item.bulbPos[0],
+                item.bulbPos[1] + 0.08,
+                item.bulbPos[2]
+            )
 
-            // Interaction: Loop/sag between bulbs
+            // Add point AT the socket
+            points.push(attachPoint)
+
+            // Add connection to NEXT bulb (or end)
             if (i < layoutData.length - 1) {
-                const next = layoutData[i + 1]
-                const curr = item
+                const nextItem = layoutData[i + 1]
+                if (!nextItem) return
 
-                if (!next) return
+                const nextAttach = new THREE.Vector3(
+                    nextItem.bulbPos[0],
+                    nextItem.bulbPos[1] + 0.08,
+                    nextItem.bulbPos[2]
+                )
 
-                // If dropping to new row, drape longer
-                const isNewRow = Math.abs(curr.bulbPos[1] - next.bulbPos[1]) > 0.4
+                // Detect if we are jumping rows (large Y difference) or just moving sideways
+                const isNewRow = Math.abs(attachPoint.y - nextAttach.y) > 0.4
 
                 if (isNewRow) {
-                    // Drape down
+                    // COMPLEX ROW TRANSITION (H -> I)
+                    // We need a multi-point detailed path to go Right -> Down -> Left -> Hook
+
+                    const gutterY = (attachPoint.y + nextAttach.y) * 0.5
+
+                    // 1. Extend RIGHT from the current bulb
                     points.push(new THREE.Vector3(
-                        (curr.bulbPos[0] + next.bulbPos[0]) * 0.5,
-                        Math.min(curr.bulbPos[1], next.bulbPos[1]) + 0.1, // Loop up then down? No, just drape
-                        -5.9
+                        attachPoint.x + 0.4,
+                        attachPoint.y - 0.1, // Start dropping earlier
+                        attachPoint.z
                     ))
+
+                    // 2. Loop Out and Down
+                    points.push(new THREE.Vector3(
+                        attachPoint.x + 0.8, // Far right
+                        gutterY - 0.1, // Lower start of loop
+                        attachPoint.z + 0.2
+                    ))
+
+                    // 3. Traverse Left across the room (hanging VERY low)
+                    points.push(new THREE.Vector3(
+                        0, // Center of room
+                        gutterY - 0.45, // Significantly lower to clear text
+                        attachPoint.z + 0.4 // Hanging away from wall
+                    ))
+
+                    // 4. Loop Far Left (past the target)
+                    points.push(new THREE.Vector3(
+                        nextAttach.x - 0.8, // Far left
+                        gutterY - 0.05, // Start coming up
+                        nextAttach.z + 0.2
+                    ))
+
+                    // 5. Hook into the new bulb from left
+                    points.push(new THREE.Vector3(
+                        nextAttach.x - 0.4,
+                        nextAttach.y,
+                        nextAttach.z + 0.1
+                    ))
+
                 } else {
-                    // Small sag
-                    points.push(new THREE.Vector3(
-                        (curr.bulbPos[0] + next.bulbPos[0]) * 0.5,
-                        curr.bulbPos[1] - 0.1, // Sag down
-                        -5.88 // Come out from wall slightly
-                    ))
+                    // STANDARD CONNECTION (A -> B)
+                    // Simple 3-point catmull rom for messiness
+
+                    let mid1 = new THREE.Vector3().lerpVectors(attachPoint, nextAttach, 0.25)
+                    let mid2 = new THREE.Vector3().lerpVectors(attachPoint, nextAttach, 0.5)
+                    let mid3 = new THREE.Vector3().lerpVectors(attachPoint, nextAttach, 0.75)
+
+                    // Standard drape between letters
+                    const sagFactor = 0.05 + seededRandom(i * 55) * 0.2
+
+                    mid1.y -= sagFactor * 0.5
+                    mid1.z += (seededRandom(i * 12) - 0.5) * 0.05
+
+                    mid2.y -= sagFactor
+                    // Random twist
+                    mid2.x += (seededRandom(i * 99) - 0.5) * 0.05
+                    mid2.z += 0.02 + seededRandom(i * 88) * 0.05
+
+                    mid3.y -= sagFactor * 0.5
+                    mid3.z += (seededRandom(i * 23) - 0.5) * 0.05
+
+                    points.push(mid1)
+                    points.push(mid2)
+                    points.push(mid3)
                 }
             }
         })
 
         // End off-screen right
-        points.push(new THREE.Vector3(4, -1, -5.9))
+        points.push(new THREE.Vector3(2.5, -0.9, -5.88))
+        points.push(new THREE.Vector3(4, -1.2, -5.9))
 
         return points
     }, [layoutData])
@@ -498,12 +811,31 @@ function AlphabetWall() {
                         <ChristmasLightBulb
                             position={item.bulbPos}
                             color={item.bulbColor}
-                            isLit={!!isLit}
+                            // Disable lights in Upside Down
+                            isLit={isUpsideDown ? false : !!isLit}
                             flickerSeed={idx * 123.4}
                         />
                     </group>
                 )
             })}
+
+            {/* Cryptic Message in Upside Down */}
+            {isUpsideDown && (
+                <group
+                    position={[0, -1.8, -5.93]}
+                >
+                    <Text
+                        color="#ff0000"
+                        fontSize={1.5}
+                        anchorX="center"
+                        anchorY="middle"
+                        outlineWidth={0.02}
+                        outlineColor="#330000"
+                    >
+                        RIGHT HERE
+                    </Text>
+                </group>
+            )}
         </group>
     )
 }
@@ -1240,8 +1572,22 @@ function RoomLighting() {
 
 // Main Scene
 function JoyceBayersRoom() {
+    const { upsideDownMode } = useKeyboard()
+
     return (
         <group>
+            {/* UPSIDE DOWN ATMOSPHERE */}
+            {upsideDownMode && (
+                <>
+                    <UpsideDownVines />
+                    <UpsideDownParticles />
+                    <ambientLight intensity={0.1} color="#000510" />
+                    <pointLight position={[0, 4, 0]} intensity={2} color="#335588" distance={20} decay={2} />
+                    {/* Overwrite fog for dark blue atmosphere */}
+                    <fog attach="fog" args={['#020408', 1, 9]} />
+                </>
+            )}
+
             {/* Walls */}
             <WornWall position={[0, 0.25, -6]} rotation={[0, 0, 0]} />
             <WornWall position={[0, 0.25, 6]} rotation={[0, Math.PI, 0]} />
@@ -1257,7 +1603,7 @@ function JoyceBayersRoom() {
             <DarkDoorway position={[4, -0.9, -5.93]} side="right" />
 
             {/* The iconic alphabet wall with lights */}
-            <AlphabetWall />
+            <AlphabetWall isUpsideDown={upsideDownMode} />
 
             {/* Authentic 80s Byers home furniture */}
             <VintageCouch />
@@ -1273,8 +1619,8 @@ function JoyceBayersRoom() {
             <ScatteredPapers />
             <DrapedBlanket />
 
-            {/* Room lighting - responds to demogorgon mode */}
-            <RoomLighting />
+            {/* Room lighting - responds to demogorgon mode but OFF in Upside Down */}
+            {!upsideDownMode && <RoomLighting />}
         </group>
     )
 }
@@ -1374,10 +1720,9 @@ export default function RoomPage() {
     const [typedSequence, setTypedSequence] = useState("")
 
     // Split states for the sequenced event
-    // lightsFlickering: triggers the 3D lights chaos immediately
     const [lightsFlickering, setLightsFlickering] = useState(false)
-    // showAttackRed: triggers the red screen and "RUN" text after delay
     const [showAttackRed, setShowAttackRed] = useState(false)
+    const [upsideDownMode, setUpsideDownMode] = useState(false)
 
     const [showTyped, setShowTyped] = useState(false)
 
@@ -1387,11 +1732,17 @@ export default function RoomPage() {
     const vecnaBufferRef = useRef<AudioBuffer | null>(null)
     const punchBufferRef = useRef<AudioBuffer | null>(null)
 
+    // ... (Audio initialization code skipped for brevity, assumed unchanged if not selected) ...
+    // Since we are replacing a large block, I must ensure I don't delete the useEffect unless I include it. 
+    // The previous tool output didn't show the middle parts fully, so I should be careful.
+    // I will target the specific blocks instead of the whole function if possible or ensure I have the content.
+    // Actually, I can just replace the state declarations and the handleKeyDown.
+
+    // I will replace separate chunks to be safe.
+
     // Initialize Audio
     useEffect(() => {
         console.log("🔊 Initializing Audio Setup...")
-
-        // initialize AudioContext immediately
         const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
         const ctx = new AudioContextClass();
         audioContextRef.current = ctx;
@@ -1572,10 +1923,11 @@ export default function RoomPage() {
                     // 3. Reset everything after it's all done
                     const resetTime = 1000 + (vecnaDuration * 1000) + 1000; // 1s after Vecna ends
                     setTimeout(() => {
-                        console.log("👻 Effect sequence ending");
+                        console.log("👻 Entering Upside Down");
                         setLightsFlickering(false);
                         setShowAttackRed(false);
                         setTypedSequence("");
+                        setUpsideDownMode(true);
                     }, resetTime);
                 }
 
@@ -1615,14 +1967,15 @@ export default function RoomPage() {
 
 
 
+    const contextValue = useMemo(() => ({
+        activeLetter,
+        typedSequence,
+        demogorgonMode: lightsFlickering,
+        upsideDownMode,
+    }), [activeLetter, typedSequence, lightsFlickering, upsideDownMode])
+
     return (
-        <KeyboardContext.Provider
-            value={{
-                activeLetter,
-                typedSequence,
-                demogorgonMode: lightsFlickering, // Map lightsFlickering to demogorgonMode for context consumers
-            }}
-        >
+        <KeyboardContext.Provider value={contextValue}>
             <div className="w-full h-screen bg-black relative overflow-hidden select-none cursor-grab active:cursor-grabbing">
                 {/* Vintage overlay effects */}
                 <FilmGrain />
@@ -1680,13 +2033,23 @@ export default function RoomPage() {
                 </div>
 
                 <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
-                    <Suspense fallback={<Loader />}>
-                        <SceneCamera lightsFlickering={lightsFlickering} />
-                        <JoyceBayersRoom />
+                    {/* Bridge the context into the Canvas */}
+                    <KeyboardContext.Provider value={contextValue}>
+                        <Suspense fallback={<Loader />}>
+                            <PerspectiveCamera
+                                makeDefault
+                                position={[0, 0, 0]}
+                                fov={70}
+                                near={0.1}
+                                far={100}
+                            />
+                            <CameraController />
+                            <JoyceBayersRoom />
 
-                        {/* Fog for atmosphere */}
-                        <fog attach="fog" args={["#1a1510", 3, 12]} />
-                    </Suspense>
+                            {/* Fog for atmosphere */}
+                            <fog attach="fog" args={["#1a1510", 3, 12]} />
+                        </Suspense>
+                    </KeyboardContext.Provider>
                 </Canvas>
             </div>
         </KeyboardContext.Provider>
