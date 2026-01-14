@@ -1696,8 +1696,180 @@ function UIOverlay() {
 export default function RoomPage() {
     const [activeLetter, setActiveLetter] = useState<string | null>(null)
     const [typedSequence, setTypedSequence] = useState("")
-    const [demogorgonMode, setDemogorgonMode] = useState(false)
+
+    // Split states for the sequenced event
+    // lightsFlickering: triggers the 3D lights chaos immediately
+    const [lightsFlickering, setLightsFlickering] = useState(false)
+    // showAttackRed: triggers the red screen and "RUN" text after delay
+    const [showAttackRed, setShowAttackRed] = useState(false)
+
     const [showTyped, setShowTyped] = useState(false)
+
+    // Audio refs
+    const bgAudioRef = useRef<HTMLAudioElement | null>(null)
+    const audioContextRef = useRef<AudioContext | null>(null)
+    const vecnaBufferRef = useRef<AudioBuffer | null>(null)
+
+    // Initialize Audio
+    useEffect(() => {
+        console.log("🔊 Initializing Audio Setup...")
+
+        // initialize AudioContext immediately
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        const ctx = new AudioContextClass();
+        audioContextRef.current = ctx;
+
+        // Load Vecna Attack Sound into a Buffer (allows for amplification > 100%)
+        fetch('/audio/strangerthings/vecnaattack.mp3')
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => ctx.decodeAudioData(arrayBuffer))
+            .then(audioBuffer => {
+                console.log("🔊 Vecna Audio Buffer loaded and decoded");
+                vecnaBufferRef.current = audioBuffer;
+            })
+            .catch(e => console.error("🔊 Failed to load Vecna audio:", e));
+
+        // Background Ambient Loop (Standard HTML5 Audio is fine for this)
+        const bgAudio = new Audio('/audio/strangerthings/strangerthingsbg.mp3')
+        bgAudio.loop = true
+        bgAudio.volume = 0.4
+
+        bgAudio.addEventListener('canplaythrough', () => console.log("🔊 BG Audio loaded and ready"))
+        bgAudio.addEventListener('error', (e) => console.error("🔊 BG Audio Error:", bgAudio.error, e))
+        bgAudio.addEventListener('play', () => console.log("🔊 BG Audio started playing"))
+
+        bgAudioRef.current = bgAudio
+
+        // Try to play background audio on first interaction
+        const startAudio = () => {
+            console.log("🔊 Interaction detected. Checking audio state...")
+
+            if (bgAudioRef.current) {
+                if (bgAudioRef.current.paused) {
+                    bgAudioRef.current.play()
+                        .then(() => console.log("🔊 BG Audio play success"))
+                        .catch(e => console.error("🔊 BG Audio autoplay blocked/failed", e))
+                }
+            }
+
+            // Resume AudioContext if suspended
+            if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+                console.log("🔊 Resuming AudioContext...")
+                audioContextRef.current.resume().then(() => console.log("🔊 AudioContext resumed"))
+            }
+        }
+
+        window.addEventListener('click', startAudio)
+        window.addEventListener('keydown', startAudio)
+
+        return () => {
+            if (bgAudioRef.current) {
+                bgAudioRef.current.pause()
+                bgAudioRef.current.src = ''
+            }
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+            }
+            window.removeEventListener('click', startAudio)
+            window.removeEventListener('keydown', startAudio)
+        }
+    }, [])
+
+    // Spark Sound Effect
+    const playSpark = useCallback(() => {
+        try {
+            if (!audioContextRef.current) return;
+            const ctx = audioContextRef.current
+
+            // Resume if suspended
+            if (ctx.state === 'suspended') {
+                ctx.resume()
+            }
+
+            // Create a short, buzzy spark sound
+            const osc = ctx.createOscillator()
+            const gain = ctx.createGain()
+            const filter = ctx.createBiquadFilter()
+
+            osc.type = 'sawtooth'
+            osc.frequency.value = 100 + Math.random() * 50
+
+            filter.type = 'highpass'
+            filter.frequency.value = 800
+
+            const now = ctx.currentTime
+            gain.gain.setValueAtTime(0.08, now)
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1)
+
+            osc.connect(filter)
+            filter.connect(gain)
+            gain.connect(ctx.destination)
+
+            osc.start(now)
+            osc.stop(now + 0.1)
+        } catch (e) {
+            console.error("⚡ Spark sound failed", e)
+        }
+    }, [])
+
+    // Function to play scary loud Vecna sound
+    const playVecnaScare = useCallback(() => {
+        if (!audioContextRef.current || !vecnaBufferRef.current) {
+            console.warn("🔊 AudioContext or Vecna Buffer not ready");
+            return;
+        }
+
+        const ctx = audioContextRef.current;
+
+        // 1. Create Source
+        const source = ctx.createBufferSource();
+        source.buffer = vecnaBufferRef.current;
+
+        // 2. Create Gain for LOUDNESS (Boost 400%)
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = 4.0; // 4x Volume
+
+        // 3. Create Compressor to prevent painful clipping while keeping it loud
+        const compressor = ctx.createDynamicsCompressor();
+        compressor.threshold.value = -10;
+        compressor.knee.value = 40;
+        compressor.ratio.value = 12;
+        compressor.attack.value = 0;
+        compressor.release.value = 0.25;
+
+        // 4. Connect: Source -> Gain -> Compressor -> Destination
+        source.connect(gainNode);
+        gainNode.connect(compressor);
+        compressor.connect(ctx.destination);
+
+        // 5. Play
+        source.start(0);
+        console.log("� PLAYING VECNA SCARY SOUND!!!");
+
+        // Duck background audio
+        if (bgAudioRef.current) {
+            const originalVolume = bgAudioRef.current.volume;
+            // Fade out
+            const fadeOut = setInterval(() => {
+                if (bgAudioRef.current && bgAudioRef.current.volume > 0.05) {
+                    bgAudioRef.current.volume -= 0.05;
+                } else {
+                    clearInterval(fadeOut);
+                }
+            }, 50);
+
+            // Restore after 5 seconds
+            setTimeout(() => {
+                const fadeIn = setInterval(() => {
+                    if (bgAudioRef.current && bgAudioRef.current.volume < originalVolume) {
+                        bgAudioRef.current.volume += 0.05;
+                    } else {
+                        clearInterval(fadeIn);
+                    }
+                }, 100);
+            }, 5000);
+        }
+    }, []);
 
     // Handle keyboard events
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -1705,6 +1877,7 @@ export default function RoomPage() {
 
         // Only respond to alphabet keys
         if (/^[A-Z]$/.test(key)) {
+            playSpark()
             setActiveLetter(key)
             setShowTyped(true)
 
@@ -1714,18 +1887,31 @@ export default function RoomPage() {
 
                 // Check for "RUN" sequence
                 if (newSeq.includes("RUN")) {
-                    setDemogorgonMode(true)
-                    // Demogorgon mode lasts 5 seconds
+                    console.log("👻 RUN sequence detected!")
+                    // 1. Immediately start lights flickering
+                    setLightsFlickering(true)
+
+                    // 2. Delay red screen slightly (500ms)
+                    setTimeout(() => setShowAttackRed(true), 500)
+
+                    // 3. Play LOUD audio after 1 second
                     setTimeout(() => {
-                        setDemogorgonMode(false)
+                        playVecnaScare();
+                    }, 1000)
+
+                    // 4. Reset everything after 6 seconds
+                    setTimeout(() => {
+                        console.log("👻 Effect sequence ending")
+                        setLightsFlickering(false)
+                        setShowAttackRed(false)
                         setTypedSequence("")
-                    }, 5000)
+                    }, 6000)
                 }
 
                 return newSeq
             })
         }
-    }, [])
+    }, [playSpark, playVecnaScare])
 
     const handleKeyUp = useCallback((e: KeyboardEvent) => {
         const key = e.key.toUpperCase()
@@ -1756,75 +1942,12 @@ export default function RoomPage() {
         }
     }, [showTyped, typedSequence])
 
-    // Scary sound effect for Demogorgon mode
-    const audioContextRef = useRef<AudioContext | null>(null)
-
-    useEffect(() => {
-        if (demogorgonMode) {
-            // Create scary sound using Web Audio API
-            try {
-                if (!audioContextRef.current) {
-                    audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-                }
-                const ctx = audioContextRef.current
-
-                // Create oscillators for scary rumbling sound
-                const oscillator1 = ctx.createOscillator()
-                const oscillator2 = ctx.createOscillator()
-                const oscillator3 = ctx.createOscillator()
-                const gainNode = ctx.createGain()
-
-                // Low ominous rumble
-                oscillator1.type = 'sine'
-                oscillator1.frequency.value = 40 // Very low rumble
-
-                // Unsettling mid-frequency
-                oscillator2.type = 'sawtooth'
-                oscillator2.frequency.value = 80
-
-                // High eerie tone
-                oscillator3.type = 'sine'
-                oscillator3.frequency.value = 220
-
-                // Connect and set gain
-                oscillator1.connect(gainNode)
-                oscillator2.connect(gainNode)
-                oscillator3.connect(gainNode)
-                gainNode.connect(ctx.destination)
-
-                // Scary crescendo effect
-                gainNode.gain.setValueAtTime(0, ctx.currentTime)
-                gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.5)
-                gainNode.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 2)
-                gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 3)
-                gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 5)
-
-                // Add frequency modulation for eeriness
-                oscillator1.frequency.linearRampToValueAtTime(30, ctx.currentTime + 2)
-                oscillator1.frequency.linearRampToValueAtTime(50, ctx.currentTime + 4)
-                oscillator2.frequency.linearRampToValueAtTime(60, ctx.currentTime + 1)
-                oscillator2.frequency.linearRampToValueAtTime(100, ctx.currentTime + 3)
-                oscillator3.frequency.linearRampToValueAtTime(180, ctx.currentTime + 2)
-                oscillator3.frequency.linearRampToValueAtTime(260, ctx.currentTime + 4)
-
-                // Start and stop
-                oscillator1.start(ctx.currentTime)
-                oscillator2.start(ctx.currentTime)
-                oscillator3.start(ctx.currentTime)
-                oscillator1.stop(ctx.currentTime + 5)
-                oscillator2.stop(ctx.currentTime + 5)
-                oscillator3.stop(ctx.currentTime + 5)
-            } catch (e) {
-                console.log('Audio not available:', e)
-            }
-        }
-    }, [demogorgonMode])
-
+    // Context value - Map lightsFlickering to demogorgonMode for 3D components
     const keyboardValue = useMemo(() => ({
         activeLetter,
-        demogorgonMode,
+        demogorgonMode: lightsFlickering, // 3D lamps use this to flicker
         typedSequence,
-    }), [activeLetter, demogorgonMode, typedSequence])
+    }), [activeLetter, lightsFlickering, typedSequence])
 
     return (
         <KeyboardContext.Provider value={keyboardValue}>
@@ -1834,7 +1957,7 @@ export default function RoomPage() {
                 <UIOverlay />
 
                 {/* Typed message display - positioned lower on screen */}
-                {showTyped && typedSequence && !demogorgonMode && (
+                {showTyped && typedSequence && !lightsFlickering && (
                     <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
                         <p
                             className="text-amber-300/70 text-3xl tracking-[0.4em] font-serif animate-pulse"
@@ -1845,8 +1968,8 @@ export default function RoomPage() {
                     </div>
                 )}
 
-                {/* DEMOGORGON WARNING */}
-                {demogorgonMode && (
+                {/* DEMOGORGON WARNING - Controlled by showAttackRed */}
+                {showAttackRed && (
                     <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center">
                         <div className="text-center animate-pulse">
                             <p
@@ -1865,7 +1988,7 @@ export default function RoomPage() {
                                 THE DEMOGORGON IS COMING
                             </p>
                         </div>
-                        {/* Red vignette overlay during demogorgon mode */}
+                        {/* Red vignette overlay during attack mode */}
                         <div
                             className="absolute inset-0"
                             style={{
