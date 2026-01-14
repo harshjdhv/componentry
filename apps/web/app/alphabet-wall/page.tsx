@@ -31,41 +31,7 @@ export const useKeyboard = () => useContext(KeyboardContext)
 // Development flag to skip intro
 const SKIP_INTRO = false
 
-// Audio Visualizer Component - Netflix style
-function AudioVisualizer({ isActive }: { isActive: boolean }) {
-    const [bars, setBars] = useState<number[]>(Array(24).fill(0.1))
 
-    useEffect(() => {
-        if (!isActive) return
-        const interval = setInterval(() => {
-            setBars(prev => prev.map((_, i) => {
-                const centerDistance = Math.abs(i - 11.5) / 12
-                const baseHeight = 0.2 + (1 - centerDistance) * 0.4
-                const randomVariation = Math.random() * 0.5
-                const wave = Math.sin(Date.now() / 200 + i * 0.3) * 0.2
-                return Math.min(1, Math.max(0.1, baseHeight + randomVariation + wave))
-            }))
-        }, 80)
-        return () => clearInterval(interval)
-    }, [isActive])
-
-    return (
-        <div className="flex items-end justify-center gap-[3px] h-12">
-            {bars.map((height, i) => (
-                <div
-                    key={i}
-                    className="w-[3px] rounded-full transition-all duration-100 ease-out"
-                    style={{
-                        height: `${height * 100}%`,
-                        background: `linear-gradient(to top, #E50914 0%, #ff4444 50%, #ff6666 100%)`,
-                        boxShadow: isActive ? `0 0 ${height * 10}px rgba(229, 9, 20, ${height * 0.6})` : 'none',
-                        opacity: isActive ? 0.8 + height * 0.2 : 0.3
-                    }}
-                />
-            ))}
-        </div>
-    )
-}
 
 // Floating Particles Effect
 function FloatingParticles() {
@@ -338,98 +304,78 @@ function CameraController() {
     const targetSpherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
 
     // Get context for camera effects
-    const { demogorgonMode, impactMoment } = useKeyboard()
+    const { demogorgonMode, impactMoment, upsideDownMode, transitionPhase } = useKeyboard()
 
+    // Track when we entered Upside Down for animation timing
+    const upsideDownStartRef = useRef(0)
+
+    // Reset view and start timer when entering Upside Down
     useEffect(() => {
-        const domElement = gl.domElement
+        if (upsideDownMode) {
+            // Reset timer
+            upsideDownStartRef.current = 0; // Will be set in useFrame
 
-        const handleMouseDown = (e: MouseEvent) => {
+            // Look slightly up and to the side (disoriented)
+            spherical.current.set(1, Math.PI / 2.22, 0.5)
+            targetSpherical.current.set(1, Math.PI / 2.22, 0.5)
+
+            // Force reset position to floor immediately
+            camera.position.set(0, -1.2, 0)
+        }
+    }, [upsideDownMode, camera])
+
+    // Restore dragging functionality
+    useEffect(() => {
+        const handleDown = (e: MouseEvent | TouchEvent) => {
+            if (demogorgonMode || transitionPhase !== 'none') return // Disable control during events
             isDragging.current = true
-            previousMousePosition.current = { x: e.clientX, y: e.clientY }
-            domElement.style.cursor = "grabbing"
+            const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+            const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
+            previousMousePosition.current = { x: clientX, y: clientY }
         }
 
-        const handleMouseUp = () => {
-            isDragging.current = false
-            domElement.style.cursor = "grab"
-        }
-
-        const handleMouseMove = (e: MouseEvent) => {
+        const handleMove = (e: MouseEvent | TouchEvent) => {
             if (!isDragging.current) return
 
-            const deltaX = e.clientX - previousMousePosition.current.x
-            const deltaY = e.clientY - previousMousePosition.current.y
+            const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+            const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
 
-            const rotationSpeed = 0.003
-
-            targetSpherical.current.theta -= deltaX * rotationSpeed
-            targetSpherical.current.phi += deltaY * rotationSpeed
-
-            targetSpherical.current.phi = Math.max(
-                0.1,
-                Math.min(Math.PI - 0.1, targetSpherical.current.phi)
-            )
-
-            previousMousePosition.current = { x: e.clientX, y: e.clientY }
-        }
-
-        const handleTouchStart = (e: TouchEvent) => {
-            const touch = e.touches[0]
-            if (e.touches.length === 1 && touch) {
-                isDragging.current = true
-                previousMousePosition.current = {
-                    x: touch.clientX,
-                    y: touch.clientY,
-                }
+            const deltaMove = {
+                x: clientX - previousMousePosition.current.x,
+                y: clientY - previousMousePosition.current.y,
             }
+
+            previousMousePosition.current = { x: clientX, y: clientY }
+
+            // Update target rotation
+            targetSpherical.current.theta -= deltaMove.x * 0.002
+            targetSpherical.current.phi -= deltaMove.y * 0.002
+
+            // Clamp vertical rotation (phi)
+            targetSpherical.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, targetSpherical.current.phi))
         }
 
-        const handleTouchEnd = () => {
+        const handleUp = () => {
             isDragging.current = false
         }
 
-        const handleTouchMove = (e: TouchEvent) => {
-            const touch = e.touches[0]
-            if (!isDragging.current || e.touches.length !== 1 || !touch) return
-
-            const deltaX = touch.clientX - previousMousePosition.current.x
-            const deltaY = touch.clientY - previousMousePosition.current.y
-
-            const rotationSpeed = 0.003
-
-            targetSpherical.current.theta -= deltaX * rotationSpeed
-            targetSpherical.current.phi += deltaY * rotationSpeed
-
-            targetSpherical.current.phi = Math.max(
-                0.1,
-                Math.min(Math.PI - 0.1, targetSpherical.current.phi)
-            )
-
-            previousMousePosition.current = {
-                x: touch.clientX,
-                y: touch.clientY,
-            }
-        }
-
-        domElement.style.cursor = "grab"
-        domElement.addEventListener("mousedown", handleMouseDown)
-        domElement.addEventListener("mouseup", handleMouseUp)
-        domElement.addEventListener("mouseleave", handleMouseUp)
-        domElement.addEventListener("mousemove", handleMouseMove)
-        domElement.addEventListener("touchstart", handleTouchStart)
-        domElement.addEventListener("touchend", handleTouchEnd)
-        domElement.addEventListener("touchmove", handleTouchMove)
+        const canvas = gl.domElement
+        canvas.addEventListener('mousedown', handleDown)
+        canvas.addEventListener('touchstart', handleDown)
+        window.addEventListener('mousemove', handleMove)
+        window.addEventListener('touchmove', handleMove)
+        window.addEventListener('mouseup', handleUp)
+        window.addEventListener('touchend', handleUp)
 
         return () => {
-            domElement.removeEventListener("mousedown", handleMouseDown)
-            domElement.removeEventListener("mouseup", handleMouseUp)
-            domElement.removeEventListener("mouseleave", handleMouseUp)
-            domElement.removeEventListener("mousemove", handleMouseMove)
-            domElement.removeEventListener("touchstart", handleTouchStart)
-            domElement.removeEventListener("touchend", handleTouchEnd)
-            domElement.removeEventListener("touchmove", handleTouchMove)
+            canvas.removeEventListener('mousedown', handleDown)
+            canvas.removeEventListener('touchstart', handleDown)
+            window.removeEventListener('mousemove', handleMove)
+            window.removeEventListener('touchmove', handleMove)
+            window.removeEventListener('mouseup', handleUp)
+            window.removeEventListener('touchend', handleUp)
         }
-    }, [gl])
+    }, [gl.domElement, demogorgonMode, transitionPhase])
 
     useFrame((state) => {
         spherical.current.theta +=
@@ -456,32 +402,65 @@ function CameraController() {
             const time = state.clock.getElapsedTime()
 
             // DESPERATE SEARCH: Wide, smooth sweeps (Looking "here and there")
-            // Not violent shaking, but active, large head movements.
-
-            // 1. Look/Head Movement (The primary effect)
-            // We use lower frequencies but LARGE amplitudes to simulate turning the head.
-            // "Going from here and there"
-
-            // Sweep Left/Right (Dominant)
-            // Complex wave to avoid perfect pendulum feel
             const lookX = Math.sin(time * 3) * 0.8 + Math.sin(time * 1.5) * 1.2
-
-            // Sweep Up/Down (Secondary)
             const lookY = Math.cos(time * 2.5) * 0.5 + Math.sin(time * 1) * 0.3
 
             lookAt.x += lookX
             lookAt.y += lookY
 
-            // 2. Body Sway (Minimal, just to keep it organic)
-            // No violent vibration. Just shifting weight.
+            // Body Sway
             posX = Math.sin(time * 2) * 0.1
             posY = Math.cos(time * 1.5) * 0.05
-            posZ = 0
 
             camera.rotation.z = 0
         } else {
-            // Reset rotation when not in any mode
             camera.rotation.z = 0
+        }
+
+        // === UPSIDE DOWN - RECOVERY SEQUENCE ===
+        if (upsideDownMode) {
+            const now = state.clock.elapsedTime
+            if (upsideDownStartRef.current === 0) {
+                upsideDownStartRef.current = now
+            }
+            const elapsed = now - upsideDownStartRef.current
+
+            // 1. WAKE UP (FLOOR) - 0s to 4s
+            // Eyes opening, vision blurred. Lying flat.
+            if (elapsed < 4.0) {
+                posY = -1.2 // On floor
+
+                // Slight groggy head drift
+                const groggyX = Math.sin(elapsed * 0.5) * 0.05
+                const groggyY = Math.cos(elapsed * 0.4) * 0.02
+                lookAt.x += groggyX
+                lookAt.y += groggyY + 0.2 // Tilt up slightly
+            }
+            // 2. RECOVERY / STAND UP - 4s to 12s
+            // "Pushes themselves up... Kneels... Stands fully upright"
+            else if (elapsed < 12.0) {
+                // Ease out cubic for heavy lifting feel
+                const t = (elapsed - 4.0) / 8.0 // Normalized 0 to 1 over 8s
+                const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t // EaseInOutQuad
+
+                // Interpolate Height: Floor (-1.2) to Standing (0.0)
+                posY = THREE.MathUtils.lerp(-1.2, 0.0, ease)
+
+                // Camera Shake simulates struggle/movement
+                // Shake decreases as we stabilize
+                const struggle = (1.0 - t) * 0.03
+                posX += (Math.random() - 0.5) * struggle
+                posZ += (Math.random() - 0.5) * struggle
+
+                // Tilt pitch from "Looking Up" towards "Level"
+                // Although spherical controls lookAt, we can nudge the targetSpherical slightly
+                // But it's better to just let the user control or naturally settle.
+                // We'll just let the posY rise naturally.
+            }
+            // 3. STANDING / RECOVERED - 12s+
+            else {
+                posY = 0.0 // Fully standing
+            }
         }
 
         camera.position.set(posX, posY, posZ)
@@ -719,10 +698,10 @@ function ChristmasLightBulb({
     }, [])
 
     const [currentIntensity, setCurrentIntensity] = useState(intensity)
-    const { demogorgonMode } = useKeyboard()
+    const { demogorgonMode, upsideDownMode } = useKeyboard()
 
     useFrame((state) => {
-        if (!isLit) {
+        if (!isLit || upsideDownMode) {
             setCurrentIntensity(0)
             return
         }
@@ -1152,10 +1131,16 @@ function BreachingWall({
                 float crack = smoothstep(0.02, 0.0, abs(sin(distFromImpact * 40.0 + time * 5.0) * 0.1 - fract(vUv.x * 20.0 + vUv.y * 15.0))) * impactStrength * 0.5;
                 finalColor = mix(finalColor, tearColor, crack);
                 
-                gl_FragColor = vec4(finalColor, 1.0);
+                // Alpha based on activity - transparent where not displaced
+                // This allows the Window and physical Wall behind to be seen until the breach occurs
+                float alpha = smoothstep(0.01, 0.2, vDisplacement) + tearAmount;
+                
+                gl_FragColor = vec4(finalColor, clamp(alpha, 0.0, 1.0));
             }
         `,
         side: THREE.DoubleSide,
+        transparent: true,
+        depthWrite: false, // Don't occlude if transparent
     }), [])
 
     useFrame((state) => {
@@ -1183,8 +1168,9 @@ function BreachingWall({
         }
     })
 
-    // Only render during breach/transition
-    const { demogorgonMode } = useKeyboard()
+    // Only render during breach/transition, and NEVER in Upside Down (it's unlit and breaks immersion)
+    const { demogorgonMode, upsideDownMode } = useKeyboard()
+    if (upsideDownMode) return null
     if (!demogorgonMode && transitionPhase === 'none') return null
 
     return (
@@ -1405,12 +1391,22 @@ function BreachScreenEffects() {
                 />
             )}
 
-            {/* Fade FROM black - eyes opening in Upside Down */}
+            {/* Fade FROM black - eyes opening in Upside Down (With Blur) */}
             {transitionPhase === 'reveal' && (
                 <div
                     className="fixed inset-0 pointer-events-none z-[100] bg-black"
                     style={{
-                        animation: 'fadeFromBlack 1.5s ease-out forwards',
+                        animation: 'fadeFromBlack 4s ease-out forwards', // Slower, more hesitant
+                    }}
+                />
+            )}
+
+            {/* Separate Blur Overlay for the "Vision blurred" effect */}
+            {transitionPhase === 'reveal' && (
+                <div
+                    className="fixed inset-0 pointer-events-none z-[90] backdrop-blur-md"
+                    style={{
+                        animation: 'blurClear 4s ease-out forwards'
                     }}
                 />
             )}
@@ -1426,7 +1422,12 @@ function BreachScreenEffects() {
                 }
                 @keyframes fadeFromBlack {
                     0% { opacity: 1; }
+                    20% { opacity: 1; } /* Hold black a bit longer */
                     100% { opacity: 0; }
+                }
+                @keyframes blurClear {
+                    0% { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+                    100% { backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
                 }
             `}</style>
         </>
@@ -2034,6 +2035,17 @@ function WornRug() {
     )
 }
 
+function UpsideDownWindowOverlay() {
+    const { upsideDownMode } = useKeyboard()
+    if (!upsideDownMode) return null
+    return (
+        <mesh position={[0, 0, 0.01]}>
+            <planeGeometry args={[2.2, 1.6]} />
+            <meshBasicMaterial color="#001133" opacity={0.6} transparent />
+        </mesh>
+    )
+}
+
 // Large window looking out to dark forest - RIGHT SIDE
 function ForestWindow() {
     // Create forest scene texture procedurally
@@ -2136,11 +2148,14 @@ function ForestWindow() {
                 <meshStandardMaterial color="#C4B4A0" roughness={0.92} />
             </mesh>
 
-            {/* Window glass with forest view */}
+            {/* Window glass with forest view - Blue tint in Upside Down */}
             <mesh position={[0, 0, 0]}>
                 <planeGeometry args={[2.2, 1.6]} />
                 <primitive object={forestMaterial} attach="material" />
             </mesh>
+            {/* Upside Down Tint Overlay */}
+            {/* UpsideDownWindowOverlay is rendered here */}
+            <UpsideDownWindowOverlay />
 
             {/* Glass reflection overlay - subtle */}
             <mesh position={[0, 0, 0.001]}>
@@ -2192,7 +2207,7 @@ function ForestWindow() {
                 distance={4}
                 decay={2}
             />
-        </group>
+        </group >
     )
 }
 
@@ -2511,16 +2526,16 @@ function RoomLighting() {
         <>
             {/* Minimal ambient - Cool-neutral shadows as per grading brief (not warm beige) */}
             <ambientLight
-                intensity={demogorgonMode ? flicker1 * 0.15 : 0.12}
+                intensity={demogorgonMode ? flicker1 * 0.15 : 0.8}
                 color={demogorgonMode ? "#FF4444" : "#14161A"} // Cool dark grey-blue
             />
 
             {/* Subtle fill light from the side - Warm Incandescent but soft (not orange) */}
             <pointLight
                 position={[4, 1, 0]}
-                intensity={demogorgonMode ? flicker2 * 0.25 : 0.2}
+                intensity={demogorgonMode ? flicker2 * 0.25 : 1.2}
                 color={demogorgonMode ? "#FF6B6B" : "#FFD8B0"} // Softer warm
-                distance={10}
+                distance={15}
                 decay={2}
             />
 
@@ -2735,13 +2750,8 @@ export default function RoomPage() {
     const vecnaBufferRef = useRef<AudioBuffer | null>(null)
     const punchBufferRef = useRef<AudioBuffer | null>(null)
 
-    // ... (Audio initialization code skipped for brevity, assumed unchanged if not selected) ...
-    // Since we are replacing a large block, I must ensure I don't delete the useEffect unless I include it. 
-    // The previous tool output didn't show the middle parts fully, so I should be careful.
-    // I will target the specific blocks instead of the whole function if possible or ensure I have the content.
-    // Actually, I can just replace the state declarations and the handleKeyDown.
-
-    // I will replace separate chunks to be safe.
+    // Active sources ref to kill them instantly
+    const activeSourcesRef = useRef<AudioBufferSourceNode[]>([])
 
     // Initialize Audio
     useEffect(() => {
@@ -2802,6 +2812,29 @@ export default function RoomPage() {
             window.removeEventListener('keydown', startAudio)
         }
     }, [])
+
+    // Manage Audio for Upside Down Awakening
+    useEffect(() => {
+        if (upsideDownMode && transitionPhase === 'reveal') {
+            if (bgAudioRef.current) {
+                // Reset and start silent
+                bgAudioRef.current.currentTime = 0;
+                bgAudioRef.current.volume = 0;
+                bgAudioRef.current.play().catch(() => { });
+
+                // Fade in over 5 seconds
+                const fadeIn = setInterval(() => {
+                    if (bgAudioRef.current && bgAudioRef.current.volume < 0.4) {
+                        bgAudioRef.current.volume = Math.min(0.4, bgAudioRef.current.volume + 0.02);
+                    } else {
+                        clearInterval(fadeIn);
+                    }
+                }, 200); // 25 steps * 200ms = 5000ms
+
+                return () => clearInterval(fadeIn);
+            }
+        }
+    }, [upsideDownMode, transitionPhase]);
 
     // Spark Sound Effect
     const playSpark = useCallback(() => {
@@ -2909,6 +2942,12 @@ export default function RoomPage() {
 
         source.start(0);
 
+        // Track the source
+        activeSourcesRef.current.push(source);
+        source.onended = () => {
+            activeSourcesRef.current = activeSourcesRef.current.filter(s => s !== source);
+        };
+
         if (duckBg && bgAudioRef.current) {
             const originalVolume = bgAudioRef.current.volume;
             // Fade out
@@ -2971,6 +3010,7 @@ export default function RoomPage() {
                         }
                     }, 1000)
 
+
                     // 2. When vecna audio has ~1s remaining: BOOM + Punch
                     const boomTime = 1000 + (vecnaDuration * 1000) - 1500; // 1.5s before end
                     setTimeout(() => {
@@ -2987,29 +3027,43 @@ export default function RoomPage() {
                         }, 300);
                     }, Math.max(2000, boomTime));
 
-                    // 3. Fade to black (eyes close) then flip to Upside Down
-                    const flipTime = 1000 + (vecnaDuration * 1000) - 500; // 0.5s before end
+                    // 3. COMPLETE SILENCE (Unconsciousness)
+                    // The blackout happens right after impact/during the impact tail
+                    const blackoutTime = 1000 + (vecnaDuration * 1000) - 500; // 0.5s before end of audio
                     setTimeout(() => {
-                        console.log("👁️ Eyes closing... transitioning");
+                        console.log("🌑 UNCONSCIOUSNESS - Cut everything");
                         clearInterval(sparkInterval); // Stop spark sounds
-                        setTransitionPhase('flip'); // Triggers fade to black
-                        setLightsFlickering(false);
-                        setShowAttackRed(false);
 
-                        // After blackout, switch to Upside Down and start reveal
+                        // CUT ALL AUDIO INSTANTLY
+                        activeSourcesRef.current.forEach(source => {
+                            try { source.stop(); } catch (e) { }
+                        });
+                        activeSourcesRef.current = []; // Clear list
+                        if (bgAudioRef.current) bgAudioRef.current.pause();
+
+                        setTransitionPhase('flip'); // Triggers fade to black (eyes closing)
+                        setLightsFlickering(false);
+                        setShowAttackRed(false); // Remove "RUN" overlay instantly for pitch black
+
+                        // 4. AWAKENING (In the Upside Down)
+                        // Hold the silence and darkness for a moment (Scene 4: Mandatory Silence)
                         setTimeout(() => {
-                            console.log("👻 Switching to Upside Down");
+                            console.log("👻 Switching to Upside Down & Waking Up");
+
+                            // Transform world state while dark
                             setUpsideDownMode(true);
-                            setTransitionPhase('reveal'); // Eyes opening slowly
                             setTypedSequence("");
+
+                            // Start slow eye open
+                            setTransitionPhase('reveal');
 
                             // End reveal animation after it completes
                             setTimeout(() => {
                                 console.log("👁️ Eyes fully open");
                                 setTransitionPhase('none');
-                            }, 1500); // Match the fadeFromBlack animation duration
-                        }, 600); // 600ms of pure black
-                    }, Math.max(3000, flipTime));
+                            }, 4000); // Match slower fadeFromBlack animation
+                        }, 3000); // 3 SECONDS OF SILENCE/DARKNESS (Disorientation)
+                    }, Math.max(3000, blackoutTime));
                 }
 
                 return newSeq
