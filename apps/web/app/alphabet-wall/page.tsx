@@ -322,16 +322,16 @@ function CameraController() {
         const handleDown = (e: MouseEvent | TouchEvent) => {
             if (transitionPhase !== 'none') return // Disable control only during transition events
             isDragging.current = true
-            const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-            const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
+            const clientX = 'touches' in e ? (e as unknown as TouchEvent).touches[0]!.clientX : (e as MouseEvent).clientX
+            const clientY = 'touches' in e ? (e as unknown as TouchEvent).touches[0]!.clientY : (e as MouseEvent).clientY
             previousMousePosition.current = { x: clientX, y: clientY }
         }
 
         const handleMove = (e: MouseEvent | TouchEvent) => {
             if (!isDragging.current) return
 
-            const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-            const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
+            const clientX = 'touches' in e ? (e as unknown as TouchEvent).touches[0]!.clientX : (e as MouseEvent).clientX
+            const clientY = 'touches' in e ? (e as unknown as TouchEvent).touches[0]!.clientY : (e as MouseEvent).clientY
 
             const deltaMove = {
                 x: clientX - previousMousePosition.current.x,
