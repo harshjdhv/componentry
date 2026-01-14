@@ -1944,32 +1944,32 @@ function VintageFloorLamp() {
             {/* Base */}
             <mesh castShadow>
                 <cylinderGeometry args={[0.15, 0.18, 0.08, 12]} />
-                <meshStandardMaterial color="#B8860B" roughness={0.5} metalness={0.4} />
+                <meshStandardMaterial color="#8B6914" roughness={0.6} metalness={0.5} />
             </mesh>
             {/* Pole */}
             <mesh position={[0, 0.8, 0]} castShadow>
                 <cylinderGeometry args={[0.02, 0.02, 1.5]} />
-                <meshStandardMaterial color="#B8860B" roughness={0.5} metalness={0.4} />
+                <meshStandardMaterial color="#8B6914" roughness={0.6} metalness={0.5} />
             </mesh>
             {/* Shade - glows during demogorgon */}
             <mesh position={[0, 1.5, 0]} castShadow>
                 <cylinderGeometry args={[0.12, 0.25, 0.3, 12, 1, true]} />
                 <meshStandardMaterial
-                    color={demogorgonMode ? "#FFB347" : "#E8DCC8"}
-                    emissive={demogorgonMode ? "#FF6B6B" : "#000000"}
-                    emissiveIntensity={demogorgonMode ? flicker * 0.5 : 0}
-                    roughness={0.95}
+                    color={demogorgonMode ? "#FFB347" : "#E2D4B7"} // Aged parchment
+                    emissive={demogorgonMode ? "#FF6B6B" : "#FF9E5E"} // Slight warm emission always
+                    emissiveIntensity={demogorgonMode ? flicker * 0.5 : 0.1} // Gentle self-illumination
+                    roughness={0.9}
                     side={THREE.DoubleSide}
                     transparent
-                    opacity={0.85}
+                    opacity={0.9}
                 />
             </mesh>
             {/* Warm light - flickers in demogorgon mode */}
             <pointLight
                 position={[0, 1.4, 0]}
-                intensity={demogorgonMode ? flicker * 0.6 : 0.4}
-                color={demogorgonMode ? "#FF6B6B" : "#FFD4A3"}
-                distance={5}
+                intensity={demogorgonMode ? flicker * 0.6 : 0.35}
+                color={demogorgonMode ? "#FF6B6B" : "#FFD0A0"} // Soft warm light
+                distance={6}
                 decay={2}
             />
         </group>
@@ -2509,18 +2509,18 @@ function RoomLighting() {
 
     return (
         <>
-            {/* Minimal ambient - flickers red in demogorgon mode */}
+            {/* Minimal ambient - Cool-neutral shadows as per grading brief (not warm beige) */}
             <ambientLight
-                intensity={demogorgonMode ? flicker1 * 0.15 : 0.08}
-                color={demogorgonMode ? "#FF4444" : "#E8DCC8"}
+                intensity={demogorgonMode ? flicker1 * 0.15 : 0.12}
+                color={demogorgonMode ? "#FF4444" : "#14161A"} // Cool dark grey-blue
             />
 
-            {/* Subtle fill light from the side - flickers */}
+            {/* Subtle fill light from the side - Warm Incandescent but soft (not orange) */}
             <pointLight
                 position={[4, 1, 0]}
-                intensity={demogorgonMode ? flicker2 * 0.25 : 0.15}
-                color={demogorgonMode ? "#FF6B6B" : "#FFD4A3"}
-                distance={8}
+                intensity={demogorgonMode ? flicker2 * 0.25 : 0.2}
+                color={demogorgonMode ? "#FF6B6B" : "#FFD8B0"} // Softer warm
+                distance={10}
                 decay={2}
             />
 
@@ -2626,7 +2626,7 @@ function JoyceBayersRoom() {
 function FilmGrain() {
     return (
         <div
-            className="absolute inset-0 pointer-events-none z-20 opacity-[0.08]"
+            className="absolute inset-0 pointer-events-none z-20 opacity-[0.05]"
             style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
                 mixBlendMode: "overlay",
@@ -3153,11 +3153,13 @@ export default function RoomPage() {
                                 near={0.1}
                                 far={100}
                             />
+                            {/* Scene Background - Cool Dark Lifted Black matching Fog */}
+                            <color attach="background" args={["#101215"]} />
                             <CameraController />
                             <JoyceBayersRoom />
 
-                            {/* Fog for atmosphere */}
-                            <fog attach="fog" args={["#1a1510", 3, 12]} />
+                            {/* Fog for atmosphere - Cool/Dark per grading brief */}
+                            <fog attach="fog" args={["#101215", 3, 12]} />
                         </Suspense>
                     </KeyboardContext.Provider>
                 </Canvas>
