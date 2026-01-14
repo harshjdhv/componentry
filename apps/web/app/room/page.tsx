@@ -2,7 +2,7 @@
 
 import { Suspense, useRef, useState, useEffect, useMemo, createContext, useContext, useCallback } from "react"
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { PerspectiveCamera, useProgress, Html, Text } from '@react-three/drei'
+import { PerspectiveCamera, useProgress, Html } from '@react-three/drei'
 import * as THREE from "three"
 
 // Keyboard context for letter activation
@@ -11,6 +11,9 @@ interface KeyboardContextType {
     demogorgonMode: boolean
     upsideDownMode: boolean
     typedSequence: string
+    breachMode: boolean // Reality is fracturing
+    impactMoment: boolean // Violent physical impact
+    transitionPhase: 'none' | 'flip' | 'reveal' // transition states: flip=eyes closing, reveal=eyes opening
 }
 
 const KeyboardContext = createContext<KeyboardContextType>({
@@ -18,6 +21,9 @@ const KeyboardContext = createContext<KeyboardContextType>({
     demogorgonMode: false,
     upsideDownMode: false,
     typedSequence: "",
+    breachMode: false,
+    impactMoment: false,
+    transitionPhase: 'none',
 })
 
 export const useKeyboard = () => useContext(KeyboardContext)
@@ -182,8 +188,8 @@ function CameraController() {
     const spherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
     const targetSpherical = useRef(new THREE.Spherical(1, Math.PI / 2, 0))
 
-    // Get demogorgon mode for shake effect
-    const { demogorgonMode } = useKeyboard()
+    // Get context for camera effects
+    const { demogorgonMode, impactMoment } = useKeyboard()
 
     useEffect(() => {
         const domElement = gl.domElement
@@ -289,8 +295,15 @@ function CameraController() {
         let posY = 0
         let posZ = 0
 
-        // Handle Shake Effect
-        if (demogorgonMode) {
+        // === QUICK IMPACT JOLT ===
+        if (impactMoment) {
+            // Quick jolt - not dramatic, just a sudden shake
+            posX = (Math.random() - 0.5) * 0.3
+            posY = (Math.random() - 0.5) * 0.2
+            camera.rotation.z = (Math.random() - 0.5) * 0.1
+        }
+        // === DEMOGORGON MODE - Desperate search ===
+        else if (demogorgonMode) {
             const time = state.clock.getElapsedTime()
 
             // DESPERATE SEARCH: Wide, smooth sweeps (Looking "here and there")
@@ -316,8 +329,10 @@ function CameraController() {
             posY = Math.cos(time * 1.5) * 0.05
             posZ = 0
 
-            // No roll
-            lookAt.z += 0
+            camera.rotation.z = 0
+        } else {
+            // Reset rotation when not in any mode
+            camera.rotation.z = 0
         }
 
         camera.position.set(posX, posY, posZ)
@@ -337,42 +352,72 @@ function WornWall({
 }) {
     const meshRef = useRef<THREE.Mesh>(null)
 
-    // Create worn wall texture procedurally
+    // Create worn 70s/80s wallpaper texture procedurally
     const wallMaterial = useMemo(() => {
         const canvas = document.createElement("canvas")
         canvas.width = 512
         canvas.height = 512
         const ctx = canvas.getContext("2d")!
 
-        // Base off-white/beige color
-        ctx.fillStyle = "#E8DCC8"
+        // Base color - faded cream/yellow (old wallpaper)
+        ctx.fillStyle = "#D4C9A8"
         ctx.fillRect(0, 0, 512, 512)
 
-        // Add age marks and stains
-        for (let i = 0; i < 50; i++) {
+        // Subtle vertical stripe pattern (70s/80s wallpaper)
+        ctx.strokeStyle = "rgba(180, 165, 130, 0.4)"
+        ctx.lineWidth = 8
+        for (let x = 0; x < 512; x += 24) {
+            ctx.beginPath()
+            ctx.moveTo(x, 0)
+            ctx.lineTo(x, 512)
+            ctx.stroke()
+        }
+
+        // Faded floral/geometric pattern hint
+        ctx.fillStyle = "rgba(160, 140, 100, 0.15)"
+        for (let y = 20; y < 512; y += 80) {
+            for (let x = 20; x < 512; x += 60) {
+                const offsetX = (Math.floor(y / 80) % 2) * 30
+                ctx.beginPath()
+                ctx.arc(x + offsetX + (Math.random() - 0.5) * 5, y + (Math.random() - 0.5) * 5, 8 + Math.random() * 4, 0, Math.PI * 2)
+                ctx.fill()
+            }
+        }
+
+        // Yellowing/aging discoloration patches
+        for (let i = 0; i < 15; i++) {
+            const gradient = ctx.createRadialGradient(
+                Math.random() * 512, Math.random() * 512, 0,
+                Math.random() * 512, Math.random() * 512, Math.random() * 100 + 40
+            )
+            gradient.addColorStop(0, `rgba(180, 160, 100, ${Math.random() * 0.15})`)
+            gradient.addColorStop(1, "rgba(180, 160, 100, 0)")
+            ctx.fillStyle = gradient
+            ctx.fillRect(0, 0, 512, 512)
+        }
+
+        // Darker stains near edges and corners
+        for (let i = 0; i < 30; i++) {
             const x = Math.random() * 512
             const y = Math.random() * 512
-            const size = Math.random() * 30 + 5
-            const alpha = Math.random() * 0.15 + 0.05
-            ctx.fillStyle = `rgba(139, 119, 101, ${alpha})`
+            const size = Math.random() * 25 + 8
+            const alpha = Math.random() * 0.12 + 0.03
+            ctx.fillStyle = `rgba(100, 85, 60, ${alpha})`
             ctx.beginPath()
-            ctx.ellipse(x, y, size, size * 0.7, Math.random() * Math.PI, 0, Math.PI * 2)
+            ctx.ellipse(x, y, size, size * 0.6, Math.random() * Math.PI, 0, Math.PI * 2)
             ctx.fill()
         }
 
-        // Add tiny cracks
-        ctx.strokeStyle = "rgba(100, 80, 60, 0.1)"
-        ctx.lineWidth = 1
-        for (let i = 0; i < 20; i++) {
+        // Tiny cracks and imperfections
+        ctx.strokeStyle = "rgba(80, 65, 45, 0.08)"
+        ctx.lineWidth = 0.5
+        for (let i = 0; i < 40; i++) {
             ctx.beginPath()
             const x = Math.random() * 512
             const y = Math.random() * 512
             ctx.moveTo(x, y)
-            for (let j = 0; j < 5; j++) {
-                ctx.lineTo(
-                    x + (Math.random() - 0.5) * 40,
-                    y + Math.random() * 30
-                )
+            for (let j = 0; j < 4; j++) {
+                ctx.lineTo(x + (Math.random() - 0.5) * 30, y + Math.random() * 25)
             }
             ctx.stroke()
         }
@@ -384,9 +429,9 @@ function WornWall({
 
         return new THREE.MeshStandardMaterial({
             map: texture,
-            roughness: 0.95,
+            roughness: 0.92,
             metalness: 0,
-            bumpScale: 0.02,
+            bumpScale: 0.015,
         })
     }, [])
 
@@ -868,6 +913,376 @@ function UpsideDownParticles() {
     )
 }
 
+// === REALITY BREACH EFFECTS ===
+// This creates the visceral moment where reality fractures but hasn't fully flipped
+// Walls behave like elastic membrane being pushed from the other side
+
+function BreachingWall({
+    position,
+    rotation,
+    side,
+}: {
+    position: [number, number, number]
+    rotation: [number, number, number]
+    side: 'back' | 'left' | 'right' | 'front'
+}) {
+    const meshRef = useRef<THREE.Mesh>(null)
+    const { transitionPhase, impactMoment } = useKeyboard()
+    const materialRef = useRef<THREE.ShaderMaterial>(null)
+
+    // Shader for elastic membrane deformation
+    const shaderMaterial = useMemo(() => new THREE.ShaderMaterial({
+        uniforms: {
+            time: { value: 0 },
+            impactPoint: { value: new THREE.Vector2(0.5, 0.5) },
+            impactStrength: { value: 0 },
+            warpIntensity: { value: 0 },
+            baseColor: { value: new THREE.Color('#D4C9A8') },
+            tearColor: { value: new THREE.Color('#1a0505') },
+        },
+        vertexShader: `
+            uniform float time;
+            uniform vec2 impactPoint;
+            uniform float impactStrength;
+            uniform float warpIntensity;
+            
+            varying vec2 vUv;
+            varying float vDisplacement;
+            
+            void main() {
+                vUv = uv;
+                vec3 pos = position;
+                
+                // Calculate distance from impact point
+                float dist = distance(uv, impactPoint);
+                
+                // Elastic membrane bulge - pushes out from impact point
+                float bulge = exp(-dist * 3.0) * impactStrength;
+                
+                // Ripple effect spreading from impact
+                float ripple = sin(dist * 20.0 - time * 8.0) * 0.1 * impactStrength * (1.0 - dist);
+                
+                // Random trembling during warp
+                float tremble = sin(time * 50.0 + uv.x * 30.0) * sin(time * 40.0 + uv.y * 25.0) * warpIntensity * 0.05;
+                
+                // Apply displacement along normal (Z axis for planes)
+                pos.z += bulge * 0.8 + ripple + tremble;
+                
+                vDisplacement = bulge + ripple * 0.5;
+                
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+            }
+        `,
+        fragmentShader: `
+            uniform float time;
+            uniform float impactStrength;
+            uniform float warpIntensity;
+            uniform vec3 baseColor;
+            uniform vec3 tearColor;
+            uniform vec2 impactPoint;
+            
+            varying vec2 vUv;
+            varying float vDisplacement;
+            
+            void main() {
+                // Calculate tear effect near high displacement
+                float tearAmount = smoothstep(0.3, 0.8, vDisplacement);
+                
+                // Flicker effect during warp
+                float flicker = step(0.5, fract(time * 30.0 + vUv.x * 10.0)) * warpIntensity * 0.3;
+                
+                // Color shift towards darkness at impact point
+                float distFromImpact = distance(vUv, impactPoint);
+                float darkness = (1.0 - distFromImpact) * impactStrength * 0.5;
+                
+                // Mix base color with tear darkness
+                vec3 finalColor = mix(baseColor, tearColor, tearAmount + darkness);
+                finalColor -= flicker;
+                
+                // Vein-like cracks spreading from impact
+                float crack = smoothstep(0.02, 0.0, abs(sin(distFromImpact * 40.0 + time * 5.0) * 0.1 - fract(vUv.x * 20.0 + vUv.y * 15.0))) * impactStrength * 0.5;
+                finalColor = mix(finalColor, tearColor, crack);
+                
+                gl_FragColor = vec4(finalColor, 1.0);
+            }
+        `,
+        side: THREE.DoubleSide,
+    }), [])
+
+    useFrame((state) => {
+        if (!materialRef.current || !materialRef.current.uniforms) return
+        const time = state.clock.elapsedTime
+        const uniforms = materialRef.current.uniforms
+
+        if (uniforms.time) uniforms.time.value = time
+
+        // Only animate on impact moment
+        if (impactMoment) {
+            // Sudden maximum displacement
+            if (uniforms.impactStrength) uniforms.impactStrength.value = 1.2
+            if (uniforms.warpIntensity) uniforms.warpIntensity.value = 0.8
+
+            // Impact point on right wall (window side)
+            if (side === 'right') {
+                if (uniforms.impactPoint) uniforms.impactPoint.value.set(0.6, 0.5)
+                if (uniforms.impactStrength) uniforms.impactStrength.value *= 1.5
+            }
+        } else {
+            // Decay when not impacting
+            if (uniforms.impactStrength) uniforms.impactStrength.value *= 0.9
+            if (uniforms.warpIntensity) uniforms.warpIntensity.value *= 0.9
+        }
+    })
+
+    // Only render during breach/transition
+    const { demogorgonMode } = useKeyboard()
+    if (!demogorgonMode && transitionPhase === 'none') return null
+
+    return (
+        <mesh
+            ref={meshRef}
+            position={position}
+            rotation={rotation}
+        >
+            <planeGeometry args={[12, 6, 64, 32]} />
+            <primitive object={shaderMaterial} ref={materialRef} attach="material" />
+        </mesh>
+    )
+}
+
+// Debris and dust explosion during impact
+function ImpactDebris() {
+    const { impactMoment, transitionPhase } = useKeyboard()
+    const particles = useRef<THREE.InstancedMesh>(null!)
+    const dummy = useMemo(() => new THREE.Object3D(), [])
+    const count = 100
+
+    const particleData = useMemo(() => {
+        return Array.from({ length: count }, () => ({
+            velocity: new THREE.Vector3(
+                (Math.random() - 0.5) * 8,
+                (Math.random() - 0.3) * 6,
+                (Math.random() - 0.5) * 8
+            ),
+            position: new THREE.Vector3(5, 0, 0), // Start from right wall (window)
+            rotation: new THREE.Euler(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI),
+            scale: 0.02 + Math.random() * 0.08,
+            life: 1,
+        }))
+    }, [])
+
+    const [active, setActive] = useState(false)
+
+    useEffect(() => {
+        if (impactMoment) {
+            setActive(true)
+            // Reset particle positions
+            particleData.forEach(p => {
+                p.position.set(5 + Math.random() * 0.5, Math.random() * 2 - 1, Math.random() * 4 - 2)
+                p.life = 1
+                p.velocity.set(
+                    (Math.random() - 0.5) * 10 - 3, // Bias toward left (into room)
+                    (Math.random() - 0.3) * 8,
+                    (Math.random() - 0.5) * 6
+                )
+            })
+        }
+    }, [impactMoment, transitionPhase, particleData])
+
+    useFrame((state, delta) => {
+        if (!active || !particles.current) return
+
+        let allDead = true
+
+        particleData.forEach((p, i) => {
+            if (p.life > 0) {
+                allDead = false
+
+                // Physics
+                p.velocity.y -= 15 * delta // Gravity
+                p.position.add(p.velocity.clone().multiplyScalar(delta))
+                p.life -= delta * 0.5
+
+                // Update matrix
+                dummy.position.copy(p.position)
+                dummy.rotation.x += delta * 5
+                dummy.rotation.y += delta * 3
+                dummy.scale.setScalar(p.scale * p.life)
+                dummy.updateMatrix()
+                particles.current.setMatrixAt(i, dummy.matrix)
+            } else {
+                dummy.scale.setScalar(0)
+                dummy.updateMatrix()
+                particles.current.setMatrixAt(i, dummy.matrix)
+            }
+        })
+
+        particles.current.instanceMatrix.needsUpdate = true
+
+        if (allDead) setActive(false)
+    })
+
+    if (!active) return null
+
+    return (
+        <instancedMesh ref={particles} args={[undefined, undefined, count]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial
+                color="#8B7355"
+                roughness={0.9}
+            />
+        </instancedMesh>
+    )
+}
+
+// Light smearing effect during reality warp
+function LightSmearEffect() {
+    const { impactMoment } = useKeyboard()
+    const groupRef = useRef<THREE.Group>(null)
+
+    const smearData = useMemo(() => {
+        return Array.from({ length: 20 }, () => ({
+            position: new THREE.Vector3(
+                (Math.random() - 0.5) * 8,
+                Math.random() * 4 - 2,
+                (Math.random() - 0.5) * 8
+            ),
+            scale: 0.1 + Math.random() * 0.3,
+            speed: 2 + Math.random() * 3,
+            offset: Math.random() * Math.PI * 2,
+            direction: Math.random() > 0.5 ? 1 : -1,
+        }))
+    }, [])
+
+    useFrame((state) => {
+        if (!groupRef.current) return
+        const time = state.clock.elapsedTime
+
+        groupRef.current.children.forEach((child, i) => {
+            const data = smearData[i]
+            if (!data) return
+
+            // Smear motion - only during impact
+            const smearAmount = impactMoment ? 2 : 0.1
+            child.scale.x = data.scale + Math.sin(time * data.speed + data.offset) * smearAmount
+            child.scale.y = data.scale * 0.3
+
+            // Flicker intensity
+            const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial
+            if (mat) {
+                mat.opacity = impactMoment
+                    ? 0.3 + Math.random() * 0.5
+                    : 0
+            }
+        })
+    })
+
+    if (!impactMoment) return null
+
+    return (
+        <group ref={groupRef}>
+            {smearData.map((data, i) => (
+                <mesh key={i} position={data.position.toArray()}>
+                    <planeGeometry args={[1, 0.1]} />
+                    <meshBasicMaterial
+                        color="#FFB347"
+                        transparent
+                        opacity={0.4}
+                        blending={THREE.AdditiveBlending}
+                        depthWrite={false}
+                    />
+                </mesh>
+            ))}
+        </group>
+    )
+}
+
+// Screen effects for the quick transition
+function BreachScreenEffects() {
+    const { transitionPhase, impactMoment } = useKeyboard()
+    const [shake, setShake] = useState({ x: 0, y: 0 })
+
+    // Quick violent shake on impact
+    useEffect(() => {
+        if (impactMoment) {
+            const interval = setInterval(() => {
+                setShake({
+                    x: (Math.random() - 0.5) * 30,
+                    y: (Math.random() - 0.5) * 20,
+                })
+            }, 16)
+
+            const timeout = setTimeout(() => {
+                clearInterval(interval)
+                setShake({ x: 0, y: 0 })
+            }, 300) // Quick 300ms shake
+
+            return () => {
+                clearInterval(interval)
+                clearTimeout(timeout)
+            }
+        }
+    }, [impactMoment])
+
+    return (
+        <>
+            {/* Screen shake on impact */}
+            {impactMoment && (
+                <div
+                    className="fixed inset-0 pointer-events-none z-40"
+                    style={{
+                        transform: `translate(${shake.x}px, ${shake.y}px)`,
+                    }}
+                />
+            )}
+
+            {/* White flash on impact - quick BOOM */}
+            {impactMoment && (
+                <div
+                    className="fixed inset-0 pointer-events-none z-50 bg-white"
+                    style={{
+                        animation: 'flashOut 0.2s ease-out forwards',
+                    }}
+                />
+            )}
+
+            {/* Fade to black - eyes closing */}
+            {transitionPhase === 'flip' && (
+                <div
+                    className="fixed inset-0 pointer-events-none z-[100] bg-black"
+                    style={{
+                        animation: 'fadeToBlack 0.5s ease-in forwards',
+                    }}
+                />
+            )}
+
+            {/* Fade FROM black - eyes opening in Upside Down */}
+            {transitionPhase === 'reveal' && (
+                <div
+                    className="fixed inset-0 pointer-events-none z-[100] bg-black"
+                    style={{
+                        animation: 'fadeFromBlack 1.5s ease-out forwards',
+                    }}
+                />
+            )}
+
+            <style>{`
+                @keyframes flashOut {
+                    0% { opacity: 0.9; }
+                    100% { opacity: 0; }
+                }
+                @keyframes fadeToBlack {
+                    0% { opacity: 0; }
+                    100% { opacity: 1; }
+                }
+                @keyframes fadeFromBlack {
+                    0% { opacity: 1; }
+                    100% { opacity: 0; }
+                }
+            `}</style>
+        </>
+    )
+}
 
 function AlphabetWall({ isUpsideDown = false }: { isUpsideDown?: boolean }) {
     const { activeLetter, demogorgonMode } = useKeyboard()
@@ -1470,68 +1885,206 @@ function WornRug() {
     )
 }
 
-// Window with curtains (dim light)
-function WindowWithCurtains() {
+// Large window looking out to dark forest - RIGHT SIDE
+function ForestWindow() {
+    // Create forest scene texture procedurally
+    const forestMaterial = useMemo(() => {
+        const canvas = document.createElement("canvas")
+        canvas.width = 512
+        canvas.height = 384
+        const ctx = canvas.getContext("2d")!
+
+        // Night sky gradient - deep dark blue/black
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, 384)
+        skyGrad.addColorStop(0, "#020408")
+        skyGrad.addColorStop(0.4, "#0a0c15")
+        skyGrad.addColorStop(1, "#050608")
+        ctx.fillStyle = skyGrad
+        ctx.fillRect(0, 0, 512, 384)
+
+        // Dense tree silhouettes in layers (back to front)
+        const drawTree = (x: number, height: number, width: number, darkness: number) => {
+            ctx.fillStyle = `rgba(5, 8, 12, ${darkness})`
+            ctx.beginPath()
+            ctx.moveTo(x, 384)
+            ctx.lineTo(x + width / 2, 384 - height)
+            ctx.lineTo(x + width, 384)
+            ctx.fill()
+            // Trunk
+            ctx.fillRect(x + width * 0.4, 384 - height * 0.3, width * 0.2, height * 0.3)
+        }
+
+        // Back layer - distant trees (lighter/more gray)
+        for (let i = 0; i < 25; i++) {
+            drawTree(
+                Math.random() * 520 - 10,
+                80 + Math.random() * 60,
+                20 + Math.random() * 15,
+                0.5 + Math.random() * 0.2
+            )
+        }
+
+        // Middle layer
+        for (let i = 0; i < 15; i++) {
+            drawTree(
+                Math.random() * 520 - 10,
+                120 + Math.random() * 80,
+                25 + Math.random() * 20,
+                0.7 + Math.random() * 0.2
+            )
+        }
+
+        // Front layer - closest trees (darkest)
+        for (let i = 0; i < 10; i++) {
+            drawTree(
+                Math.random() * 520 - 10,
+                180 + Math.random() * 100,
+                35 + Math.random() * 25,
+                0.85 + Math.random() * 0.15
+            )
+        }
+
+        // Distant streetlamp (isolated, ominous)
+        const lampX = 380
+        const lampY = 200
+        // Lamp glow (amber/warm)
+        const glowGrad = ctx.createRadialGradient(lampX, lampY, 0, lampX, lampY, 80)
+        glowGrad.addColorStop(0, "rgba(255, 180, 80, 0.3)")
+        glowGrad.addColorStop(0.3, "rgba(255, 160, 60, 0.15)")
+        glowGrad.addColorStop(0.6, "rgba(255, 140, 40, 0.05)")
+        glowGrad.addColorStop(1, "rgba(255, 140, 40, 0)")
+        ctx.fillStyle = glowGrad
+        ctx.fillRect(lampX - 80, lampY - 80, 160, 160)
+
+        // Lamp post silhouette
+        ctx.fillStyle = "#0a0a0a"
+        ctx.fillRect(lampX - 2, lampY, 4, 184) // Post
+        ctx.fillRect(lampX - 8, lampY - 5, 16, 12) // Lamp head
+
+        // Lamp light source
+        ctx.fillStyle = "#FFB366"
+        ctx.beginPath()
+        ctx.arc(lampX, lampY + 2, 4, 0, Math.PI * 2)
+        ctx.fill()
+
+        // Subtle ground fog
+        const fogGrad = ctx.createLinearGradient(0, 340, 0, 384)
+        fogGrad.addColorStop(0, "rgba(40, 50, 60, 0)")
+        fogGrad.addColorStop(1, "rgba(40, 50, 60, 0.4)")
+        ctx.fillStyle = fogGrad
+        ctx.fillRect(0, 340, 512, 44)
+
+        const texture = new THREE.CanvasTexture(canvas)
+        return new THREE.MeshBasicMaterial({ map: texture })
+    }, [])
+
     return (
-        <group position={[5.95, 0.3, -1]}>
-            {/* Window frame */}
-            <mesh castShadow>
-                <boxGeometry args={[0.1, 1.8, 1.2]} />
-                <meshStandardMaterial color="#F5F5DC" roughness={0.9} />
+        <group position={[5.9, 0.2, 0]} rotation={[0, -Math.PI / 2, 0]}>
+            {/* Window frame - worn white painted wood */}
+            {/* Outer frame */}
+            <mesh position={[0, 0, -0.08]} castShadow>
+                <boxGeometry args={[2.4, 1.8, 0.12]} />
+                <meshStandardMaterial color="#C4B4A0" roughness={0.92} />
             </mesh>
-            {/* Dark glass (night) */}
-            <mesh position={[-0.03, 0, 0]}>
-                <planeGeometry args={[0.08, 1.5, 1]} />
-                <meshStandardMaterial color="#0a0a15" roughness={0.2} />
+
+            {/* Window glass with forest view */}
+            <mesh position={[0, 0, 0]}>
+                <planeGeometry args={[2.2, 1.6]} />
+                <primitive object={forestMaterial} attach="material" />
             </mesh>
-            {/* Curtain left */}
-            <mesh position={[-0.05, 0, -0.7]} castShadow>
-                <boxGeometry args={[0.05, 2, 0.4]} />
-                <meshStandardMaterial color="#4A3728" roughness={0.95} />
+
+            {/* Glass reflection overlay - subtle */}
+            <mesh position={[0, 0, 0.001]}>
+                <planeGeometry args={[2.2, 1.6]} />
+                <meshStandardMaterial
+                    color="#445566"
+                    transparent
+                    opacity={0.08}
+                    roughness={0.1}
+                    metalness={0.8}
+                />
             </mesh>
-            {/* Curtain right */}
-            <mesh position={[-0.05, 0, 0.7]} castShadow>
-                <boxGeometry args={[0.05, 2, 0.4]} />
-                <meshStandardMaterial color="#4A3728" roughness={0.95} />
+
+            {/* Window muntins (thin wooden dividers) */}
+            {/* Vertical center */}
+            <mesh position={[0, 0, 0.02]} castShadow>
+                <boxGeometry args={[0.04, 1.6, 0.03]} />
+                <meshStandardMaterial color="#B0A090" roughness={0.9} />
             </mesh>
+            {/* Horizontal center */}
+            <mesh position={[0, 0, 0.02]} castShadow>
+                <boxGeometry args={[2.2, 0.04, 0.03]} />
+                <meshStandardMaterial color="#B0A090" roughness={0.9} />
+            </mesh>
+
+            {/* Curtains - heavy, slightly open */}
+            {/* Left curtain */}
+            <mesh position={[-1.0, 0, 0.05]} castShadow>
+                <boxGeometry args={[0.5, 2, 0.08]} />
+                <meshStandardMaterial color="#4A3A28" roughness={0.98} />
+            </mesh>
+            {/* Right curtain */}
+            <mesh position={[1.0, 0, 0.05]} castShadow>
+                <boxGeometry args={[0.5, 2, 0.08]} />
+                <meshStandardMaterial color="#4A3A28" roughness={0.98} />
+            </mesh>
+
             {/* Curtain rod */}
-            <mesh position={[-0.08, 1.05, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-                <cylinderGeometry args={[0.015, 0.015, 1.6]} />
-                <meshStandardMaterial color="#B8860B" roughness={0.4} metalness={0.5} />
+            <mesh position={[0, 1.05, 0.08]} rotation={[0, 0, Math.PI / 2]} castShadow>
+                <cylinderGeometry args={[0.02, 0.02, 2.8]} />
+                <meshStandardMaterial color="#8B7355" roughness={0.6} metalness={0.2} />
             </mesh>
+
+            {/* Subtle ambient light from window (moonlight) */}
+            <pointLight
+                position={[0, 0, 0.5]}
+                intensity={0.03}
+                color="#667788"
+                distance={4}
+                decay={2}
+            />
         </group>
     )
 }
 
-// Dark doorway - pitch black void inside
-function DarkDoorway({ position, side }: { position: [number, number, number], side: 'left' | 'right' }) {
+// Dark doorway - larger, more realistic proportions
+function DarkDoorway({ position }: { position: [number, number, number] }) {
     return (
         <group position={position}>
-            {/* Door frame - worn white painted wood */}
-            {/* Top frame */}
-            <mesh position={[0, 1.1, 0]} castShadow>
-                <boxGeometry args={[0.9, 0.1, 0.15]} />
-                <meshStandardMaterial color="#D4C4A8" roughness={0.9} />
+            {/* Door frame - worn white painted wood, realistic proportions */}
+            {/* Larger frame for realistic suburban door */}
+            {/* Top frame (header) */}
+            <mesh position={[0, 1.25, 0]} castShadow>
+                <boxGeometry args={[1.1, 0.12, 0.18]} />
+                <meshStandardMaterial color="#C8BCA8" roughness={0.92} />
             </mesh>
-            {/* Left frame */}
-            <mesh position={[-0.4, 0, 0]} castShadow>
-                <boxGeometry args={[0.1, 2.2, 0.15]} />
-                <meshStandardMaterial color="#D4C4A8" roughness={0.9} />
+            {/* Left frame jamb */}
+            <mesh position={[-0.5, 0, 0]} castShadow>
+                <boxGeometry args={[0.12, 2.5, 0.18]} />
+                <meshStandardMaterial color="#C8BCA8" roughness={0.92} />
             </mesh>
-            {/* Right frame */}
-            <mesh position={[0.4, 0, 0]} castShadow>
-                <boxGeometry args={[0.1, 2.2, 0.15]} />
-                <meshStandardMaterial color="#D4C4A8" roughness={0.9} />
+            {/* Right frame jamb */}
+            <mesh position={[0.5, 0, 0]} castShadow>
+                <boxGeometry args={[0.12, 2.5, 0.18]} />
+                <meshStandardMaterial color="#C8BCA8" roughness={0.92} />
             </mesh>
-            {/* Pitch black void inside - the darkness */}
-            <mesh position={[0, 0, 0.05]}>
-                <planeGeometry args={[0.7, 2.1]} />
-                <meshBasicMaterial color="#000000" />
+
+            {/* Pitch black void inside - the darkness beyond */}
+            <mesh position={[0, 0, 0.02]}>
+                <planeGeometry args={[0.88, 2.38]} />
+                <meshBasicMaterial color="#010101" />
             </mesh>
-            {/* Subtle depth illusion - darker gradient */}
-            <mesh position={[0, 0, 0.03]}>
-                <planeGeometry args={[0.72, 2.12]} />
-                <meshBasicMaterial color="#050505" />
+
+            {/* Door slightly ajar - adds depth and unease */}
+            <mesh position={[0.35, 0, 0.08]} rotation={[0, 0.15, 0]} castShadow>
+                <boxGeometry args={[0.88, 2.35, 0.04]} />
+                <meshStandardMaterial color="#3D3428" roughness={0.9} />
+            </mesh>
+
+            {/* Door handle/knob */}
+            <mesh position={[0.08, 0, 0.12]} castShadow>
+                <sphereGeometry args={[0.025, 12, 12]} />
+                <meshStandardMaterial color="#8B7355" roughness={0.4} metalness={0.6} />
             </mesh>
         </group>
     )
@@ -1608,7 +2161,7 @@ function SideTableWithPhone() {
     )
 }
 
-// Scattered newspapers and magazines
+// Scattered newspapers, magazines, and household clutter
 function ScatteredPapers() {
     return (
         <group>
@@ -1626,6 +2179,54 @@ function ScatteredPapers() {
             <mesh position={[0.8, -1.97, 1.8]} rotation={[-Math.PI / 2, 0, 0.8]} receiveShadow>
                 <planeGeometry args={[0.3, 0.4]} />
                 <meshStandardMaterial color="#D4C4A8" roughness={0.95} />
+            </mesh>
+
+            {/* Joyce's scattered notes - desperate handwriting */}
+            <mesh position={[1.5, -1.97, 0.5]} rotation={[-Math.PI / 2, 0, 0.15]} receiveShadow>
+                <planeGeometry args={[0.2, 0.25]} />
+                <meshStandardMaterial color="#F5F0E0" roughness={0.98} />
+            </mesh>
+            <mesh position={[1.3, -1.97, 0.8]} rotation={[-Math.PI / 2, 0, -0.4]} receiveShadow>
+                <planeGeometry args={[0.15, 0.2]} />
+                <meshStandardMaterial color="#FFF8DC" roughness={0.98} />
+            </mesh>
+
+            {/* Old coffee mug on floor */}
+            <mesh position={[0.3, -1.93, 2.2]} castShadow>
+                <cylinderGeometry args={[0.035, 0.03, 0.09, 12]} />
+                <meshStandardMaterial color="#8B7355" roughness={0.8} />
+            </mesh>
+
+            {/* Pencils/pens scattered */}
+            <mesh position={[1.2, -1.97, 0.3]} rotation={[-Math.PI / 2, 0, 0.6]}>
+                <cylinderGeometry args={[0.005, 0.005, 0.15, 8]} />
+                <meshStandardMaterial color="#FFD700" roughness={0.6} />
+            </mesh>
+            <mesh position={[1.35, -1.97, 0.45]} rotation={[-Math.PI / 2, 0, -0.3]}>
+                <cylinderGeometry args={[0.004, 0.004, 0.12, 8]} />
+                <meshStandardMaterial color="#222222" roughness={0.8} />
+            </mesh>
+
+            {/* Kids' crayon drawing (Will's drawing) */}
+            <mesh position={[-3.5, -1.97, 0]} rotation={[-Math.PI / 2, 0, 0.1]} receiveShadow>
+                <planeGeometry args={[0.35, 0.28]} />
+                <meshStandardMaterial color="#FFFAFA" roughness={0.95} />
+            </mesh>
+
+            {/* Photo fallen on ground */}
+            <mesh position={[2.8, -1.97, 2.5]} rotation={[-Math.PI / 2, 0, 0.5]} receiveShadow>
+                <planeGeometry args={[0.12, 0.09]} />
+                <meshStandardMaterial color="#D4C4A8" roughness={0.85} />
+            </mesh>
+
+            {/* Crumpled paper ball near trash */}
+            <mesh position={[-3.8, -1.9, 1.2]} castShadow>
+                <icosahedronGeometry args={[0.04, 0]} />
+                <meshStandardMaterial color="#E8E0D0" roughness={0.99} />
+            </mesh>
+            <mesh position={[-3.6, -1.92, 1.4]} castShadow>
+                <icosahedronGeometry args={[0.035, 0]} />
+                <meshStandardMaterial color="#F5F0E0" roughness={0.99} />
             </mesh>
         </group>
     )
@@ -1833,8 +2434,8 @@ function JoyceBayersRoom() {
             <WornRug />
 
             {/* Dark doorways on either side of alphabet wall */}
-            <DarkDoorway position={[-4, -0.9, -5.93]} side="left" />
-            <DarkDoorway position={[4, -0.9, -5.93]} side="right" />
+            <DarkDoorway position={[-4, -0.9, -5.93]} />
+            <DarkDoorway position={[4, -0.9, -5.93]} />
 
             {/* The iconic alphabet wall with lights */}
             <AlphabetWall isUpsideDown={upsideDownMode} />
@@ -1848,13 +2449,26 @@ function JoyceBayersRoom() {
             <VintageBookshelf />
             <VintageFloorLamp />
             <WoodStove />
-            <WindowWithCurtains />
+            <ForestWindow />
             <WallPhone />
             <ScatteredPapers />
             <DrapedBlanket />
 
             {/* Room lighting - responds to demogorgon mode but OFF in Upside Down */}
             {!upsideDownMode && <RoomLighting />}
+
+            {/* === REALITY BREACH EFFECTS === */}
+            {/* These render during the transition phases to create the visceral breach moment */}
+
+            {/* Breaching walls - elastic membrane deformation effect */}
+            {/* Right wall (window area) is the primary breach point */}
+            <BreachingWall position={[5.95, 0.25, 0]} rotation={[0, -Math.PI / 2, 0]} side="right" />
+
+            {/* Debris explosion from impact */}
+            <ImpactDebris />
+
+            {/* Light smearing during reality warp */}
+            <LightSmearEffect />
         </group>
     )
 }
@@ -1958,6 +2572,11 @@ export default function RoomPage() {
     const [lightsFlickering, setLightsFlickering] = useState(false)
     const [showAttackRed, setShowAttackRed] = useState(false)
     const [upsideDownMode, setUpsideDownMode] = useState(false)
+
+    // NEW: Breach transition states
+    const [breachMode, setBreachMode] = useState(false) // Reality is fracturing
+    const [impactMoment, setImpactMoment] = useState(false) // Violent physical impact
+    const [transitionPhase, setTransitionPhase] = useState<'none' | 'flip' | 'reveal'>('none')
 
     const [showTyped, setShowTyped] = useState(false)
 
@@ -2181,13 +2800,19 @@ export default function RoomPage() {
                     console.log("👻 RUN sequence detected!")
                     setLightsFlickering(true)
 
-                    // TIMELINE
-                    // T=0: Flicker Starts + Camera Shake
-                    // T=1s: Vecna Audio Starts
-                    // T=(1s + VecnaDuration - 2s): Punch Audio + Red Screen
+                    // TIMELINE - Simple and effective
+                    // The random flickering IS the vibe - don't mess with it
+                    // Just add a quick BOOM at the end before transitioning
 
                     const vecnaDuration = vecnaBufferRef.current?.duration || 5;
 
+                    // 0. HEAVY SPARKING SOUNDS during flickering
+                    // Random electrical sparks and crackles throughout
+                    const sparkInterval = setInterval(() => {
+                        if (Math.random() > 0.3) { // 70% chance each tick
+                            playSpark();
+                        }
+                    }, 150 + Math.random() * 250); // Random interval 150-400ms
 
                     // 1. Play Vecna Audio after 1s
                     setTimeout(() => {
@@ -2197,26 +2822,45 @@ export default function RoomPage() {
                         }
                     }, 1000)
 
-                    // 2. Schedule Punch + Red Screen
-                    const triggerTime = 1000 + (vecnaDuration * 1000) - 2000;
-
+                    // 2. When vecna audio has ~1s remaining: BOOM + Punch
+                    const boomTime = 1000 + (vecnaDuration * 1000) - 1500; // 1.5s before end
                     setTimeout(() => {
-                        console.log("👊 PUNCH + 🚨 RED SCREEN");
+                        console.log("💥 BOOM - Quick impact!");
                         setShowAttackRed(true);
+                        setImpactMoment(true); // This triggers the quick screen shake
                         if (punchBufferRef.current) {
                             playBuffer(punchBufferRef.current, 2.0, false);
                         }
-                    }, Math.max(1000, triggerTime));
 
-                    // 3. Reset everything after it's all done
-                    const resetTime = 1000 + (vecnaDuration * 1000) + 1000; // 1s after Vecna ends
+                        // Impact only lasts 300ms - quick and violent
+                        setTimeout(() => {
+                            setImpactMoment(false);
+                        }, 300);
+                    }, Math.max(2000, boomTime));
+
+                    // 3. Fade to black (eyes close) then flip to Upside Down
+                    const flipTime = 1000 + (vecnaDuration * 1000) - 500; // 0.5s before end
                     setTimeout(() => {
-                        console.log("👻 Entering Upside Down");
+                        console.log("👁️ Eyes closing... transitioning");
+                        clearInterval(sparkInterval); // Stop spark sounds
+                        setTransitionPhase('flip'); // Triggers fade to black
                         setLightsFlickering(false);
                         setShowAttackRed(false);
-                        setTypedSequence("");
-                        setUpsideDownMode(true);
-                    }, resetTime);
+
+                        // After blackout, switch to Upside Down and start reveal
+                        setTimeout(() => {
+                            console.log("👻 Switching to Upside Down");
+                            setUpsideDownMode(true);
+                            setTransitionPhase('reveal'); // Eyes opening slowly
+                            setTypedSequence("");
+
+                            // End reveal animation after it completes
+                            setTimeout(() => {
+                                console.log("👁️ Eyes fully open");
+                                setTransitionPhase('none');
+                            }, 1500); // Match the fadeFromBlack animation duration
+                        }, 600); // 600ms of pure black
+                    }, Math.max(3000, flipTime));
                 }
 
                 return newSeq
@@ -2260,7 +2904,10 @@ export default function RoomPage() {
         typedSequence,
         demogorgonMode: lightsFlickering,
         upsideDownMode,
-    }), [activeLetter, typedSequence, lightsFlickering, upsideDownMode])
+        breachMode,
+        impactMoment,
+        transitionPhase,
+    }), [activeLetter, typedSequence, lightsFlickering, upsideDownMode, breachMode, impactMoment, transitionPhase])
 
     return (
         <KeyboardContext.Provider value={contextValue}>
@@ -2278,6 +2925,9 @@ export default function RoomPage() {
                     <Vignette />
                     <UIOverlay />
                 </div>
+
+                {/* Breach transition screen effects - shake, chromatic aberration, flashes */}
+                <BreachScreenEffects />
 
                 {/* Typed message display - positioned lower on screen */}
                 {showTyped && typedSequence && !lightsFlickering && (
