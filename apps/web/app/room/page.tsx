@@ -504,69 +504,152 @@ const bulbColors = [
 // --- UPSIDE DOWN VISUALS ---
 
 function UpsideDownVines() {
-    // Generate some "vines" crawling on the wall/ceiling
-    // We use a few fixed paths for performance and aesthetic control
-    const vinePaths = useMemo(() => {
-        const paths = []
+    // Generates "Spider Web" style vein networks covering the walls
+    const vineGeometries = useMemo(() => {
+        const geometries: { curve: THREE.CatmullRomCurve3; width: number }[] = []
 
-        // Vine 1: Traversing the alphabet wall
-        const curve1 = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(-5, -2, -6),
-            new THREE.Vector3(-3, 0, -5.8),
-            new THREE.Vector3(-1, 2, -5.9),
-            new THREE.Vector3(2, 1, -5.8),
-            new THREE.Vector3(5, -1, -5.9)
-        ])
+        // Helper to recursively grow a vine vein on a wall plane
+        const growVein = (
+            startPoint: THREE.Vector3,
+            direction: THREE.Vector3, // Initial direction to grow
+            wallNormal: THREE.Vector3, // Away from wall
+            wallU: THREE.Vector3, // Wall local axis 1
+            wallV: THREE.Vector3, // Wall local axis 2
+            generations: number,
+            width: number,
+            length: number
+        ) => {
+            const points = [startPoint.clone()]
+            let currentPos = startPoint.clone()
+            let currentDir = direction.clone().normalize()
 
-        // Vine 2: Ceiling dangle
-        const curve2 = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(-2, 3, -4),
-            new THREE.Vector3(-1, 2, -4),
-            new THREE.Vector3(0, 2.5, -4),
-            new THREE.Vector3(2, 1.8, -4),
-            new THREE.Vector3(2.5, 3, -4)
-        ])
+            const segmentCount = Math.floor(length * 10) // density
+            const stepSize = length / segmentCount
 
-        // Vine 3: Corner creep
-        const curve3 = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(-5.9, -2, 5),
-            new THREE.Vector3(-5.8, 1, 0),
-            new THREE.Vector3(-5.9, 2.5, -5)
-        ])
+            for (let i = 0; i < segmentCount; i++) {
+                // Wiggle direction: Rotate slightly around wall normal
+                const angle = (Math.random() - 0.5) * 1.0 // Radians wiggle
+                currentDir.applyAxisAngle(wallNormal, angle).normalize()
 
-        paths.push(curve1, curve2, curve3)
-        return paths
+                // Move forward
+                const move = currentDir.clone().multiplyScalar(stepSize)
+                currentPos.add(move)
+
+                // 3D Depth noise (undulate off wall slightly)
+                const depthOffset = wallNormal.clone().multiplyScalar(Math.sin(i * 0.5) * 0.05)
+
+                points.push(currentPos.clone().add(depthOffset))
+
+                // BRANCHING (The "Spider Web" effect)
+                // Middle generations branch often
+                if (generations > 0 && Math.random() < 0.08) { // Distinctly reduced branching
+                    // Branch offsets by 45-90 degrees
+                    const branchDir = currentDir.clone().applyAxisAngle(wallNormal, (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 3 + Math.random() * 0.5))
+                    growVein(
+                        currentPos.clone(),
+                        branchDir,
+                        wallNormal,
+                        wallU,
+                        wallV,
+                        generations - 1,
+                        width * 0.6, // thinner
+                        length * 0.7 // shorter
+                    )
+                }
+            }
+
+            if (points.length > 2) {
+                geometries.push({
+                    curve: new THREE.CatmullRomCurve3(points),
+                    width: width
+                })
+            }
+        }
+
+        // --- SPAWN CENTERS ---
+        // We create "nodes" on the walls from which webs spread
+        const spawnWebNode = (
+            center: THREE.Vector3,
+            wallNormal: THREE.Vector3,
+            wallU: THREE.Vector3,
+            wallV: THREE.Vector3
+        ) => {
+            // Spawn 1-3 main arteries radiating from this center (Sparse)
+            const arteryCount = 1 + Math.floor(Math.random() * 2)
+            for (let i = 0; i < arteryCount; i++) {
+                // Radial direction
+                const angle = (i / arteryCount) * Math.PI * 2 + (Math.random() * 0.5)
+                const dir = new THREE.Vector3()
+                    .addScaledVector(wallU, Math.cos(angle))
+                    .addScaledVector(wallV, Math.sin(angle))
+
+                growVein(center, dir, wallNormal, wallU, wallV, 3, 0.12, 3.5)
+            }
+        }
+
+        // BACK WALL (Z = -6)
+        // Spread nodes across the surface
+        for (let i = 0; i < 2; i++) {
+            spawnWebNode(
+                new THREE.Vector3(-4 + Math.random() * 8, -1 + Math.random() * 6, -5.9),
+                new THREE.Vector3(0, 0, 1),
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 1, 0)
+            )
+        }
+
+        // LEFT WALL (X = -6)
+        for (let i = 0; i < 2; i++) {
+            spawnWebNode(
+                new THREE.Vector3(-5.9, -1 + Math.random() * 6, -4 + Math.random() * 8),
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, 1),
+                new THREE.Vector3(0, 1, 0)
+            )
+        }
+
+        // RIGHT WALL (X = 6)
+        for (let i = 0; i < 2; i++) {
+            spawnWebNode(
+                new THREE.Vector3(5.9, -1 + Math.random() * 6, -4 + Math.random() * 8),
+                new THREE.Vector3(-1, 0, 0),
+                new THREE.Vector3(0, 0, -1),
+                new THREE.Vector3(0, 1, 0)
+            )
+        }
+
+        // CEILING (Y = 6) - Massive web above
+        for (let i = 0; i < 2; i++) {
+            spawnWebNode(
+                new THREE.Vector3(-3 + Math.random() * 6, 5.9, -3 + Math.random() * 6),
+                new THREE.Vector3(0, -1, 0),
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, 1)
+            )
+        }
+
+        return geometries
     }, [])
 
     return (
         <group>
-            {vinePaths.map((curve, i) => (
-                <mesh key={i}>
-                    <tubeGeometry args={[curve, 64, 0.08, 8, false]} />
+            {vineGeometries.map((item, i) => (
+                <mesh key={i} receiveShadow castShadow>
+                    <tubeGeometry args={[item.curve, 32, item.width, 8, false]} />
                     <meshStandardMaterial
                         color="#050505"
-                        roughness={0.9}
+                        roughness={0.2}
                         metalness={0.1}
-                        emissive="#0a0a0a" // Faint dark glow
                     />
                 </mesh>
             ))}
-            {/* Add some "slime" nodes */}
-            <mesh position={[0, 1, -5.8]}>
-                <sphereGeometry args={[0.3, 16, 16]} />
-                <meshStandardMaterial color="#000" roughness={0.2} />
-            </mesh>
-            <mesh position={[-3, -1, -5.8]}>
-                <sphereGeometry args={[0.2, 16, 16]} />
-                <meshStandardMaterial color="#000" roughness={0.2} />
-            </mesh>
         </group>
     )
 }
 
 function UpsideDownParticles() {
-    // Floating "ash" / spores
-    const count = 300
+    // Floating "ash" / spores / dust
+    const count = 1500 // Higher count for dust effect
     const mesh = useRef<THREE.InstancedMesh>(null!)
     const dummy = useMemo(() => new THREE.Object3D(), [])
     const particles = useMemo(() => {
@@ -574,10 +657,10 @@ function UpsideDownParticles() {
         for (let i = 0; i < count; i++) {
             const t = Math.random() * 100
             const factor = 20 + Math.random() * 100
-            const speed = 0.01 + Math.random() / 200
-            const xFactor = -5 + Math.random() * 10
-            const yFactor = -5 + Math.random() * 10
-            const zFactor = -5 + Math.random() * 10
+            const speed = 0.002 + Math.random() / 500 // Very slow float
+            const xFactor = -6 + Math.random() * 12
+            const yFactor = 0 + Math.random() * 6
+            const zFactor = -6 + Math.random() * 12
             temp.push({ t, factor, speed, xFactor, yFactor, zFactor, mx: 0, my: 0 })
         }
         return temp
@@ -600,12 +683,8 @@ function UpsideDownParticles() {
                 (particle.my / 10) * b + zFactor + Math.cos((t / 10) * factor) + (Math.sin(t * 3) * factor) / 10
             )
 
-            // Constrain to room bounds broadly
-            dummy.position.x = (dummy.position.x % 12)
-            dummy.position.y = (dummy.position.y % 6)
-            dummy.position.z = (dummy.position.z % 12)
-
-            dummy.scale.setScalar(0.02 + Math.random() * 0.01) // Varying small sizes
+            // Random micro-rotations and small size
+            dummy.scale.setScalar(0.01 + Math.random() * 0.03)
             dummy.rotation.set(s * 5, s * 5, s * 5)
             dummy.updateMatrix()
             mesh.current.setMatrixAt(i, dummy.matrix)
@@ -615,13 +694,13 @@ function UpsideDownParticles() {
 
     return (
         <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-            <dodecahedronGeometry args={[0.2, 0]} />
+            <dodecahedronGeometry args={[0.03, 0]} />
             <meshStandardMaterial
-                color="#8899aa"
+                color="#cccccc"
                 transparent
-                opacity={0.6}
-                roughness={1}
-                blending={THREE.AdditiveBlending}
+                opacity={0.5}
+                roughness={0.2} // Catch light better
+                blending={THREE.NormalBlending}
             />
         </instancedMesh>
     )
@@ -819,23 +898,8 @@ function AlphabetWall({ isUpsideDown = false }: { isUpsideDown?: boolean }) {
                 )
             })}
 
-            {/* Cryptic Message in Upside Down */}
-            {isUpsideDown && (
-                <group
-                    position={[0, -1.8, -5.93]}
-                >
-                    <Text
-                        color="#ff0000"
-                        fontSize={1.5}
-                        anchorX="center"
-                        anchorY="middle"
-                        outlineWidth={0.02}
-                        outlineColor="#330000"
-                    >
-                        RIGHT HERE
-                    </Text>
-                </group>
-            )}
+            {/* Cryptic Message in Upside Down - REMOVED for canon accuracy */}
+            {isUpsideDown && null}
         </group>
     )
 }
@@ -1581,10 +1645,18 @@ function JoyceBayersRoom() {
                 <>
                     <UpsideDownVines />
                     <UpsideDownParticles />
-                    <ambientLight intensity={0.1} color="#000510" />
-                    <pointLight position={[0, 4, 0]} intensity={2} color="#335588" distance={20} decay={2} />
-                    {/* Overwrite fog for dark blue atmosphere */}
-                    <fog attach="fog" args={['#020408', 1, 9]} />
+                    {/* Directionless air light */}
+                    <hemisphereLight
+                        args={['#2a3244', '#000000', 1.5]}
+                    />
+                    {/* Blue moonlight / dimension light for definition */}
+                    <directionalLight
+                        position={[5, 10, 5]}
+                        intensity={2}
+                        color="#445588"
+                    />
+                    {/* Fog pushed back to reveal room */}
+                    <fog attach="fog" args={['#020408', 2, 20]} />
                 </>
             )}
 
@@ -2025,12 +2097,26 @@ export default function RoomPage() {
                     </div>
                 )}
 
-                {/* Type hint */}
-                <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-                    <p className="text-amber-200/40 text-xs tracking-wider font-serif text-center">
-                        Type letters to communicate • Type &quot;RUN&quot; for a surprise
-                    </p>
-                </div>
+                {/* Type hint - Standard Mode Only */}
+                {!upsideDownMode && (
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                        <p className="text-amber-200/40 text-xs tracking-wider font-serif text-center">
+                            Type letters to communicate • Type &quot;RUN&quot; for a surprise
+                        </p>
+                    </div>
+                )}
+
+                {/* UPSIDE DOWN LOCATION CAPTION (Documentary Style) */}
+                {upsideDownMode && (
+                    <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none text-center">
+                        <p
+                            className="text-[#aeb1b5] text-sm font-sans tracking-[0.2em] font-medium opacity-80"
+                            style={{ textShadow: "0 0 10px rgba(0,0,0,0.5)" }} // Subtle shadow for readability against dark floor
+                        >
+                            Right here in the Upside down
+                        </p>
+                    </div>
+                )}
 
                 <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
                     {/* Bridge the context into the Canvas */}
