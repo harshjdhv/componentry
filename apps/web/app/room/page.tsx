@@ -1709,6 +1709,7 @@ export default function RoomPage() {
     const bgAudioRef = useRef<HTMLAudioElement | null>(null)
     const audioContextRef = useRef<AudioContext | null>(null)
     const vecnaBufferRef = useRef<AudioBuffer | null>(null)
+    const punchBufferRef = useRef<AudioBuffer | null>(null)
 
     // Initialize Audio
     useEffect(() => {
@@ -1719,43 +1720,40 @@ export default function RoomPage() {
         const ctx = new AudioContextClass();
         audioContextRef.current = ctx;
 
-        // Load Vecna Attack Sound into a Buffer (allows for amplification > 100%)
-        fetch('/audio/strangerthings/vecnaattack.mp3')
-            .then(response => response.arrayBuffer())
-            .then(arrayBuffer => ctx.decodeAudioData(arrayBuffer))
-            .then(audioBuffer => {
-                console.log("🔊 Vecna Audio Buffer loaded and decoded");
-                vecnaBufferRef.current = audioBuffer;
-            })
-            .catch(e => console.error("🔊 Failed to load Vecna audio:", e));
+        // Load Audio Buffers
+        const loadBuffer = async (url: string, ref: React.MutableRefObject<AudioBuffer | null>) => {
+            try {
+                const response = await fetch(url)
+                const arrayBuffer = await response.arrayBuffer()
+                const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
+                ref.current = audioBuffer
+                console.log(`🔊 Loaded buffer: ${url}`)
+            } catch (e) {
+                console.error(`🔊 Failed to load ${url}:`, e)
+            }
+        }
 
-        // Background Ambient Loop (Standard HTML5 Audio is fine for this)
+        loadBuffer('/audio/strangerthings/vecnaattack.mp3', vecnaBufferRef)
+        loadBuffer('/audio/strangerthings/rockpunchcinematic.mp3', punchBufferRef)
+
+        // Background Ambient Loop
         const bgAudio = new Audio('/audio/strangerthings/strangerthingsbg.mp3')
         bgAudio.loop = true
         bgAudio.volume = 0.4
-
-        bgAudio.addEventListener('canplaythrough', () => console.log("🔊 BG Audio loaded and ready"))
-        bgAudio.addEventListener('error', (e) => console.error("🔊 BG Audio Error:", bgAudio.error, e))
-        bgAudio.addEventListener('play', () => console.log("🔊 BG Audio started playing"))
 
         bgAudioRef.current = bgAudio
 
         // Try to play background audio on first interaction
         const startAudio = () => {
-            console.log("🔊 Interaction detected. Checking audio state...")
-
             if (bgAudioRef.current) {
                 if (bgAudioRef.current.paused) {
                     bgAudioRef.current.play()
-                        .then(() => console.log("🔊 BG Audio play success"))
                         .catch(e => console.error("🔊 BG Audio autoplay blocked/failed", e))
                 }
             }
 
-            // Resume AudioContext if suspended
             if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-                console.log("🔊 Resuming AudioContext...")
-                audioContextRef.current.resume().then(() => console.log("🔊 AudioContext resumed"))
+                audioContextRef.current.resume()
             }
         }
 
@@ -1781,12 +1779,8 @@ export default function RoomPage() {
             if (!audioContextRef.current) return;
             const ctx = audioContextRef.current
 
-            // Resume if suspended
-            if (ctx.state === 'suspended') {
-                ctx.resume()
-            }
+            if (ctx.state === 'suspended') ctx.resume();
 
-            // Create a short, buzzy spark sound
             const osc = ctx.createOscillator()
             const gain = ctx.createGain()
             const filter = ctx.createBiquadFilter()
@@ -1812,42 +1806,27 @@ export default function RoomPage() {
         }
     }, [])
 
-    // Function to play scary loud Vecna sound
-    const playVecnaScare = useCallback(() => {
-        if (!audioContextRef.current || !vecnaBufferRef.current) {
-            console.warn("🔊 AudioContext or Vecna Buffer not ready");
-            return;
-        }
-
+    // Play helper
+    const playBuffer = useCallback((buffer: AudioBuffer, volume: number = 1.0, duckBg: boolean = false) => {
+        if (!audioContextRef.current || !buffer) return;
         const ctx = audioContextRef.current;
 
-        // 1. Create Source
         const source = ctx.createBufferSource();
-        source.buffer = vecnaBufferRef.current;
+        source.buffer = buffer;
 
-        // 2. Create Gain for LOUDNESS (Boost 400%)
         const gainNode = ctx.createGain();
-        gainNode.gain.value = 4.0; // 4x Volume
+        gainNode.gain.value = volume;
 
-        // 3. Create Compressor to prevent painful clipping while keeping it loud
+        // Compressor for safety if volume is high
         const compressor = ctx.createDynamicsCompressor();
-        compressor.threshold.value = -10;
-        compressor.knee.value = 40;
-        compressor.ratio.value = 12;
-        compressor.attack.value = 0;
-        compressor.release.value = 0.25;
 
-        // 4. Connect: Source -> Gain -> Compressor -> Destination
         source.connect(gainNode);
         gainNode.connect(compressor);
         compressor.connect(ctx.destination);
 
-        // 5. Play
         source.start(0);
-        console.log("� PLAYING VECNA SCARY SOUND!!!");
 
-        // Duck background audio
-        if (bgAudioRef.current) {
+        if (duckBg && bgAudioRef.current) {
             const originalVolume = bgAudioRef.current.volume;
             // Fade out
             const fadeOut = setInterval(() => {
@@ -1858,7 +1837,7 @@ export default function RoomPage() {
                 }
             }, 50);
 
-            // Restore after 5 seconds
+            // Restore after buffer duration
             setTimeout(() => {
                 const fadeIn = setInterval(() => {
                     if (bgAudioRef.current && bgAudioRef.current.volume < originalVolume) {
@@ -1867,51 +1846,75 @@ export default function RoomPage() {
                         clearInterval(fadeIn);
                     }
                 }, 100);
-            }, 5000);
+            }, buffer.duration * 1000);
         }
-    }, []);
+    }, [])
 
     // Handle keyboard events
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         const key = e.key.toUpperCase()
 
-        // Only respond to alphabet keys
         if (/^[A-Z]$/.test(key)) {
             playSpark()
             setActiveLetter(key)
             setShowTyped(true)
 
-            // Add to typed sequence (keep last 10 chars)
             setTypedSequence(prev => {
                 const newSeq = (prev + key).slice(-10)
 
-                // Check for "RUN" sequence
                 if (newSeq.includes("RUN")) {
                     console.log("👻 RUN sequence detected!")
-                    // 1. Immediately start lights flickering
                     setLightsFlickering(true)
 
-                    // 2. Delay red screen slightly (500ms)
-                    setTimeout(() => setShowAttackRed(true), 500)
+                    // TIMELINE
+                    // T=0: Flicker Starts
+                    // T=1s: Vecna Audio Starts
+                    // T=(1s + VecnaDuration - 2s): Punch Audio + Red Screen
 
-                    // 3. Play LOUD audio after 1 second
+                    const vecnaDuration = vecnaBufferRef.current?.duration || 5;
+                    const punchTimeRaw = vecnaDuration - 1.8; // ~2s before end (tweaked slightly)
+                    const punchDelay = Math.max(0, punchTimeRaw) * 1000;
+
+                    // 1. Play Vecna Audio after 1s
                     setTimeout(() => {
-                        playVecnaScare();
+                        console.log("🔊 Playing Vecna (LOUD)");
+                        if (vecnaBufferRef.current) {
+                            playBuffer(vecnaBufferRef.current, 4.0, true);
+                        }
                     }, 1000)
 
-                    // 4. Reset everything after 6 seconds
+                    // 2. Schedule Punch + Red Screen
+                    // Note: calculate relative to T=0. 
+                    // Vecna starts at T=1000. So punch relative to T=0 is 1000 + punchDelay in secs? 
+                    // No, punchDelay is calculated from duration. 
+                    // Wait, if I want it 2s before end of Vecna:
+                    // Vecna End = T+1000 + (Duration*1000)
+                    // Punch Start = Vecna End - 2000
+
+                    const triggerTime = 1000 + (vecnaDuration * 1000) - 2000;
+
                     setTimeout(() => {
-                        console.log("👻 Effect sequence ending")
-                        setLightsFlickering(false)
-                        setShowAttackRed(false)
-                        setTypedSequence("")
-                    }, 6000)
+                        console.log("👊 PUNCH + 🚨 RED SCREEN");
+                        setShowAttackRed(true);
+                        if (punchBufferRef.current) {
+                            playBuffer(punchBufferRef.current, 2.0, false);
+                        }
+                    }, Math.max(1000, triggerTime));
+
+                    // 3. Reset everything after it's all done
+                    const resetTime = 1000 + (vecnaDuration * 1000) + 1000; // 1s after Vecna ends
+                    setTimeout(() => {
+                        console.log("👻 Effect sequence ending");
+                        setLightsFlickering(false);
+                        setShowAttackRed(false);
+                        setTypedSequence("");
+                    }, resetTime);
                 }
 
                 return newSeq
             })
         }
-    }, [playSpark, playVecnaScare])
+    }, [playSpark, playBuffer])
 
     const handleKeyUp = useCallback((e: KeyboardEvent) => {
         const key = e.key.toUpperCase()
