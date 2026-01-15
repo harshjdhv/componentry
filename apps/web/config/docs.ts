@@ -19,28 +19,17 @@ export const docsConfig = {
       ],
     },
     {
-      title: "Components",
+      title: "Text Animations",
       items: [
-        {
-          title: "Flight Status Card",
-          href: "/docs/components/flight-status-card",
-        },
         {
           title: "Hyper Text",
           href: "/docs/components/hyper-text",
         },
-        {
-          title: "Spotlight Card",
-          href: "/docs/components/spotlight-card",
-        },
-        {
-          title: "Showcase Card",
-          href: "/docs/components/showcase-card",
-        },
-        {
-          title: "Border Beam",
-          href: "/docs/components/border-beam",
-        },
+      ],
+    },
+    {
+      title: "Components",
+      items: [
         {
           title: "Circuit Board",
           href: "/docs/components/circuit-board",
@@ -50,14 +39,34 @@ export const docsConfig = {
           href: "/docs/components/command-menu",
         },
         {
+          title: "Flight Status Card",
+          href: "/docs/components/flight-status-card",
+        },
+        {
+          title: "Gravity Card",
+          href: "/docs/components/gravity-card",
+        },
+        {
           title: "Magnetic Dock",
           href: "/docs/components/magnetic-dock",
+        },
+        {
+          title: "Showcase Card",
+          href: "/docs/components/showcase-card",
+        },
+        {
+          title: "Spotlight Card",
+          href: "/docs/components/spotlight-card",
         },
       ],
     },
     {
-      title: "Dither Effects",
+      title: "Visual Effects",
       items: [
+        {
+          title: "Border Beam",
+          href: "/docs/components/border-beam",
+        },
         {
           title: "Dither Gradient",
           href: "/docs/components/dither-gradient",
