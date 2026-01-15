@@ -10,6 +10,7 @@
     "screenshot": "node scripts/screenshot.js"
   },
   "devDependencies": {
+    "@types/three": "^0.182.0",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "playwright": "^1.57.0",
@@ -20,5 +21,10 @@
   "packageManager": "pnpm@10.4.1",
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "three": "^0.182.0"
   }
 }

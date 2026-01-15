@@ -51,10 +51,6 @@ export const docsConfig = {
           href: "/docs/components/flight-status-card",
         },
         {
-          title: "Gravity Card",
-          href: "/docs/components/gravity-card",
-        },
-        {
           title: "Magnetic Dock",
           href: "/docs/components/magnetic-dock",
         },
@@ -65,6 +61,15 @@ export const docsConfig = {
         {
           title: "Spotlight Card",
           href: "/docs/components/spotlight-card",
+        },
+      ],
+    },
+    {
+      title: "Hero Backgrounds",
+      items: [
+        {
+          title: "Hero Geometric",
+          href: "/docs/components/hero-geometric",
         },
       ],
     },
