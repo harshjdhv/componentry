@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="apps/web/public/www.componentry.fun_.png" alt="Componentry Banner" width="100%" />
+</div>
+
 <h1 align="center">Componentry</h1>
 
 <p align="center">
