@@ -6,7 +6,6 @@ import { Canvas, useFrame, ThreeElements } from "@react-three/fiber";
 import * as THREE from "three";
 import { motion } from "framer-motion";
 
-// @ts-expect-error - Required for relative import resolution in monorepo
 import { cn } from "../lib/utils";
 
 /* eslint-disable @typescript-eslint/no-namespace */
@@ -221,7 +220,7 @@ export default function HeroGeometric({
                         {/* Headline */}
                         <div className="flex flex-col items-center text-center mb-5 md:mb-7">
                             {title1 && (
-                                <div className="overflow-hidden">
+                                <div className="overflow-hidden pb-8 md:pb-12">
                                     <motion.h1
                                         initial={{ y: "100%", opacity: 0 }}
                                         animate={{ y: "0%", opacity: 1 }}
@@ -235,7 +234,7 @@ export default function HeroGeometric({
                                 </div>
                             )}
                             {title2 && (
-                                <div className="overflow-hidden">
+                                <div className="overflow-hidden pb-8 md:pb-12">
                                     <motion.h1
                                         initial={{ y: "100%", opacity: 0 }}
                                         animate={{ y: "0%", opacity: 1 }}
