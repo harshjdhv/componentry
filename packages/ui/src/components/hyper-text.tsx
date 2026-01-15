@@ -42,7 +42,7 @@ export const HyperText = ({
                             ? l
                             : i <= iterations.current
                                 ? text[i] ?? ""
-                                : alphabets[Math.floor(Math.random() * alphabets.length)]
+                                : alphabets[Math.floor(Math.random() * alphabets.length)] ?? ""
                     )
                 );
                 iterations.current = iterations.current + 0.1;
