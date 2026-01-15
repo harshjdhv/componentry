@@ -25,6 +25,10 @@ export const docsConfig = {
           title: "Hyper Text",
           href: "/docs/components/hyper-text",
         },
+        {
+          title: "True Focus",
+          href: "/docs/components/true-focus",
+        },
       ],
     },
     {
