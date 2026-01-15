@@ -20,8 +20,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/harshjdhv/componentry/blob/main/LICENSE">License</a> ·
-  <a href="https://twitter.com/harshjdhv">Twitter</a>
+  <a href="https://github.com/harshjdhv/componentry/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
+  </a>
+  <a href="https://twitter.com/harshjdhv">
+    <img src="https://img.shields.io/twitter/follow/harshjdhv?style=social" alt="Twitter" />
+  </a>
 </p>
 
 ---
