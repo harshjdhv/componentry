@@ -29,6 +29,10 @@ export const docsConfig = {
           title: "True Focus",
           href: "/docs/components/true-focus",
         },
+        {
+          title: "Velocity Scroll",
+          href: "/docs/components/scroll-based-velocity",
+        },
       ],
     },
     {
@@ -78,6 +82,10 @@ export const docsConfig = {
         {
           title: "Liquid Blob",
           href: "/docs/components/liquid-blob",
+        },
+        {
+          title: "Magnet Lines",
+          href: "/docs/components/magnet-lines",
         },
         {
           title: "Noise Texture",
