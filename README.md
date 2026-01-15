@@ -13,26 +13,22 @@
 </p>
 
 <p align="center">
-  <a href="https://componentry.harshjdhv.com">Documentation</a> ·
-  <a href="https://componentry.harshjdhv.com/docs/components">Components</a> ·
+  <a href="https://componentry.fun">Documentation</a> ·
+  <a href="https://componentry.fun/docs/components">Components</a> ·
   <a href="https://github.com/harshjdhv/componentry/issues">Report Bug</a> ·
   <a href="https://github.com/harshjdhv/componentry/issues">Request Feature</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/harshjdhv/componentry/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
-  </a>
-  <a href="https://twitter.com/harshjdhv">
-    <img src="https://img.shields.io/twitter/follow/harshjdhv?style=social" alt="Twitter" />
-  </a>
+  <a href="https://github.com/harshjdhv/componentry/blob/main/LICENSE">License</a> ·
+  <a href="https://twitter.com/harshjdhv">Twitter</a>
 </p>
 
 ---
 
 ## Introduction
 
-Componentry is a collection of beautifully designed, interactive UI components built with React and Tailwind CSS. Unlike traditional component libraries, Componentry gives you the actual source code - just copy, paste, and customize to match your brand.
+Componentry is a collection of beautifully designed, interactive UI components built with React and Tailwind CSS. Just run the CLI command, add the component to your project, and start building.
 
 ### Why Componentry?
 
@@ -43,12 +39,7 @@ Componentry is a collection of beautifully designed, interactive UI components b
 - **Dark Mode** - All components support light and dark modes.
 - **TypeScript** - Fully typed for the best developer experience.
 
-## Featured Components
 
-| Component | Description |
-|-----------|-------------|
-| [Flight Status Card](https://componentry.harshjdhv.com/docs/components/flight-status-card) | Premium flight tracker with dot-matrix display and progress animation |
-| [Spotlight Card](https://componentry.harshjdhv.com/docs/components/spotlight-card) | Interactive cards with cursor-following spotlight and 3D tilt effects |
 
 ## Quick Start
 
@@ -57,28 +48,9 @@ Componentry is a collection of beautifully designed, interactive UI components b
 The fastest way to add components is using the shadcn CLI:
 
 ```bash
-npx shadcn@latest add https://componentry.harshjdhv.com/r/spotlight-card.json
+npx shadcn@latest add https://componentry.fun/r/spotlight-card.json
 ```
 
-### Manual Installation
-
-1. Copy the component source code from the documentation
-2. Paste it into your project's components directory
-3. Install any required dependencies
-4. Import and use the component
-
-```tsx
-import { SpotlightCard } from "@/components/ui/spotlight-card"
-
-export default function Page() {
-  return (
-    <SpotlightCard className="w-96">
-      <h2>Hello World</h2>
-      <p>This card has a spotlight effect!</p>
-    </SpotlightCard>
-  )
-}
-```
 
 ## Development
 
