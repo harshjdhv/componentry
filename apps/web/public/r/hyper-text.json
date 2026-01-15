@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hyper-text",
+  "type": "registry:ui",
+  "title": "Hyper Text",
+  "description": "A text effect that scrambles and cycles characters before revealing the final text, inspired by cyberpunk aesthetics.",
+  "dependencies": [],
+  "devDependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hyper-text.tsx",
+      "type": "registry:ui",
+      "content": "\"use client\";\n\nimport { cn } from \"@workspace/ui/lib/utils\";\nimport { useEffect, useRef, useState } from \"react\";\n\ninterface HyperTextProps {\n    className?: string;\n    duration?: number;\n    text: string;\n    animateOnLoad?: boolean;\n}\n\nconst alphabets = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";\n\nexport const HyperText = ({\n    className,\n    duration = 800,\n    text,\n    animateOnLoad = true,\n}: HyperTextProps) => {\n    const [displayText, setDisplayText] = useState(text.split(\"\"));\n    const [trigger, setTrigger] = useState(false);\n    const iterations = useRef(0);\n    const isFirstRender = useRef(true);\n\n    const triggerAnimation = () => {\n        iterations.current = 0;\n        setTrigger(true);\n    };\n\n    useEffect(() => {\n        const interval = setInterval(() => {\n            if (!animateOnLoad && isFirstRender.current) {\n                clearInterval(interval);\n                isFirstRender.current = false;\n                return;\n            }\n            if (iterations.current < text.length) {\n                setDisplayText((t) =>\n                    t.map((l, i) =>\n                        l === \" \"\n                            ? l\n                            : i <= iterations.current\n                                ? text[i] ?? \"\"\n                                : alphabets[Math.floor(Math.random() * alphabets.length)]\n                    )\n                );\n                iterations.current = iterations.current + 0.1;\n            } else {\n                setTrigger(false);\n                clearInterval(interval);\n            }\n        }, duration / (text.length * 10));\n        // Clean up interval on unmount\n        return () => clearInterval(interval);\n    }, [text, duration, trigger, animateOnLoad]);\n\n    return (\n        <div\n            className={cn(\"flex cursor-default overflow-hidden py-2 font-mono\", className)}\n            onMouseEnter={triggerAnimation}\n        >\n            {displayText.map((letter, i) => (\n                <span key={i} className=\"min-w-[0.1em]\">\n                    {letter}\n                </span>\n            ))}\n        </div>\n    );\n};\n"
+    }
+  ],
+  "tailwind": {},
+  "cssVars": {},
+  "meta": {}
+}

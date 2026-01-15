@@ -26,6 +26,10 @@ export const docsConfig = {
           href: "/docs/components/flight-status-card",
         },
         {
+          title: "Hyper Text",
+          href: "/docs/components/hyper-text",
+        },
+        {
           title: "Spotlight Card",
           href: "/docs/components/spotlight-card",
         },
