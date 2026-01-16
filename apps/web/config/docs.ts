@@ -62,6 +62,10 @@ export const docsConfig = {
           title: "Spotlight Card",
           href: "/docs/components/spotlight-card",
         },
+        {
+          title: "Auth Modal",
+          href: "/docs/components/auth-modal",
+        },
       ],
     },
     {
