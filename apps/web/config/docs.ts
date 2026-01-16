@@ -66,6 +66,10 @@ export const docsConfig = {
           title: "Auth Modal",
           href: "/docs/components/auth-modal",
         },
+        {
+          title: "Github Calendar",
+          href: "/docs/components/github-calendar",
+        },
       ],
     },
     {
