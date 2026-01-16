@@ -13,6 +13,7 @@ import {
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
 import { ComponentLayout, Section } from "@/components/component-layout"
+import { ComponentPreview } from "@/components/component-preview"
 
 export const metadata: Metadata = {
     title: "Magnetic Dock Component",
@@ -86,30 +87,30 @@ export default function MagneticDockPage(): React.JSX.Element {
 
                     <div className="space-y-0">
                         <h3 className="text-xl font-medium mb-4">Default (Glass)</h3>
-                        <div className="p-8 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center min-h-[250px]">
+                        <ComponentPreview className="bg-gradient-to-br from-neutral-100 via-neutral-50 to-white dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 min-h-[250px]">
                             <MagneticDock items={defaultItems} />
-                        </div>
+                        </ComponentPreview>
                         <CodeBlock code={basicCode} lang="tsx" className="rounded-t-none" />
                     </div>
 
                     <div className="space-y-0">
                         <h3 className="text-xl font-medium mb-4">Solid Variant</h3>
-                        <div className="p-8 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center min-h-[250px]">
+                        <ComponentPreview className="bg-gradient-to-br from-neutral-100 via-neutral-50 to-white dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 min-h-[250px]">
                             <MagneticDock items={minimalItems} variant="solid" />
-                        </div>
+                        </ComponentPreview>
                         <CodeBlock code={solidCode} lang="tsx" className="rounded-t-none" />
                     </div>
 
                     <div className="space-y-0">
                         <h3 className="text-xl font-medium mb-4">Large Scale Effect</h3>
-                        <div className="p-8 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center min-h-[280px]">
+                        <ComponentPreview className="bg-gradient-to-br from-neutral-100 via-neutral-50 to-white dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 min-h-[280px]">
                             <MagneticDock
                                 items={minimalItems}
                                 iconSize={48}
                                 maxScale={2}
                                 magneticDistance={200}
                             />
-                        </div>
+                        </ComponentPreview>
                         <CodeBlock code={customScaleCode} lang="tsx" className="rounded-t-none" />
                     </div>
 

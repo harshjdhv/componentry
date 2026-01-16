@@ -4,6 +4,7 @@ import { TrueFocus } from "@workspace/ui/components/true-focus"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
 import { ComponentLayout, Section } from "@/components/component-layout"
+import { ComponentPreview } from "@/components/component-preview"
 
 export const metadata: Metadata = {
     title: "True Focus Component",
@@ -47,7 +48,7 @@ export default function TrueFocusPage(): React.JSX.Element {
                 <div className="space-y-12">
                     <div className="space-y-0">
                         <h3 className="text-xl font-medium mb-4">Auto Mode</h3>
-                        <div className="p-8 bg-black rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[300px]">
+                        <ComponentPreview className="bg-black border min-h-[300px]">
                             <TrueFocus
                                 sentence="Reality Is Broken"
                                 manualMode={false}
@@ -55,13 +56,13 @@ export default function TrueFocusPage(): React.JSX.Element {
                                 borderColor="#22c55e"
                                 glowColor="rgba(34, 197, 94, 0.6)"
                             />
-                        </div>
+                        </ComponentPreview>
                         <CodeBlock code={autoCode} lang="tsx" className="rounded-t-none" />
                     </div>
 
                     <div className="space-y-0">
                         <h3 className="text-xl font-medium mb-4">Manual Hover Mode</h3>
-                        <div className="p-8 bg-black rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[300px]">
+                        <ComponentPreview className="bg-black border min-h-[300px]">
                             <TrueFocus
                                 sentence="Hover To Focus"
                                 manualMode={true}
@@ -69,7 +70,7 @@ export default function TrueFocusPage(): React.JSX.Element {
                                 borderColor="#06b6d4"
                                 glowColor="rgba(6, 182, 212, 0.6)"
                             />
-                        </div>
+                        </ComponentPreview>
                         <CodeBlock code={manualCode} lang="tsx" className="rounded-t-none" />
                     </div>
                 </div>

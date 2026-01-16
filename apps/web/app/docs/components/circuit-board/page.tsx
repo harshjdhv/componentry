@@ -4,6 +4,7 @@ import { CircuitBoard } from "@workspace/ui/components/circuit-board"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
 import { ComponentLayout, Section } from "@/components/component-layout"
+import { ComponentPreview } from "@/components/component-preview"
 import { Database, Server, Cloud, Globe, Shield, GitBranch, Cpu, HardDrive, Wifi } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -110,7 +111,7 @@ export default function CircuitBoardPage(): React.JSX.Element {
 
           <div className="space-y-0">
             <h3 className="text-xl font-medium mb-4">Simple Flow</h3>
-            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+            <ComponentPreview>
               <CircuitBoard
                 nodes={[
                   { id: "start", x: 80, y: 150, label: "Cloud", icon: <Cloud className="w-4 h-4" /> },
@@ -127,13 +128,13 @@ export default function CircuitBoardPage(): React.JSX.Element {
                 width={500}
                 height={300}
               />
-            </div>
+            </ComponentPreview>
             <CodeBlock code={simpleFlowCode} lang="tsx" className="rounded-t-none" />
           </div>
 
           <div className="space-y-0">
             <h3 className="text-xl font-medium mb-4">Load Balancer</h3>
-            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+            <ComponentPreview>
               <CircuitBoard
                 nodes={[
                   { id: "user", x: 60, y: 150, label: "User", icon: <Globe className="w-4 h-4" /> },
@@ -152,13 +153,13 @@ export default function CircuitBoardPage(): React.JSX.Element {
                 width={480}
                 height={300}
               />
-            </div>
+            </ComponentPreview>
             <CodeBlock code={loadBalancerCode} lang="tsx" className="rounded-t-none" />
           </div>
 
           <div className="space-y-0">
             <h3 className="text-xl font-medium mb-4">Bidirectional</h3>
-            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+            <ComponentPreview>
               <CircuitBoard
                 nodes={[
                   { id: "cpu", x: 100, y: 100, label: "CPU", icon: <Cpu className="w-4 h-4" /> },
@@ -173,13 +174,13 @@ export default function CircuitBoardPage(): React.JSX.Element {
                 height={200}
                 showGrid={false}
               />
-            </div>
+            </ComponentPreview>
             <CodeBlock code={bidirectionalCode} lang="tsx" className="rounded-t-none" />
           </div>
 
           <div className="space-y-0">
             <h3 className="text-xl font-medium mb-4">Network Topology</h3>
-            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border-b border-border flex items-center justify-center">
+            <ComponentPreview>
               <CircuitBoard
                 nodes={[
                   { id: "router", x: 240, y: 100, label: "Router", icon: <Wifi className="w-4 h-4" /> },
@@ -196,7 +197,7 @@ export default function CircuitBoardPage(): React.JSX.Element {
                 height={300}
                 pulseSpeed={1.5}
               />
-            </div>
+            </ComponentPreview>
             <CodeBlock code={networkCode} lang="tsx" className="rounded-t-none" />
           </div>
 
