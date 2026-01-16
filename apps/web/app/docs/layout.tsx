@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { MobileNav } from "@/components/mobile-nav"
+
 export default function DocsLayout({
   children,
 }: {
@@ -28,14 +30,15 @@ export default function DocsLayout({
     <div className="min-h-svh flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-14 items-center justify-between px-6">
-          <div className="flex items-center gap-6">
+        <div className="flex h-14 items-center justify-between px-4 md:px-6">
+          <div className="flex items-center gap-4 md:gap-6">
+            <MobileNav />
             <Link
               href="/"
-              className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+              className="hidden md:flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             >
               <Logomark className="h-5 w-5" />
-              <span>Componentry</span>
+              <span className="hidden sm:inline-block">Componentry</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link
@@ -46,14 +49,14 @@ export default function DocsLayout({
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <CommandMenu />
             <div className="flex items-center gap-1">
               <a
                 href="https://github.com/harshjdhv/component-playground"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent transition-colors"
+                className="hidden md:inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent transition-colors"
                 aria-label="GitHub"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
