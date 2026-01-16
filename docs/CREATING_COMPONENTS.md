@@ -347,6 +347,39 @@ className="p-4 sm:p-6 lg:p-8"
 className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
 ```
 
+### Hero Background Components
+
+For `hero-*` components only, follow these strict presentation rules:
+
+1. **Aspect Ratio:** Must be **16:9** (use `aspect-video`).
+2. **Preview Container:**
+   - Rounded top corners (`rounded-xl`).
+   - Square bottom corners (`rounded-b-none`).
+   - Full width (`w-full`) with `overflow-hidden`.
+3. **Code Block:**
+   - Stacked directly below preview with **no** vertical gap.
+   - Square top corners (`rounded-t-none`).
+   - No top border (`border-t-0`).
+   - Rounded bottom corners (default).
+
+**Example Structure:**
+
+```tsx
+<div className="flex flex-col space-y-0">
+  {/* Preview */}
+  <div className="relative aspect-video w-full overflow-hidden rounded-xl rounded-b-none border shadow-2xl">
+    <HeroComponent />
+  </div>
+  
+  {/* Code */}
+  <CodeBlock 
+    code={code} 
+    lang="tsx" 
+    className="mt-0 rounded-t-none border-t-0" 
+  />
+</div>
+```
+
 ---
 
 ## ✅ Pre-Launch Checklist

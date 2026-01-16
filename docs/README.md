@@ -50,3 +50,4 @@ See [CREATING_COMPONENTS.md](./CREATING_COMPONENTS.md) for detailed instructions
 - **Live Site:** https://componentry.fun
 - **Registry URL:** https://componentry.fun/r/{component}.json
 - **Install Example:** `pnpm dlx shadcn@latest add "https://componentry.fun/r/showcase-card.json"`
+
