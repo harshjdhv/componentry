@@ -25,12 +25,12 @@ const MarqueeStyles = React.memo(() => (
     <style>
         {`
         @keyframes marquee-left {
-          from { transform: translateX(0); }
-          to { transform: translateX(-100%); }
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(-100%, 0, 0); }
         }
         @keyframes marquee-right {
-          from { transform: translateX(-100%); }
-          to { transform: translateX(0); }
+          from { transform: translate3d(-100%, 0, 0); }
+          to { transform: translate3d(0, 0, 0); }
         }
         .animate-marquee-left {
            animation: marquee-left var(--duration) linear infinite;
@@ -41,6 +41,7 @@ const MarqueeStyles = React.memo(() => (
         `}
     </style>
 ))
+MarqueeStyles.displayName = "MarqueeStyles"
 
 const MarqueeRow = React.memo(({
     children,
@@ -56,39 +57,40 @@ const MarqueeRow = React.memo(({
     pauseOnHover?: boolean
 }) => {
     return (
-        <div className={cn("group flex overflow-hidden p-2 [--gap:1rem] [gap:var(--gap)]", className)}>
+        <div className={cn("group flex overflow-hidden p-2 [--gap:1rem]", className)}>
             <div
-                className={cn("flex shrink-0 justify-around [gap:var(--gap)] min-w-full",
+                className={cn("flex shrink-0 justify-start [gap:var(--gap)] min-w-full pr-[var(--gap)] will-change-transform [backface-visibility:hidden]",
                     direction === "left" ? "animate-marquee-left" : "animate-marquee-right",
                     pauseOnHover && "group-hover:[animation-play-state:paused]"
                 )}
                 style={{
-                    ["--duration" as any]: `${speed}s`,
-                }}
+                    "--duration": `${speed}s`,
+                } as React.CSSProperties}
             >
                 {children}
             </div>
             <div
                 aria-hidden="true"
-                className={cn("flex shrink-0 justify-around [gap:var(--gap)] min-w-full",
+                className={cn("flex shrink-0 justify-start [gap:var(--gap)] min-w-full pr-[var(--gap)] will-change-transform [backface-visibility:hidden]",
                     direction === "left" ? "animate-marquee-left" : "animate-marquee-right",
                     pauseOnHover && "group-hover:[animation-play-state:paused]"
                 )}
                 style={{
-                    ["--duration" as any]: `${speed}s`,
-                }}
+                    "--duration": `${speed}s`,
+                } as React.CSSProperties}
             >
                 {children}
             </div>
         </div>
     )
 })
+MarqueeRow.displayName = "MarqueeRow"
 
 
 const TestimonialCard = React.memo(({ item, variant = "default" }: { item: Testimonial, variant?: "default" | "flush" }) => {
     if (variant === "flush") {
         return (
-            <div className="relative group flex h-full w-[350px] shrink-0 flex-col justify-between overflow-hidden rounded-none border-r border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all hover:bg-white/10">
+            <div className="relative group flex h-auto w-[350px] shrink-0 flex-col justify-between overflow-hidden rounded-none border-r border-white/10 bg-white/5 p-6 transition-all hover:bg-white/10 transform-gpu [backface-visibility:hidden]">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 
                 <div className="relative z-10 flex flex-col gap-4">
@@ -98,7 +100,7 @@ const TestimonialCard = React.memo(({ item, variant = "default" }: { item: Testi
 
                     <div className="flex items-center gap-3 pt-2">
                         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/20">
-                            <img src={item.avatar} alt={item.name} className="h-full w-full object-cover" />
+                            <img src={item.avatar} alt={item.name} className="h-full w-full object-cover" loading="eager" />
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm font-medium text-white">{item.name}</span>
@@ -113,7 +115,7 @@ const TestimonialCard = React.memo(({ item, variant = "default" }: { item: Testi
     }
 
     return (
-        <div className="relative group flex h-full w-[350px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all hover:bg-white/10 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1">
+        <div className="relative group flex h-auto w-[350px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:bg-white/10 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 transform-gpu [backface-visibility:hidden]">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 
             <div className="relative z-10 flex flex-col gap-4">
@@ -123,7 +125,7 @@ const TestimonialCard = React.memo(({ item, variant = "default" }: { item: Testi
 
                 <div className="flex items-center gap-3 pt-2">
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/20">
-                        <img src={item.avatar} alt={item.name} className="h-full w-full object-cover" />
+                        <img src={item.avatar} alt={item.name} className="h-full w-full object-cover" loading="eager" />
                     </div>
                     <div className="flex flex-col">
                         <span className="text-sm font-medium text-white">{item.name}</span>
@@ -136,6 +138,7 @@ const TestimonialCard = React.memo(({ item, variant = "default" }: { item: Testi
         </div>
     )
 })
+TestimonialCard.displayName = "TestimonialCard"
 
 export function TestimonialMarquee({ items, variant = "default", className, speed = 30, containerClassName }: TestimonialMarqueeProps) {
     // Combine custom className with container styling if needed
