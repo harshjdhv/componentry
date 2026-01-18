@@ -10,15 +10,6 @@ export const docsConfig = {
       ],
     },
     {
-      title: "Experiences",
-      items: [
-        {
-          title: "Alphabet Wall",
-          href: "/alphabet-wall",
-        },
-      ],
-    },
-    {
       title: "Text Animations",
       items: [
         {
