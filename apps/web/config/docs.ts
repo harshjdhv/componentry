@@ -62,6 +62,10 @@ export const docsConfig = {
           href: "/docs/components/testimonial-marquee",
         },
         {
+          title: "Collection Surfer",
+          href: "/docs/components/collection-surfer",
+        },
+        {
           title: "Github Calendar",
           href: "/docs/components/github-calendar",
         },
