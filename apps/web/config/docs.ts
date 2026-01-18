@@ -58,6 +58,10 @@ export const docsConfig = {
           href: "/docs/components/auth-modal",
         },
         {
+          title: "Testimonial Marquee",
+          href: "/docs/components/testimonial-marquee",
+        },
+        {
           title: "Github Calendar",
           href: "/docs/components/github-calendar",
         },

@@ -150,6 +150,8 @@
     }
   }
 
+
+
   --animate-pulse: pulse var(--duration) ease-out infinite;
 
   @keyframes pulse {
