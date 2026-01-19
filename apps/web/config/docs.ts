@@ -103,6 +103,10 @@ export const docsConfig = {
           title: "Noise Texture",
           href: "/docs/components/noise-texture",
         },
+        {
+          title: "Pixel Canvas",
+          href: "/docs/components/pixel-canvas",
+        },
       ],
     },
   ],
