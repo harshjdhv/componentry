@@ -107,6 +107,10 @@ export const docsConfig = {
           title: "Pixel Canvas",
           href: "/docs/components/pixel-canvas",
         },
+        {
+          title: "Matrix Rain",
+          href: "/docs/components/matrix-rain",
+        },
       ],
     },
   ],
