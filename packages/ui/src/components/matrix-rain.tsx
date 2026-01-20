@@ -58,15 +58,30 @@ export function MatrixRain({
         // Character set: Katakana + Numbers
         const chars = "ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1234567890"
 
-        const colors: Record<string, string> = {
-            default: "#0F0",
-            cyan: "#0FF",
-            rainbow: ""
-        }
+
+
+        let isDark = document.documentElement.classList.contains("dark")
+
+        // Set default background based on theme immediately to avoid delay
+        const bg = isDark ? "#000000" : "#ffffff"
+
+        ctx.fillStyle = bg
+        ctx.fillRect(0, 0, w, h)
 
         const draw = () => {
-            // Semi-transparent black for trail effect
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)"
+            // Check theme state on every frame
+            const currentIsDark = document.documentElement.classList.contains("dark")
+
+            // If theme changed, reset the background immediately
+            if (currentIsDark !== isDark) {
+                isDark = currentIsDark
+                ctx.fillStyle = isDark ? "#000000" : "#ffffff"
+                ctx.fillRect(0, 0, canvas.width, canvas.height)
+            }
+
+            // Semi-transparent color for trail effect
+            // Use black for dark mode, white for light mode
+            ctx.fillStyle = isDark ? "rgba(0, 0, 0, 0.05)" : "rgba(255, 255, 255, 0.05)"
             ctx.fillRect(0, 0, canvas.width, canvas.height)
 
             ctx.font = `${fontSize}px monospace`
@@ -78,8 +93,16 @@ export function MatrixRain({
                 if (variant === "rainbow" && !fixedColor) {
                     const hue = (Date.now() / 20 + i * 10) % 360
                     ctx.fillStyle = `hsl(${hue}, 100%, 50%)`
+                } else if (fixedColor) {
+                    ctx.fillStyle = fixedColor
                 } else {
-                    ctx.fillStyle = fixedColor || colors[variant] || "#0F0"
+                    // Adaptive colors based on background
+                    if (variant === "cyan") {
+                        ctx.fillStyle = isDark ? "#0FF" : "#0e7490" // Cyan-700
+                    } else {
+                        // Default to green
+                        ctx.fillStyle = isDark ? "#0F0" : "#15803d" // Green-700
+                    }
                 }
 
                 const x = i * fontSize
@@ -106,7 +129,7 @@ export function MatrixRain({
     return (
         <canvas
             ref={canvasRef}
-            className={cn("size-full bg-black block rounded-[inherit]", className)}
+            className={cn("size-full bg-background block rounded-[inherit]", className)}
             style={{ width, height }}
         />
     )

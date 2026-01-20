@@ -42,9 +42,9 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16),
+            r: parseInt(result[1]!, 16),
+            g: parseInt(result[2]!, 16),
+            b: parseInt(result[3]!, 16),
         }
         : null;
 }
@@ -67,7 +67,7 @@ export function PixelCanvas({
 
     const getColorFromIntensity = useCallback((intensity: number, phase: number) => {
         if (colors.length === 0) return "#ffffff";
-        if (colors.length === 1) return colors[0];
+        if (colors.length === 1) return colors[0]!;
 
         // Use phase + intensity to create a shifting color effect
         const t = (phase + intensity) % 1;
@@ -79,7 +79,7 @@ export function PixelCanvas({
         const color2 = colors[nextIndex];
 
         if (!color1) return "#ffffff";
-        if (!color2) return color1;
+        if (!color2) return color1!;
 
         return lerpColor(color1, color2, localT);
     }, [colors]);
@@ -111,19 +111,20 @@ export function PixelCanvas({
 
             const newPixels: Pixel[][] = [];
             for (let i = 0; i < cols; i++) {
-                newPixels[i] = [];
+                const row: Pixel[] = [];
                 for (let j = 0; j < rows; j++) {
                     // Preserve existing intensity if pixel exists
                     const existing = pixelsRef.current[i]?.[j];
-                    newPixels[i][j] = {
+                    row.push({
                         x: i * pixelSize,
                         y: j * pixelSize,
                         size: pixelSize - 1,
                         intensity: existing?.intensity ?? 0,
                         targetIntensity: 0,
                         colorPhase: Math.random(), // Random starting phase for color variety
-                    };
+                    });
                 }
+                newPixels.push(row);
             }
             pixelsRef.current = newPixels;
         };

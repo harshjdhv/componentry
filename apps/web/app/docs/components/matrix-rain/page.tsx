@@ -18,7 +18,7 @@ const defaultCode = `import { MatrixRain } from "@/components/ui/matrix-rain"
 <div className="relative flex h-[300px] w-full items-center justify-center overflow-hidden rounded-lg border bg-background">
   <MatrixRain />
   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <h1 className="text-4xl font-bold text-white tracking-wider">
+    <h1 className="text-4xl font-bold text-foreground tracking-wider">
       MATRIX
     </h1>
   </div>
@@ -29,7 +29,7 @@ const rainbowCode = `import { MatrixRain } from "@/components/ui/matrix-rain"
 <div className="relative flex h-[300px] w-full items-center justify-center overflow-hidden rounded-lg border bg-background">
   <MatrixRain variant="rainbow" />
   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <h1 className="text-4xl font-bold text-white tracking-widest">
+    <h1 className="text-4xl font-bold text-foreground tracking-widest">
       RGB
     </h1>
   </div>
@@ -44,7 +44,7 @@ const customCode = `import { MatrixRain } from "@/components/ui/matrix-rain"
     fontSize={20}
   />
   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <h1 className="text-4xl font-bold text-white">
+    <h1 className="text-4xl font-bold text-foreground">
       CYBERPUNK
     </h1>
   </div>
@@ -65,10 +65,10 @@ export default function MatrixRainPage(): React.JSX.Element {
 
           <div className="space-y-0">
             <h3 className="text-xl font-medium mb-4">Default</h3>
-            <div className="relative flex h-[300px] w-full items-center justify-center overflow-hidden rounded-t-xl rounded-b-none border border-border bg-black shadow-sm">
+            <div className="relative flex h-[300px] w-full items-center justify-center overflow-hidden rounded-t-xl rounded-b-none border border-border bg-background shadow-sm">
               <MatrixRain />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <h1 className="text-4xl font-bold text-white tracking-wider">
+                <h1 className="text-4xl font-bold text-foreground tracking-wider">
                   MATRIX
                 </h1>
               </div>
@@ -78,10 +78,10 @@ export default function MatrixRainPage(): React.JSX.Element {
 
           <div className="space-y-0">
             <h3 className="text-xl font-medium mb-4">Rainbow Variant</h3>
-            <div className="relative flex h-[300px] w-full items-center justify-center overflow-hidden rounded-t-xl rounded-b-none border border-border bg-black shadow-sm">
+            <div className="relative flex h-[300px] w-full items-center justify-center overflow-hidden rounded-t-xl rounded-b-none border border-border bg-background shadow-sm">
               <MatrixRain variant="rainbow" />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <h1 className="text-4xl font-bold text-white tracking-widest">
+                <h1 className="text-4xl font-bold text-foreground tracking-widest">
                   RGB
                 </h1>
               </div>
@@ -91,14 +91,14 @@ export default function MatrixRainPage(): React.JSX.Element {
 
           <div className="space-y-0">
             <h3 className="text-xl font-medium mb-4">Custom Configuration</h3>
-            <div className="relative flex h-[300px] w-full items-center justify-center overflow-hidden rounded-t-xl rounded-b-none border border-border bg-black shadow-sm">
+            <div className="relative flex h-[300px] w-full items-center justify-center overflow-hidden rounded-t-xl rounded-b-none border border-border bg-background shadow-sm">
               <MatrixRain
                 fixedColor="#ec4899"
                 speed={80}
                 fontSize={20}
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <h1 className="text-4xl font-bold text-white">
+                <h1 className="text-4xl font-bold text-foreground">
                   CYBERPUNK
                 </h1>
               </div>
@@ -114,7 +114,7 @@ export default function MatrixRainPage(): React.JSX.Element {
           <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
             <div className="font-mono text-sm">variant</div>
             <div className="text-sm text-muted-foreground">
-              Preset theme: "default", "cyan", or "rainbow" (default: "default")
+              Preset theme: &quot;default&quot;, &quot;cyan&quot;, or &quot;rainbow&quot; (default: &quot;default&quot;)
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
