@@ -21,6 +21,10 @@ export const docsConfig = {
           href: "/docs/components/true-focus",
         },
         {
+          title: "Text Animate",
+          href: "/docs/components/text-animate",
+        },
+        {
           title: "Velocity Scroll",
           href: "/docs/components/scroll-based-velocity",
         },
