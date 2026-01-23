@@ -108,6 +108,10 @@ export const docsConfig = {
           href: "/docs/components/noise-texture",
         },
         {
+          title: "Particle Galaxy",
+          href: "/docs/components/particle-galaxy",
+        },
+        {
           title: "Pixel Canvas",
           href: "/docs/components/pixel-canvas",
         },
