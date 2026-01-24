@@ -38,7 +38,7 @@ export default function DocsLayout({
               className="hidden md:flex items-center gap-2.5 text-sm font-medium text-foreground hover:text-foreground/90 transition-colors"
             >
               <Logomark className="h-5 w-5" />
-              <span className="font-semibold">Componentry</span>
+              <span className="font-semibold">COMPONENTRY</span>
             </Link>
 
             {/* Nav Divider */}

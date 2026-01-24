@@ -67,8 +67,8 @@ export function InstallCommand({ component }: InstallCommandProps) {
             key={pm}
             onClick={() => setSelected(pm)}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-md transition-all duration-200 ${selected === pm
-                ? "bg-background dark:bg-zinc-800 text-foreground shadow-sm ring-1 ring-border dark:ring-zinc-700"
-                : "text-muted-foreground hover:text-foreground hover:bg-accent/50 dark:hover:bg-zinc-800/50"
+              ? "bg-background dark:bg-zinc-800 text-foreground shadow-sm ring-1 ring-border dark:ring-zinc-700"
+              : "text-muted-foreground hover:text-foreground hover:bg-accent/50 dark:hover:bg-zinc-800/50"
               }`}
           >
             {PM_ICONS[pm]}
@@ -78,17 +78,17 @@ export function InstallCommand({ component }: InstallCommandProps) {
       </div>
 
       {/* Command display */}
-      <div className="relative group bg-zinc-950 dark:bg-zinc-950">
+      <div className="relative group bg-zinc-100 dark:bg-zinc-950">
         <pre className="px-4 py-4 text-sm font-mono overflow-x-auto whitespace-nowrap selection:bg-emerald-500/30">
-          <span className="text-zinc-500">{selected === "npm" ? "npx" : selected === "pnpm" ? "pnpm dlx" : selected === "yarn" ? "yarn dlx" : "bunx"}</span>
-          <span className="text-zinc-300"> shadcn@latest add</span>
-          <span className="text-cyan-400">{` "${componentUrl}"`}</span>
+          <span className="text-zinc-500 dark:text-zinc-500">{selected === "npm" ? "npx" : selected === "pnpm" ? "pnpm dlx" : selected === "yarn" ? "yarn dlx" : "bunx"}</span>
+          <span className="text-zinc-700 dark:text-zinc-300"> shadcn@latest add</span>
+          <span className="text-cyan-600 dark:text-cyan-400">{` "${componentUrl}"`}</span>
         </pre>
         <button
           onClick={copyToClipboard}
           className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all duration-200 ${hasCopied
-              ? "bg-emerald-500/20 text-emerald-400"
-              : "bg-zinc-800/80 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/80 opacity-0 group-hover:opacity-100"
+            ? "bg-emerald-500/20 text-emerald-500 dark:text-emerald-400"
+            : "bg-zinc-200/80 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-300/80 dark:hover:bg-zinc-700/80 opacity-0 group-hover:opacity-100"
             }`}
           aria-label="Copy command"
         >
