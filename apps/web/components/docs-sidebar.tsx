@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { docsConfig } from "@/config/docs"
-import { ChevronDown, Circle } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 
 export function DocsSidebar() {
   const pathname = usePathname()
@@ -38,8 +38,8 @@ export function DocsSidebar() {
                 <button
                   onClick={() => toggleGroup(group.title)}
                   className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md text-xs font-medium uppercase tracking-wider transition-colors ${hasActiveItem
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                     }`}
                 >
                   <span>{group.title}</span>
@@ -61,20 +61,13 @@ export function DocsSidebar() {
                         key={item.href}
                         href={item.href}
                         className={`
-                          group relative flex items-center gap-2.5 py-1.5 px-3 ml-2 text-sm rounded-md transition-all duration-200
+                          group relative flex items-center py-1.5 px-3 ml-2 text-sm rounded-md transition-all duration-200
                           ${isActive
                             ? "bg-accent text-foreground font-medium"
                             : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                           }
                         `}
                       >
-                        {/* Dot indicator */}
-                        <Circle
-                          className={`h-1.5 w-1.5 transition-all duration-200 ${isActive
-                              ? "fill-current text-primary"
-                              : "fill-current text-muted-foreground/30 group-hover:text-muted-foreground/60"
-                            }`}
-                        />
                         <span>{item.title}</span>
                       </Link>
                     )
