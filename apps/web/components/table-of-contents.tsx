@@ -367,9 +367,9 @@ export function TableOfContents(): React.JSX.Element | null {
         <div className="mt-auto pt-6" />
 
         {/* CTA Card */}
-        <div className="rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 p-4 space-y-3">
-          <div className="space-y-1.5">
-            <h4 className="text-sm font-semibold text-foreground">
+        <div className="rounded-xl border border-border/50 bg-muted/20 p-4 space-y-3">
+          <div className="space-y-1">
+            <h4 className="text-sm font-medium text-foreground tracking-tight">
               Need custom components?
             </h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
@@ -380,11 +380,11 @@ export function TableOfContents(): React.JSX.Element | null {
             href="https://studio.componentry.fun"
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-white text-xs font-medium text-center transition-all duration-200 shadow-lg shadow-cyan-500/20"
+            className="group flex items-center justify-center gap-2 w-full py-2 px-3 rounded-lg bg-foreground text-background hover:opacity-90 text-xs font-medium transition-all shadow-sm"
           >
             Explore Studio
             <svg
-              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+              className="h-3 w-3 opacity-70 group-hover:translate-x-0.5 transition-transform"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
