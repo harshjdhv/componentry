@@ -27,9 +27,9 @@ export function TableOfContents(): React.JSX.Element | null {
       "div.text-xs.uppercase.tracking-widest.text-muted-foreground",
       "p.text-xs.uppercase.tracking-widest.text-muted-foreground",
     ]
-    
+
     const candidateElements = Array.from(document.querySelectorAll(selectors.join(",")))
-    
+
     const items: { id: string; text: string }[] = []
     const observedElements: Element[] = []
 
@@ -96,34 +96,52 @@ export function TableOfContents(): React.JSX.Element | null {
   return (
     <aside className="w-56 shrink-0 hidden xl:block">
       {headings.length > 0 && (
-        <div className="sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto pl-8 py-10">
-          <p className="font-medium text-xs mb-3 text-muted-foreground/70 uppercase tracking-wider">
-            On This Page
-          </p>
-          <nav className="flex flex-col gap-0.5">
-            {headings.map((heading) => (
-              <a
-                key={heading.id}
-                href={`#${heading.id}`}
-                className={`
-                text-xs transition-colors block py-1
-                ${
-                  activeId === heading.id
-                    ? "text-foreground font-medium"
-                    : "text-muted-foreground hover:text-foreground"
-                }
-              `}
-                onClick={(e) => {
-                  e.preventDefault()
-                  document.getElementById(heading.id)?.scrollIntoView({
-                    behavior: "smooth",
-                  })
-                  setActiveId(heading.id)
-                }}
-              >
-                {heading.text}
-              </a>
-            ))}
+        <div className="sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto pl-6 pr-4 py-10">
+          {/* Header with accent color matching c15t */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-1 w-1 rounded-full bg-cyan-500" />
+            <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">
+              On This Page
+            </p>
+          </div>
+
+          {/* Navigation with vertical line */}
+          <nav className="relative flex flex-col gap-0.5">
+            {/* Vertical line */}
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-border/50" />
+
+            {headings.map((heading) => {
+              const isActive = activeId === heading.id
+              return (
+                <a
+                  key={heading.id}
+                  href={`#${heading.id}`}
+                  className={`
+                    relative text-xs transition-all duration-200 block py-1.5 pl-4
+                    ${isActive
+                      ? "text-cyan-500 font-medium"
+                      : "text-muted-foreground hover:text-foreground"
+                    }
+                  `}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    document.getElementById(heading.id)?.scrollIntoView({
+                      behavior: "smooth",
+                    })
+                    setActiveId(heading.id)
+                  }}
+                >
+                  {/* Active indicator line */}
+                  <span
+                    className={`
+                      absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full transition-all duration-200
+                      ${isActive ? "bg-cyan-500" : "bg-transparent"}
+                    `}
+                  />
+                  {heading.text}
+                </a>
+              )
+            })}
           </nav>
         </div>
       )}

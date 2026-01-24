@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { ParticleGalaxyDemo } from "./particle-galaxy-client"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
-import { ComponentLayout, Section } from "@/components/component-layout"
+import { ComponentLayout, Section, InfoBox } from "@/components/component-layout"
 
 export const metadata: Metadata = {
     title: "Particle Galaxy Component",
@@ -13,7 +13,18 @@ export const metadata: Metadata = {
     },
 }
 
+const basicUsageCode = `import { ParticleGalaxy } from "@/components/ui/particle-galaxy"
 
+export default function Hero() {
+  return (
+    <div className="relative h-screen w-full">
+      <ParticleGalaxy />
+      <div className="relative z-10 flex items-center justify-center h-full">
+        <h1 className="text-6xl font-bold">Your Content Here</h1>
+      </div>
+    </div>
+  )
+}`
 
 const customColorsCode = `import { ParticleGalaxy } from "@/components/ui/particle-galaxy"
 
@@ -56,20 +67,32 @@ export default function ParticleGalaxyPage(): React.JSX.Element {
     return (
         <ComponentLayout
             title="Particle Galaxy"
-            description="A stunning 3D particle system that creates an interactive spiral galaxy using Three.js and custom WebGL shaders. Features smooth mouse-controlled rotation, realistic particle distribution, extensive customization options, and support for both light and dark backgrounds. Perfect for hero backgrounds, immersive landing pages, and creative portfolios."
+            description="A stunning 3D particle system that creates an interactive spiral galaxy using Three.js and custom WebGL shaders. Features smooth mouse-controlled rotation, realistic particle distribution, and extensive customization options."
+            badge="Visual Effect"
         >
-            <Section title="Install" id="install">
+            <Section title="Installation" id="install" step={1}>
+                <p className="text-muted-foreground mb-4">
+                    Install the component using the shadcn CLI. This will automatically add all required dependencies.
+                </p>
                 <InstallCommand component="particle-galaxy" />
             </Section>
 
-            <Section title="Examples" id="examples">
+            <Section title="Basic Usage" id="usage" step={2}>
+                <p className="text-muted-foreground mb-4">
+                    Import and use the component in your project. Perfect for hero sections and landing pages.
+                </p>
+                <CodeBlock code={basicUsageCode} lang="tsx" filename="app/page.tsx" />
+            </Section>
+
+            <Section title="Examples" id="examples" step={3}>
                 <div className="space-y-12">
 
-
-
-                    <div className="space-y-0">
-                        <h3 className="text-xl font-medium mb-4">Custom Colors & 5 Arms</h3>
-                        <div className="relative h-[600px] w-full overflow-hidden rounded-t-xl rounded-b-none border border-border shadow-sm">
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Custom Colors & 5 Arms</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Customize the galaxy with your brand colors and adjust the number of spiral arms.
+                        </p>
+                        <div className="relative h-[500px] w-full overflow-hidden rounded-t-xl border border-border/50">
                             <ParticleGalaxyDemo
                                 colors={["#10b981", "#06b6d4", "#3b82f6"]}
                                 spiralArms={5}
@@ -80,9 +103,12 @@ export default function ParticleGalaxyPage(): React.JSX.Element {
                         <CodeBlock code={customColorsCode} lang="tsx" className="rounded-t-none" />
                     </div>
 
-                    <div className="space-y-0">
-                        <h3 className="text-xl font-medium mb-4">Dense Center & High Glow</h3>
-                        <div className="relative h-[600px] w-full overflow-hidden rounded-t-xl rounded-b-none border border-border shadow-sm">
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Dense Center & High Glow</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Create a more intense galaxy with higher particle concentration in the center.
+                        </p>
+                        <div className="relative h-[500px] w-full overflow-hidden rounded-t-xl border border-border/50">
                             <ParticleGalaxyDemo
                                 colors={["#f97316", "#ef4444", "#ec4899"]}
                                 particleCount={20000}
@@ -96,9 +122,12 @@ export default function ParticleGalaxyPage(): React.JSX.Element {
                         <CodeBlock code={denseGalaxyCode} lang="tsx" className="rounded-t-none" />
                     </div>
 
-                    <div className="space-y-0">
-                        <h3 className="text-xl font-medium mb-4">Slow Rotation & Static Camera</h3>
-                        <div className="relative h-[600px] w-full overflow-hidden rounded-t-xl rounded-b-none border border-border shadow-sm">
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Slow Rotation & Static Camera</h3>
+                        <p className="text-sm text-muted-foreground">
+                            A calmer version with slower rotation for more subtle backgrounds.
+                        </p>
+                        <div className="relative h-[500px] w-full overflow-hidden rounded-t-xl border border-border/50">
                             <ParticleGalaxyDemo
                                 colors={["#8b5cf6", "#ec4899", "#f97316"]}
                                 rotationSpeed={0.0005}
@@ -113,104 +142,120 @@ export default function ParticleGalaxyPage(): React.JSX.Element {
                 </div>
             </Section>
 
-            <Section title="Props" id="props">
-                <div className="grid grid-cols-1 divide-y border rounded-xl bg-muted/30">
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">particleCount</div>
-                        <div className="text-sm text-muted-foreground">
-                            Number of particles in the galaxy (default: 10000). Higher values create denser galaxies but may impact performance.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">particleSize</div>
-                        <div className="text-sm text-muted-foreground">
-                            Base size of individual particles (default: 0.02). Larger values create more visible particles.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">rotationSpeed</div>
-                        <div className="text-sm text-muted-foreground">
-                            Speed of automatic galaxy rotation (default: 0.001). Higher values create faster rotation.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">spiralArms</div>
-                        <div className="text-sm text-muted-foreground">
-                            Number of spiral arms in the galaxy (default: 3). Affects the galaxy shape and structure.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">colors</div>
-                        <div className="text-sm text-muted-foreground">
-                            Array of 3 hex color strings for galaxy coloring (default: [&quot;#4f46e5&quot;, &quot;#8b5cf6&quot;, &quot;#ec4899&quot;]). Colors are distributed across particles and blended based on distance from center.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">mouseInfluence</div>
-                        <div className="text-sm text-muted-foreground">
-                            Strength of mouse interaction (default: 0.5). Range 0-1. Higher values make the galaxy more responsive to mouse movement.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">autoRotate</div>
-                        <div className="text-sm text-muted-foreground">
-                            Enable automatic rotation (default: true). When false, rotation is controlled entirely by mouse movement.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">blendMode</div>
-                        <div className="text-sm text-muted-foreground">
-                            Blend mode for particles (default: &quot;additive&quot;). Use &quot;additive&quot; for dark backgrounds and &quot;normal&quot; for light backgrounds.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">spread</div>
-                        <div className="text-sm text-muted-foreground">
-                            How spread out the galaxy is (default: 2.5). Range 1-5. Higher values create larger, more spread-out galaxies.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">density</div>
-                        <div className="text-sm text-muted-foreground">
-                            Particle opacity/density (default: 0.7). Range 0-1. Higher values make particles more visible.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">glow</div>
-                        <div className="text-sm text-muted-foreground">
-                            Glow intensity around particles (default: 60). Range 0-100. Higher values create stronger glow effects.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">cameraMovement</div>
-                        <div className="text-sm text-muted-foreground">
-                            Enable gentle camera movement (default: true). Creates subtle floating effect.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">centerConcentration</div>
-                        <div className="text-sm text-muted-foreground">
-                            Concentration of particles toward center (default: 0.5). Range 0-1. Higher values create denser centers.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">pulsate</div>
-                        <div className="text-sm text-muted-foreground">
-                            Enable particle pulsation animation (default: true). Creates breathing effect.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">pulsateSpeed</div>
-                        <div className="text-sm text-muted-foreground">
-                            Speed of particle pulsation (default: 1). Range 0.1-2. Higher values create faster pulsation.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">className</div>
-                        <div className="text-sm text-muted-foreground">
-                            Additional CSS classes for the container element.
-                        </div>
-                    </div>
+            <Section title="Props Reference" id="props" step={4}>
+                <InfoBox type="tip">
+                    All props are optional. The component works great with defaults, but you can customize everything.
+                </InfoBox>
+
+                <div className="mt-6 rounded-xl border border-border/50 overflow-hidden">
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="border-b border-border/50 bg-muted/30">
+                                <th className="text-left font-medium p-4">Prop</th>
+                                <th className="text-left font-medium p-4">Type</th>
+                                <th className="text-left font-medium p-4">Default</th>
+                                <th className="text-left font-medium p-4 hidden md:table-cell">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/30">
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">particleCount</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">10000</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Number of particles in the galaxy</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">particleSize</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">0.02</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Base size of individual particles</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">rotationSpeed</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">0.001</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Speed of automatic galaxy rotation</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">spiralArms</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">3</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Number of spiral arms in the galaxy</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">colors</td>
+                                <td className="p-4 text-muted-foreground">string[]</td>
+                                <td className="p-4 text-muted-foreground font-mono text-xs">[&quot;#4f46e5&quot;, ...]</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Array of 3 hex colors for galaxy coloring</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">mouseInfluence</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">0.5</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Strength of mouse interaction (0-1)</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">autoRotate</td>
+                                <td className="p-4 text-muted-foreground">boolean</td>
+                                <td className="p-4 text-muted-foreground">true</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Enable automatic rotation</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">blendMode</td>
+                                <td className="p-4 text-muted-foreground">&quot;additive&quot; | &quot;normal&quot;</td>
+                                <td className="p-4 text-muted-foreground">&quot;additive&quot;</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Blend mode for particles</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">spread</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">2.5</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">How spread out the galaxy is (1-5)</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">density</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">0.7</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Particle opacity/density (0-1)</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">glow</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">60</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Glow intensity around particles (0-100)</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">cameraMovement</td>
+                                <td className="p-4 text-muted-foreground">boolean</td>
+                                <td className="p-4 text-muted-foreground">true</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Enable gentle camera movement</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">centerConcentration</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">0.5</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Concentration of particles toward center (0-1)</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">pulsate</td>
+                                <td className="p-4 text-muted-foreground">boolean</td>
+                                <td className="p-4 text-muted-foreground">true</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Enable particle pulsation animation</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">pulsateSpeed</td>
+                                <td className="p-4 text-muted-foreground">number</td>
+                                <td className="p-4 text-muted-foreground">1</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Speed of particle pulsation (0.1-2)</td>
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-mono text-cyan-600 dark:text-cyan-400">className</td>
+                                <td className="p-4 text-muted-foreground">string</td>
+                                <td className="p-4 text-muted-foreground">-</td>
+                                <td className="p-4 text-muted-foreground hidden md:table-cell">Additional CSS classes for the container</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </Section>
         </ComponentLayout>
