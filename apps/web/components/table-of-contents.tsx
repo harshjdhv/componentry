@@ -1,9 +1,10 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import { motion } from "framer-motion"
 
 interface TocHeading {
   id: string
@@ -15,6 +16,12 @@ export function TableOfContents(): React.JSX.Element | null {
   const pathname = usePathname()
   const [headings, setHeadings] = useState<TocHeading[]>([])
   const [activeId, setActiveId] = useState<string>("")
+  const navRef = useRef<HTMLElement>(null)
+  const [indicatorStyle, setIndicatorStyle] = useState({ top: 0, height: 32 })
+
+  // Refs to prevent scroll handler from fighting with click navigation
+  const isScrollingRef = useRef(false)
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     // Helper to generate IDs
@@ -121,21 +128,85 @@ export function TableOfContents(): React.JSX.Element | null {
 
     setHeadings(items)
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id)
-          }
+    const handleScroll = () => {
+      // Skip scroll updates when we're programmatically scrolling after a click
+      if (isScrollingRef.current) return
+
+      const scrollY = window.scrollY
+      const windowHeight = window.innerHeight
+      const docHeight = document.documentElement.scrollHeight
+
+      // Check if we're at the bottom of the page
+      if (scrollY + windowHeight >= docHeight - 50) {
+        const lastItem = items[items.length - 1]
+        if (lastItem) {
+          setActiveId(lastItem.id)
+          return
+        }
+      }
+
+      // Find the current active section
+      // We look for the last section that has its top position above (or close to) the viewport top
+      // 100px offset provides a comfortable "read ahead" buffer and accounts for the sticky header
+      const offset = 100
+      let currentId = ""
+
+      for (const item of items) {
+        const element = document.getElementById(item.id)
+        if (!element) continue
+
+        const rect = element.getBoundingClientRect()
+
+        // If the section header is above the threshold line
+        if (rect.top < offset) {
+          currentId = item.id
+        } else {
+          // Since items are sorted by position, once we find a header below the line,
+          // we know all subsequent headers are also below.
+          break
+        }
+      }
+
+      setActiveId(currentId)
+    }
+
+    // Throttle the scroll event
+    let ticking = false
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
         })
-      },
-      { rootMargin: "-20% 0% -35% 0%" }
-    )
+        ticking = true
+      }
+    }
 
-    observedElements.forEach((elem) => observer.observe(elem))
+    window.addEventListener("scroll", onScroll)
+    // Initial check to set active state on load
+    handleScroll()
 
-    return () => observer.disconnect()
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      // Clean up timeout on unmount
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+    }
   }, [pathname])
+
+  // Update indicator position when activeId changes
+  useEffect(() => {
+    if (!activeId || !navRef.current) return
+
+    const activeLink = navRef.current.querySelector(`a[href="#${activeId}"]`) as HTMLElement
+    if (activeLink) {
+      setIndicatorStyle({
+        top: activeLink.offsetTop,
+        height: activeLink.offsetHeight,
+      })
+    }
+  }, [activeId, headings])
 
   return (
     <aside className="w-64 shrink-0 hidden xl:block border-l border-border/50">
@@ -150,42 +221,140 @@ export function TableOfContents(): React.JSX.Element | null {
               </p>
             </div>
 
-            {/* Navigation with vertical line */}
-            <nav className="relative flex flex-col gap-0.5">
-              {/* Vertical line */}
-              <div className="absolute left-0 top-0 bottom-0 w-px bg-border/50" />
+            {/* Navigation with custom track */}
+            <nav ref={navRef} className="relative flex flex-col">
+              {/* Single animated active indicator - moves directly without intermediate stops */}
+              {activeId && (() => {
+                const activeIndex = headings.findIndex(h => h.id === activeId)
+                if (activeIndex === -1) return null
 
-              {headings.map((heading) => {
+                const activeHeading = headings[activeIndex]
+                if (!activeHeading) return null
+
+                const isSubsection = activeHeading.level === 3
+                const prevHeading = headings[activeIndex - 1]
+                const prevLevel = prevHeading ? prevHeading.level : activeHeading.level
+
+                const startX = prevLevel === 3 ? 12.5 : 0.5
+                const currentX = isSubsection ? 12.5 : 0.5
+                const effectiveStartX = activeIndex === 0 ? currentX : startX
+
+                const pathD = `
+                  M ${effectiveStartX} 0 
+                  C ${effectiveStartX} 25 ${currentX} 25 ${currentX} 50 
+                  L ${currentX} 100
+                `
+
+                return (
+                  <motion.div
+                    className="absolute left-0 w-4 pointer-events-none"
+                    initial={false}
+                    animate={{
+                      top: indicatorStyle.top,
+                      height: indicatorStyle.height,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 260,
+                      damping: 30,
+                    }}
+                  >
+                    <svg
+                      className="w-full h-full text-cyan-500"
+                      viewBox="0 0 16 100"
+                      preserveAspectRatio="none"
+                    >
+                      <motion.path
+                        d={pathD}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        className="drop-shadow-[0_0_4px_rgba(6,182,212,0.6)]"
+                        initial={false}
+                        animate={{ d: pathD }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 260,
+                          damping: 30,
+                        }}
+                      />
+                    </svg>
+                  </motion.div>
+                )
+              })()}
+
+              {headings.map((heading, index) => {
                 const isActive = activeId === heading.id
                 const isSubsection = heading.level === 3
+                const prevHeading = headings[index - 1]
+                const prevLevel = prevHeading ? prevHeading.level : heading.level
+
+                // Track curve calculation
+                const startX = prevLevel === 3 ? 12.5 : 0.5
+                const currentX = isSubsection ? 12.5 : 0.5
+                const effectiveStartX = index === 0 ? currentX : startX
+
+                const pathD = `
+                  M ${effectiveStartX} 0 
+                  C ${effectiveStartX} 25 ${currentX} 25 ${currentX} 50 
+                  L ${currentX} 100
+                `
 
                 return (
                   <a
                     key={heading.id}
                     href={`#${heading.id}`}
                     className={`
-                      relative text-xs transition-all duration-200 block py-1.5
+                      relative transition-colors duration-200 block py-1.5 pr-2 text-[13px]
                       ${isSubsection ? "pl-7" : "pl-4"}
                       ${isActive
-                        ? "text-cyan-500 font-medium"
+                        ? "text-cyan-600 dark:text-cyan-400 font-medium"
                         : "text-muted-foreground hover:text-foreground"
                       }
                     `}
                     onClick={(e) => {
                       e.preventDefault()
+
+                      // Lock scroll handler updates during programmatic scroll
+                      isScrollingRef.current = true
+
+                      // Clear any existing timeout
+                      if (scrollTimeoutRef.current) {
+                        clearTimeout(scrollTimeoutRef.current)
+                      }
+
+                      // Immediately set the active state for instant feedback
+                      setActiveId(heading.id)
+
+                      // Perform smooth scroll
                       document.getElementById(heading.id)?.scrollIntoView({
                         behavior: "smooth",
                       })
-                      setActiveId(heading.id)
+
+                      // Release scroll handler after animation completes (~800ms for smooth scroll)
+                      scrollTimeoutRef.current = setTimeout(() => {
+                        isScrollingRef.current = false
+                      }, 800)
                     }}
                   >
-                    {/* Active indicator line */}
-                    <span
-                      className={`
-                        absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full transition-all duration-200
-                        ${isActive ? "bg-cyan-500" : "bg-transparent"}
-                      `}
-                    />
+                    {/* Track Container - Background track only */}
+                    <div className="absolute left-0 top-0 w-4 h-full pointer-events-none">
+                      {/* Background Track */}
+                      <svg
+                        className="w-full h-full"
+                        viewBox="0 0 16 100"
+                        preserveAspectRatio="none"
+                      >
+                        <path
+                          d={pathD}
+                          fill="none"
+                          className="stroke-border/50"
+                          strokeWidth="1"
+                        />
+                      </svg>
+                    </div>
+
                     {heading.text}
                   </a>
                 )
