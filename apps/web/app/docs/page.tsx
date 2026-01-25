@@ -1,57 +1,101 @@
+"use client"
+
 import type React from "react"
 import Link from "next/link"
-import { docsConfig } from "@/config/docs"
+import { motion } from "framer-motion"
+import { ArrowRight, Terminal, Copy, Palette } from "lucide-react"
 
 export default function DocsIntroPage(): React.JSX.Element {
   return (
-    <div className="space-y-16">
+    <div className="space-y-16 pt-4">
+      {/* Hero */}
       <header className="space-y-6">
-        <h1
-          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
+        <motion.h1
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]"
           style={{ fontFamily: "var(--font-serif)" }}
         >
-          Introduction
-        </h1>
-        <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
-          Copy-paste ready React components built with Tailwind CSS and Framer
-          Motion. No npm installs, no bloated dependencies just grab the code
-          and ship.
-        </p>
+          Components that feel
+          <br />
+          <span className="text-muted-foreground/60">like they belong</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          className="text-muted-foreground text-lg leading-relaxed max-w-xl"
+        >
+          Handcrafted React components built with Tailwind CSS and Framer Motion.
+          No npm install — just copy the code and make it yours.
+        </motion.p>
       </header>
 
-      <div className="space-y-12">
-        {docsConfig.nav.slice(1).map((category) => (
-          <div key={category.title} id={category.title.toLowerCase().replace(/\s+/g, "-")} data-section-title={category.title} className="scroll-mt-20">
-            <h2 className="text-2xl font-semibold tracking-tight mb-6">
-              {category.title}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {category.items.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="group flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
-                >
-                  <span className="font-medium">{item.title}</span>
-                  <svg
-                    className="h-4 w-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
-              ))}
+      {/* Getting Started Flow */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        className="space-y-6"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Terminal className="w-5 h-5 text-muted-foreground" />
+              <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                01
+              </span>
             </div>
+            <h3 className="font-medium">Run the CLI</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Use the install command to add dependencies automatically.
+            </p>
           </div>
-        ))}
-      </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Copy className="w-5 h-5 text-muted-foreground" />
+              <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                02
+              </span>
+            </div>
+            <h3 className="font-medium">Copy the snippet</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Grab the component code with one click.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Palette className="w-5 h-5 text-muted-foreground" />
+              <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                03
+              </span>
+            </div>
+            <h3 className="font-medium">Make it yours</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Customize colors, sizes, and animations to match your brand.
+            </p>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* CTA */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Link
+          href="/docs/components/hyper-text"
+          className="group inline-flex items-center gap-2 text-sm font-medium"
+        >
+          Start with your first component
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      </motion.div>
     </div>
   )
 }
