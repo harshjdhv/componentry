@@ -20,8 +20,8 @@ export function CopyButton({ code }: CopyButtonProps) {
     <button
       onClick={handleCopy}
       className={`absolute top-3 right-3 p-2 rounded-lg transition-all duration-200 z-10 ${copied
-          ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-          : "bg-zinc-200/80 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-300/80 dark:hover:bg-zinc-700/80 opacity-0 group-hover:opacity-100"
+        ? "bg-zinc-200/80 dark:bg-zinc-800/80 text-zinc-950 dark:text-zinc-50"
+        : "bg-zinc-200/80 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-300/80 dark:hover:bg-zinc-700/80"
         }`}
       aria-label={copied ? "Copied" : "Copy code"}
     >

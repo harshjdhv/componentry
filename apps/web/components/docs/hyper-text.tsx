@@ -6,6 +6,7 @@ import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
 import { Section } from "@/components/component-layout"
 import { InstallationTabs } from "@/components/installation-tabs"
+import { ComponentPreview } from "@/components/component-preview"
 
 const hyperTextSource = `"use client";
 
@@ -78,21 +79,19 @@ export const HyperText = ({
     );
 };`
 
+const importCode = `import { HyperText } from "@/components/ui/hyper-text"`
+
 const defaultCode = `import { HyperText } from "@/components/ui/hyper-text"
 
 <HyperText text="Hyper Text" className="text-4xl font-bold" />`
 
-const customDurationCode = `import { HyperText } from "@/components/ui/hyper-text"
-
-<HyperText
+const customDurationCode = `<HyperText
   text="Slower Reveal"
   duration={2000}
   className="text-4xl font-bold"
 />`
 
-const hoverOnlyCode = `import { HyperText } from "@/components/ui/hyper-text"
-
-<HyperText
+const hoverOnlyCode = `<HyperText
   text="Hover Me"
   animateOnLoad={false}
   className="text-4xl font-bold"
@@ -101,29 +100,38 @@ const hoverOnlyCode = `import { HyperText } from "@/components/ui/hyper-text"
 export function HyperTextDocs() {
     return (
         <>
-            <div className="border border-border rounded-xl p-12 flex flex-col justify-center items-center bg-muted/20 min-h-[350px] gap-4">
-                <HyperText text="Hyper Text" className="text-4xl md:text-5xl font-bold text-foreground" />
-                <p className="text-sm text-muted-foreground mt-4">Hover to trigger effect</p>
+            <div className="space-y-0">
+                <ComponentPreview>
+                    <HyperText
+                        text="Hyper Text"
+                        className="text-4xl md:text-5xl font-bold text-foreground"
+                    />
+                </ComponentPreview>
+                <CodeBlock code={defaultCode} lang="tsx" className="rounded-t-none" />
             </div>
 
             <Section title="Installation">
                 <InstallationTabs
                     cliContent={<InstallCommand component="hyper-text" />}
                     manualContent={
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <p className="text-sm font-medium">1. Install dependencies</p>
-                                <div className="text-sm text-muted-foreground mb-2">
-                                    Ensure you have the utility function <code className="text-xs bg-muted px-1 py-0.5 rounded">cn</code> in <code className="text-xs bg-muted px-1 py-0.5 rounded">lib/utils.ts</code>
-                                </div>
+                        <div className="space-y-6">
+                            <div className="space-y-3">
+                                <p className="text-base font-semibold">1. Install dependencies</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Ensure you have the utility function <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono text-foreground">cn</code> in <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono text-foreground">lib/utils.ts</code>
+                                </p>
                                 <CodeBlock code={`npm install clsx tailwind-merge`} lang="bash" />
                             </div>
-                            <div className="space-y-2">
-                                <p className="text-sm font-medium">2. Copy the source code</p>
-                                <div className="text-sm text-muted-foreground mb-2">
-                                    Copy the following code to <code className="text-xs bg-muted px-1 py-0.5 rounded">components/ui/hyper-text.tsx</code>
-                                </div>
-                                <CodeBlock code={hyperTextSource} lang="tsx" filename="components/ui/hyper-text.tsx" />
+                            <div className="space-y-3">
+                                <p className="text-base font-semibold">2. Copy the source code</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Copy the following code to <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono text-foreground">components/ui/hyper-text.tsx</code>
+                                </p>
+                                <CodeBlock
+                                    code={hyperTextSource}
+                                    lang="tsx"
+                                    filename="components/ui/hyper-text.tsx"
+                                />
                             </div>
                         </div>
                     }
@@ -131,59 +139,119 @@ export function HyperTextDocs() {
             </Section>
 
             <Section title="Usage">
-                <div className="space-y-12">
+                <CodeBlock code={importCode} lang="tsx" />
+            </Section>
+
+            <Section title="Examples">
+                <div className="space-y-10">
                     <div className="space-y-4">
-                        <h3 className="text-xl font-medium">Default</h3>
-                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[200px]">
-                            <HyperText text="Hyper Text" className="text-4xl font-bold text-neutral-900 dark:text-white" />
+                        <h3 className="font-heading text-xl font-semibold tracking-tight">Custom Duration</h3>
+                        <div className="space-y-0">
+                            <ComponentPreview>
+                                <HyperText
+                                    text="Slower Reveal"
+                                    duration={2000}
+                                    className="text-4xl font-bold text-foreground"
+                                />
+                            </ComponentPreview>
+                            <CodeBlock code={customDurationCode} lang="tsx" className="rounded-t-none" />
                         </div>
-                        <CodeBlock code={defaultCode} lang="tsx" className="rounded-t-none mt-0" />
                     </div>
 
                     <div className="space-y-4">
-                        <h3 className="text-xl font-medium">Custom Duration</h3>
-                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[200px]">
-                            <HyperText text="Slower Reveal" duration={2000} className="text-4xl font-bold text-neutral-900 dark:text-white" />
+                        <h3 className="font-heading text-xl font-semibold tracking-tight">Hover Trigger Only</h3>
+                        <div className="space-y-0">
+                            <ComponentPreview>
+                                <HyperText
+                                    text="Hover Me"
+                                    animateOnLoad={false}
+                                    className="text-4xl font-bold text-foreground"
+                                />
+                            </ComponentPreview>
+                            <CodeBlock code={hoverOnlyCode} lang="tsx" className="rounded-t-none" />
                         </div>
-                        <CodeBlock code={customDurationCode} lang="tsx" className="rounded-t-none mt-0" />
-                    </div>
-
-                    <div className="space-y-4">
-                        <h3 className="text-xl font-medium">Hover Trigger Only</h3>
-                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[200px]">
-                            <HyperText text="Hover Me" animateOnLoad={false} className="text-4xl font-bold cursor-pointer text-neutral-900 dark:text-white" />
-                        </div>
-                        <CodeBlock code={hoverOnlyCode} lang="tsx" className="rounded-t-none mt-0" />
                     </div>
                 </div>
             </Section>
 
             <Section title="Props">
-                <div className="grid grid-cols-1 divide-y border rounded-xl bg-muted/30">
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">text</div>
-                        <div className="text-sm text-muted-foreground">
-                            The text to be displayed and animated.
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">duration</div>
-                        <div className="text-sm text-muted-foreground">
-                            Total animation duration in milliseconds (default: 800).
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">animateOnLoad</div>
-                        <div className="text-sm text-muted-foreground">
-                            Whether to start the animation automatically on mount (default: true).
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-                        <div className="font-mono text-sm">className</div>
-                        <div className="text-sm text-muted-foreground">
-                            CSS class for the container. Font size and color styles should be applied here.
-                        </div>
-                    </div>
+                <div className="my-6 w-full overflow-y-auto rounded-lg border">
+                    <table className="w-full text-left text-sm">
+                        <thead className="bg-muted/50">
+                            <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 w-[150px]">
+                                    Prop
+                                </th>
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 w-[150px]">
+                                    Type
+                                </th>
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 w-[150px]">
+                                    Default
+                                </th>
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
+                                    Description
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="[&_tr:last-child]:border-0">
+                            <tr className="border-b transition-colors data-[state=selected]:bg-muted">
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono font-semibold text-foreground">
+                                    text
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
+                                    string
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
+                                    -
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">
+                                    The text content to be animated.
+                                </td>
+                            </tr>
+                            <tr className="border-b transition-colors data-[state=selected]:bg-muted">
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono font-semibold text-foreground">
+                                    duration
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
+                                    number
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
+                                    800
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">
+                                    Total animation duration in milliseconds.
+                                </td>
+                            </tr>
+                            <tr className="border-b transition-colors data-[state=selected]:bg-muted">
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono font-semibold text-foreground">
+                                    animateOnLoad
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
+                                    boolean
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
+                                    true
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">
+                                    Whether to start the animation automatically on mount.
+                                </td>
+                            </tr>
+                            <tr className="border-b transition-colors data-[state=selected]:bg-muted">
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono font-semibold text-foreground">
+                                    className
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
+                                    string
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
+                                    -
+                                </td>
+                                <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">
+                                    Additional CSS classes for styling.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </Section>
         </>

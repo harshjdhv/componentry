@@ -19,7 +19,7 @@ export function InstallationTabs({ cliContent, manualContent }: InstallationTabs
                     className={cn(
                         "px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200",
                         method === "cli"
-                            ? "border-cyan-500 text-cyan-600 dark:text-cyan-400 bg-cyan-500/5"
+                            ? "border-foreground text-foreground"
                             : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     )}
                 >
@@ -30,7 +30,7 @@ export function InstallationTabs({ cliContent, manualContent }: InstallationTabs
                     className={cn(
                         "px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200",
                         method === "manual"
-                            ? "border-cyan-500 text-cyan-600 dark:text-cyan-400 bg-cyan-500/5"
+                            ? "border-foreground text-foreground"
                             : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     )}
                 >
@@ -38,7 +38,7 @@ export function InstallationTabs({ cliContent, manualContent }: InstallationTabs
                 </button>
             </div>
 
-            <div className="min-h-[200px] animate-in fade-in slide-in-from-top-1 duration-200">
+            <div className="min-h-[100px] animate-in fade-in slide-in-from-top-1 duration-200">
                 <div className={cn(method === "cli" ? "block" : "hidden")}>
                     {cliContent}
                 </div>
