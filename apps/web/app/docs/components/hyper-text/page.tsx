@@ -4,6 +4,7 @@ import { HyperText } from "@workspace/ui/components/hyper-text"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
 import { ComponentLayout, Section } from "@/components/component-layout"
+import { InstallationTabs } from "@/components/installation-tabs"
 
 export const metadata: Metadata = {
     title: "Hyper Text Component",
@@ -13,11 +14,82 @@ export const metadata: Metadata = {
     },
 }
 
-const defaultCode = `import { HyperText } from "@workspace/ui/components/hyper-text"
+const hyperTextSource = `"use client";
+
+import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
+
+interface HyperTextProps {
+    className?: string;
+    duration?: number;
+    text: string;
+    animateOnLoad?: boolean;
+}
+
+const alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+export const HyperText = ({
+    className,
+    duration = 800,
+    text,
+    animateOnLoad = true,
+}: HyperTextProps) => {
+    const [displayText, setDisplayText] = useState(text.split(""));
+    const [trigger, setTrigger] = useState(false);
+    const iterations = useRef(0);
+    const isFirstRender = useRef(true);
+
+    const triggerAnimation = () => {
+        iterations.current = 0;
+        setTrigger(true);
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!animateOnLoad && isFirstRender.current) {
+                clearInterval(interval);
+                isFirstRender.current = false;
+                return;
+            }
+            if (iterations.current < text.length) {
+                setDisplayText((t) =>
+                    t.map((l, i) =>
+                        l === " "
+                            ? l
+                            : i <= iterations.current
+                                ? text[i] ?? ""
+                                : alphabets[Math.floor(Math.random() * alphabets.length)] ?? ""
+                    )
+                );
+                iterations.current = iterations.current + 0.1;
+            } else {
+                setTrigger(false);
+                clearInterval(interval);
+            }
+        }, duration / (text.length * 10));
+        // Clean up interval on unmount
+        return () => clearInterval(interval);
+    }, [text, duration, trigger, animateOnLoad]);
+
+    return (
+        <div
+            className={cn("flex cursor-default overflow-hidden py-2 font-mono", className)}
+            onMouseEnter={triggerAnimation}
+        >
+            {displayText.map((letter, i) => (
+                <span key={i} className="min-w-[0.1em]">
+                    {letter}
+                </span>
+            ))}
+        </div>
+    );
+};`
+
+const defaultCode = `import { HyperText } from "@/components/ui/hyper-text"
 
 <HyperText text="Hyper Text" className="text-4xl font-bold" />`
 
-const customDurationCode = `import { HyperText } from "@workspace/ui/components/hyper-text"
+const customDurationCode = `import { HyperText } from "@/components/ui/hyper-text"
 
 <HyperText
   text="Slower Reveal"
@@ -25,7 +97,7 @@ const customDurationCode = `import { HyperText } from "@workspace/ui/components/
   className="text-4xl font-bold"
 />`
 
-const hoverOnlyCode = `import { HyperText } from "@workspace/ui/components/hyper-text"
+const hoverOnlyCode = `import { HyperText } from "@/components/ui/hyper-text"
 
 <HyperText
   text="Hover Me"
@@ -39,34 +111,59 @@ export default function HyperTextPage(): React.JSX.Element {
             title="Hyper Text"
             description="A text scrambler effect that cycles through random characters before revealing the final text. Great for titles, loading states, or hover interactions."
         >
-            <Section title="Install">
-                <InstallCommand component="hyper-text" />
+            <div className="border border-border rounded-xl p-12 flex flex-col justify-center items-center bg-muted/20 min-h-[350px] gap-4">
+                <HyperText text="Hyper Text" className="text-4xl md:text-5xl font-bold text-foreground" />
+                <p className="text-sm text-muted-foreground mt-4">Hover to trigger effect</p>
+            </div>
+
+            <Section title="Installation">
+                <InstallationTabs
+                    cliContent={<InstallCommand component="hyper-text" />}
+                    manualContent={
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium">1. Install dependencies</p>
+                                <div className="text-sm text-muted-foreground mb-2">
+                                    Ensure you have the utility function <code className="text-xs bg-muted px-1 py-0.5 rounded">cn</code> in <code className="text-xs bg-muted px-1 py-0.5 rounded">lib/utils.ts</code>
+                                </div>
+                                <CodeBlock code={`npm install clsx tailwind-merge`} lang="bash" />
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium">2. Copy the source code</p>
+                                <div className="text-sm text-muted-foreground mb-2">
+                                    Copy the following code to <code className="text-xs bg-muted px-1 py-0.5 rounded">components/ui/hyper-text.tsx</code>
+                                </div>
+                                <CodeBlock code={hyperTextSource} lang="tsx" filename="components/ui/hyper-text.tsx" />
+                            </div>
+                        </div>
+                    }
+                />
             </Section>
 
-            <Section title="Examples">
+            <Section title="Usage">
                 <div className="space-y-12">
-                    <div className="space-y-0">
-                        <h3 className="text-xl font-medium mb-4">Default</h3>
-                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center">
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-medium">Default</h3>
+                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[200px]">
                             <HyperText text="Hyper Text" className="text-4xl font-bold text-neutral-900 dark:text-white" />
                         </div>
-                        <CodeBlock code={defaultCode} lang="tsx" className="rounded-t-none" />
+                        <CodeBlock code={defaultCode} lang="tsx" className="rounded-t-none mt-0" />
                     </div>
 
-                    <div className="space-y-0">
-                        <h3 className="text-xl font-medium mb-4">Custom Duration</h3>
-                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center">
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-medium">Custom Duration</h3>
+                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[200px]">
                             <HyperText text="Slower Reveal" duration={2000} className="text-4xl font-bold text-neutral-900 dark:text-white" />
                         </div>
-                        <CodeBlock code={customDurationCode} lang="tsx" className="rounded-t-none" />
+                        <CodeBlock code={customDurationCode} lang="tsx" className="rounded-t-none mt-0" />
                     </div>
 
-                    <div className="space-y-0">
-                        <h3 className="text-xl font-medium mb-4">Hover Trigger Only</h3>
-                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center">
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-medium">Hover Trigger Only</h3>
+                        <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[200px]">
                             <HyperText text="Hover Me" animateOnLoad={false} className="text-4xl font-bold cursor-pointer text-neutral-900 dark:text-white" />
                         </div>
-                        <CodeBlock code={hoverOnlyCode} lang="tsx" className="rounded-t-none" />
+                        <CodeBlock code={hoverOnlyCode} lang="tsx" className="rounded-t-none mt-0" />
                     </div>
                 </div>
             </Section>
