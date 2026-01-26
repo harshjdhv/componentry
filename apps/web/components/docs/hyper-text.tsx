@@ -1,22 +1,11 @@
+"use client"
+
 import type React from "react"
-import type { Metadata } from "next"
-import { notFound } from "next/navigation"
-import { getComponent } from "@/registry"
 import { HyperText } from "@workspace/ui/components/hyper-text"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
-import { ComponentLayout, Section } from "@/components/component-layout"
+import { Section } from "@/components/component-layout"
 import { InstallationTabs } from "@/components/installation-tabs"
-
-const component = getComponent("hyper-text")
-
-export const metadata: Metadata = {
-    title: `${component?.title ?? "Component"} Component`,
-    description: component?.description ?? "Component documentation",
-    alternates: {
-        canonical: `https://componentry.fun/docs/components/${component?.slug ?? ""}`,
-    },
-}
 
 const hyperTextSource = `"use client";
 
@@ -109,16 +98,9 @@ const hoverOnlyCode = `import { HyperText } from "@/components/ui/hyper-text"
   className="text-4xl font-bold"
 />`
 
-export default function HyperTextPage(): React.JSX.Element {
-    if (!component) {
-        return notFound()
-    }
-
+export function HyperTextDocs() {
     return (
-        <ComponentLayout
-            title={component.title}
-            description={component.description}
-        >
+        <>
             <div className="border border-border rounded-xl p-12 flex flex-col justify-center items-center bg-muted/20 min-h-[350px] gap-4">
                 <HyperText text="Hyper Text" className="text-4xl md:text-5xl font-bold text-foreground" />
                 <p className="text-sm text-muted-foreground mt-4">Hover to trigger effect</p>
@@ -204,6 +186,6 @@ export default function HyperTextPage(): React.JSX.Element {
                     </div>
                 </div>
             </Section>
-        </ComponentLayout>
+        </>
     )
 }
