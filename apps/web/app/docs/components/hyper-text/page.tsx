@@ -1,16 +1,20 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { notFound } from "next/navigation"
+import { getComponent } from "@/registry"
 import { HyperText } from "@workspace/ui/components/hyper-text"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
 import { ComponentLayout, Section } from "@/components/component-layout"
 import { InstallationTabs } from "@/components/installation-tabs"
 
+const component = getComponent("hyper-text")
+
 export const metadata: Metadata = {
-    title: "Hyper Text Component",
-    description: "A text scramble effect that cycles through characters before revealing the final text. Inspired by cyberpunk and futuristic UIs.",
+    title: `${component?.title ?? "Component"} Component`,
+    description: component?.description ?? "Component documentation",
     alternates: {
-        canonical: "https://componentry.fun/docs/components/hyper-text",
+        canonical: `https://componentry.fun/docs/components/${component?.slug ?? ""}`,
     },
 }
 
@@ -106,10 +110,14 @@ const hoverOnlyCode = `import { HyperText } from "@/components/ui/hyper-text"
 />`
 
 export default function HyperTextPage(): React.JSX.Element {
+    if (!component) {
+        return notFound()
+    }
+
     return (
         <ComponentLayout
-            title="Hyper Text"
-            description="A text scrambler effect that cycles through random characters before revealing the final text. Great for titles, loading states, or hover interactions."
+            title={component.title}
+            description={component.description}
         >
             <div className="border border-border rounded-xl p-12 flex flex-col justify-center items-center bg-muted/20 min-h-[350px] gap-4">
                 <HyperText text="Hyper Text" className="text-4xl md:text-5xl font-bold text-foreground" />

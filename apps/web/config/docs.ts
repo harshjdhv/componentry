@@ -1,125 +1,60 @@
-export const docsConfig = {
-  nav: [
+import { components } from "@/registry";
+
+type NavItem = {
+  title: string;
+  href: string;
+  items?: NavItem[];
+};
+
+type NavGroup = {
+  title: string;
+  items: NavItem[];
+};
+
+const gettingStarted: NavGroup = {
+  title: "Getting Started",
+  items: [
     {
-      title: "Getting Started",
-      items: [
-        {
-          title: "Introduction",
-          href: "/docs",
-        },
-      ],
-    },
-    {
-      title: "Text Animations",
-      items: [
-        {
-          title: "Hyper Text",
-          href: "/docs/components/hyper-text",
-        },
-        {
-          title: "True Focus",
-          href: "/docs/components/true-focus",
-        },
-        {
-          title: "Text Animate",
-          href: "/docs/components/text-animate",
-        },
-        {
-          title: "Velocity Scroll",
-          href: "/docs/components/scroll-based-velocity",
-        },
-      ],
-    },
-    {
-      title: "Components",
-      items: [
-        {
-          title: "Circuit Board",
-          href: "/docs/components/circuit-board",
-        },
-        {
-          title: "Command Menu",
-          href: "/docs/components/command-menu",
-        },
-        {
-          title: "Flight Status Card",
-          href: "/docs/components/flight-status-card",
-        },
-        {
-          title: "Magnetic Dock",
-          href: "/docs/components/magnetic-dock",
-        },
-        {
-          title: "Showcase Card",
-          href: "/docs/components/showcase-card",
-        },
-        {
-          title: "Spotlight Card",
-          href: "/docs/components/spotlight-card",
-        },
-        {
-          title: "Auth Modal",
-          href: "/docs/components/auth-modal",
-        },
-        {
-          title: "Testimonial Marquee",
-          href: "/docs/components/testimonial-marquee",
-        },
-        {
-          title: "Collection Surfer",
-          href: "/docs/components/collection-surfer",
-        },
-        {
-          title: "Github Calendar",
-          href: "/docs/components/github-calendar",
-        },
-      ],
-    },
-    {
-      title: "Hero Backgrounds",
-      items: [
-        {
-          title: "Hero Geometric",
-          href: "/docs/components/hero-geometric",
-        },
-      ],
-    },
-    {
-      title: "Visual Effects",
-      items: [
-        {
-          title: "Border Beam",
-          href: "/docs/components/border-beam",
-        },
-        {
-          title: "Dither Gradient",
-          href: "/docs/components/dither-gradient",
-        },
-        {
-          title: "Liquid Blob",
-          href: "/docs/components/liquid-blob",
-        },
-        {
-          title: "Magnet Lines",
-          href: "/docs/components/magnet-lines",
-        },
-        {
-          title: "Noise Texture",
-          href: "/docs/components/noise-texture",
-        },
-        {
-          title: "Particle Galaxy",
-          href: "/docs/components/particle-galaxy",
-        },
-        {
-          title: "Pixel Canvas",
-          href: "/docs/components/pixel-canvas",
-        },
-        {
-          title: "Matrix Rain",
-          href: "/docs/components/matrix-rain",
-        },
-      ],
+      title: "Introduction",
+      href: "/docs",
     },
   ],
+};
+
+const categoryOrder = [
+  "Text Animations",
+  "Components",
+  "Hero Backgrounds",
+  "Visual Effects",
+];
+
+const getComponentNav = (): NavGroup[] => {
+  const groups: Record<string, NavGroup> = {};
+
+  Object.values(components).forEach((component) => {
+    if (!groups[component.category]) {
+      groups[component.category] = {
+        title: component.category,
+        items: [],
+      };
+    }
+    groups[component.category]!.items.push({
+      title: component.title,
+      href: `/docs/components/${component.slug}`,
+    });
+  });
+
+  // Sort items within groups alphabetically
+  Object.keys(groups).forEach((key) => {
+    groups[key]!.items.sort((a, b) => a.title.localeCompare(b.title));
+  });
+
+  // Return groups in defined order
+  return categoryOrder
+    .map((category) => groups[category])
+    .filter(Boolean) as NavGroup[];
+};
+
+export const docsConfig = {
+  nav: [gettingStarted, ...getComponentNav()],
 };
