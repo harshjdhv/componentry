@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Check, ChevronDown, Copy } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { AI_ASSISTANTS } from "@/config/ai"
 
 interface PageContextMenuProps {
     content: string
@@ -46,6 +47,11 @@ function SciraIcon({ className }: { className?: string }) {
     )
 }
 
+const ICONS = {
+    chatgpt: ChatGPTIcon,
+    claude: ClaudeIcon,
+    scira: SciraIcon,
+}
 
 export function PageContextMenu({ content }: PageContextMenuProps) {
     const [copied, setCopied] = React.useState(false)
@@ -69,25 +75,18 @@ export function PageContextMenu({ content }: PageContextMenuProps) {
     }
 
     const getPrompt = (url: string) => {
-        const cleanUrl = url.replace("http://localhost:3000", "https://componentry.fun")
-        return `I’m looking at this documentation: ${cleanUrl}. Help me understand how to use it. Be ready to explain concepts, give examples, or help debug based on it.`
+        return `I’m looking at this componentry documentation: ${url}. Help me understand how to use it. Be ready to explain concepts, give examples, or help debug based on it.`
     }
 
-    const openLink = (platform: "chatgpt" | "claude" | "scira") => {
-        const url = window.location.href
+    const openLink = (assistant: typeof AI_ASSISTANTS[number]) => {
+        // Construct the canonical URL regardless of the current environment
+        const url = new URL(window.location.pathname, "https://componentry.fun").toString()
         const prompt = getPrompt(url)
 
-        // Copy prompt to clipboard first
+        // Copy prompt to clipboard as fallback
         navigator.clipboard.writeText(prompt)
 
-        // Open respective platform
-        const platformUrls = {
-            chatgpt: "https://chat.openai.com/",
-            claude: "https://claude.ai/",
-            scira: "https://scira.app/"
-        }
-
-        window.open(platformUrls[platform], "_blank")
+        window.open(assistant.url(prompt), "_blank")
         setIsOpen(false)
     }
 
@@ -137,27 +136,19 @@ export function PageContextMenu({ content }: PageContextMenuProps) {
                         View as Markdown
                     </button>
 
-                    <button
-                        onClick={() => openLink("chatgpt")}
-                        className="w-full flex items-center gap-2 px-2 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-left"
-                    >
-                        <ChatGPTIcon className="h-4 w-4" />
-                        Open in ChatGPT
-                    </button>
-                    <button
-                        onClick={() => openLink("claude")}
-                        className="w-full flex items-center gap-2 px-2 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-left"
-                    >
-                        <ClaudeIcon className="h-4 w-4" />
-                        Open in Claude
-                    </button>
-                    <button
-                        onClick={() => openLink("scira")}
-                        className="w-full flex items-center gap-2 px-2 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-left"
-                    >
-                        <SciraIcon className="h-4 w-4" />
-                        Open in Scira
-                    </button>
+                    {AI_ASSISTANTS.map((assistant) => {
+                        const Icon = ICONS[assistant.id as keyof typeof ICONS]
+                        return (
+                            <button
+                                key={assistant.id}
+                                onClick={() => openLink(assistant)}
+                                className="w-full flex items-center gap-2 px-2 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-left"
+                            >
+                                {Icon && <Icon className="h-4 w-4" />}
+                                Open in {assistant.name}
+                            </button>
+                        )
+                    })}
                 </div>
             )}
         </div>
