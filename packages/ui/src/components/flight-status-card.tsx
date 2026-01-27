@@ -294,8 +294,8 @@ function DotMatrixChar({
             style={
               cell
                 ? {
-                    filter: "drop-shadow(0 0 3px rgba(180, 245, 78, 0.6))",
-                  }
+                  filter: "drop-shadow(0 0 3px rgba(180, 245, 78, 0.6))",
+                }
                 : {}
             }
           />
@@ -486,7 +486,7 @@ function FlightStatusCard({
 
       <div className="relative z-10">
         {/* Airport codes and route */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 md:gap-0 mb-6">
           <div className="flex items-center gap-4">
             {/* Departure */}
             <div className="flex flex-col items-start">
@@ -681,7 +681,7 @@ function FlightStatusCardLight({
 
       <div className="relative z-10">
         {/* Airport codes and route */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 md:gap-0 mb-6">
           <div className="flex items-center gap-4">
             {/* Departure */}
             <div className="flex flex-col items-start">
