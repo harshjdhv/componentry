@@ -4,6 +4,7 @@ import { AuthModalDocs } from "@/components/docs/auth-modal";
 import { TextAnimateDocs } from "@/components/docs/text-animate";
 import { TrueFocusDocs } from "@/components/docs/true-focus";
 import { ScrollBasedVelocityDocs } from "@/components/docs/scroll-based-velocity";
+import { CircuitBoardDocs } from "@/components/docs/circuit-board";
 
 export const docsRegistry: Record<string, any> = {
   "hyper-text": HyperTextDocs,
@@ -11,4 +12,5 @@ export const docsRegistry: Record<string, any> = {
   "text-animate": TextAnimateDocs,
   "true-focus": TrueFocusDocs,
   "scroll-based-velocity": ScrollBasedVelocityDocs,
+  "circuit-board": CircuitBoardDocs,
 };

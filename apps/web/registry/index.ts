@@ -44,7 +44,8 @@ export const components: Record<string, ComponentMetadata> = {
   // Components
   "circuit-board": {
     title: "Circuit Board",
-    description: "Interactive circuit board pattern for backgrounds.",
+    description:
+      "Animated circuit board visualization with nodes and connections.",
     category: "Components",
     slug: "circuit-board",
   },
