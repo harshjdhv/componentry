@@ -5,7 +5,7 @@ import { TextAnimateDocs } from "@/components/docs/text-animate";
 import { TrueFocusDocs } from "@/components/docs/true-focus";
 import { ScrollBasedVelocityDocs } from "@/components/docs/scroll-based-velocity";
 
-export const docsRegistry: Record<string, React.ComponentType | undefined> = {
+export const docsRegistry: Record<string, any> = {
   "hyper-text": HyperTextDocs,
   "auth-modal": AuthModalDocs,
   "text-animate": TextAnimateDocs,
