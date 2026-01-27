@@ -2,11 +2,8 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getComponent } from "@/registry"
-import { InstallCommand } from "@/components/install-command"
-import { ComponentLayout, Section } from "@/components/component-layout"
-import { InstallationTabs } from "@/components/installation-tabs"
-import { docsRegistry, docsContextRegistry } from "@/components/docs/registry"
-import { PageContextMenu } from "@/components/page-context-menu"
+import { docsRegistry } from "@/components/docs/registry"
+import { DocsPageLayout } from "@/components/docs-page-layout"
 
 // -----------------------------------------------------------------------------
 // NOTE: This entire file is structurally identical to hyper-text/page.tsx.
@@ -42,61 +39,34 @@ export default async function ComponentPage(props: PageProps) {
     const params = await props.params
     const component = getComponent(params.slug)
     const DocsComponent = docsRegistry[params.slug]
-    const pageContext = docsContextRegistry[params.slug]
 
     if (!component) {
         return notFound()
     }
 
+    if (DocsComponent) {
+        return <DocsComponent />
+    }
+
     return (
-        <ComponentLayout
+        <DocsPageLayout
             title={component.title}
             description={component.description}
-            action={pageContext ? <PageContextMenu content={pageContext} /> : undefined}
-        >
-            {DocsComponent ? (
-                <DocsComponent />
-            ) : (
-                <>
-                    <div className="border border-border rounded-xl p-12 flex flex-col justify-center items-center bg-muted/20 min-h-[350px] gap-4">
-                        <div className="text-center space-y-2">
-                            <h3 className="text-lg font-medium">{component.title} Preview</h3>
-                            <p className="text-sm text-muted-foreground">
-                                Component preview will appear here.
-                            </p>
-                        </div>
+            installPackageName={component.slug}
+            preview={
+                <div className="border border-border rounded-xl p-12 flex flex-col justify-center items-center bg-muted/20 min-h-[350px] gap-4">
+                    <div className="text-center space-y-2">
+                        <h3 className="text-lg font-medium">{component.title} Preview</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Component preview will appear here.
+                        </p>
                     </div>
-
-                    <Section title="Installation">
-                        <InstallationTabs
-                            cliContent={<InstallCommand component={component.slug} />}
-                            manualContent={
-                                <div className="space-y-4">
-                                    <div className="text-sm text-muted-foreground">
-                                        Manual installation guide coming soon for {component.title}.
-                                    </div>
-                                </div>
-                            }
-                        />
-                    </Section>
-
-                    <Section title="Usage">
-                        <div className="space-y-12">
-                            <div className="space-y-4">
-                                <div className="p-8 bg-muted/30 rounded-xl border border-border flex items-center justify-center min-h-[200px]">
-                                    <p className="text-muted-foreground text-sm">Usage examples coming soon.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </Section>
-
-                    <Section title="Props">
-                        <div className="p-4 border rounded-xl bg-muted/30">
-                            <p className="text-sm text-muted-foreground">API Reference coming soon.</p>
-                        </div>
-                    </Section>
-                </>
-            )}
-        </ComponentLayout>
+                </div>
+            }
+            previewCode="// Preview code coming soon"
+            usageCode="// Usage examples coming soon"
+            examples={[]}
+            props={[]}
+        />
     )
 }

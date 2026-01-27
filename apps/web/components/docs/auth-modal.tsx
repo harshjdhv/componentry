@@ -2,10 +2,6 @@
 
 import type React from "react";
 import { AuthModal } from "@workspace/ui/components/auth-modal";
-import { InstallCommand } from "@/components/install-command";
-import { CodeBlock } from "@/components/code-block";
-import { Section } from "@/components/component-layout";
-import { InstallationTabs } from "@/components/installation-tabs";
 
 const authModalSource = `"use client"
 
@@ -250,93 +246,40 @@ export function AuthModalDemo() {
   )
 }`;
 
-export function AuthModalDocs() {
+import { DocsPageLayout } from "@/components/docs-page-layout"
+
+// ... existing code ...
+
+export function AuthModalDocs({ action }: { action?: React.ReactNode }) {
   return (
-    <>
-      <div className="border border-border rounded-xl p-12 flex flex-col justify-center items-center bg-muted/20 min-h-[350px] gap-4">
-        <AuthModal />
-      </div>
-
-      <Section title="Installation">
-        <InstallationTabs
-          cliContent={<InstallCommand component="auth-modal" />}
-          manualContent={
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">1. Install dependencies</p>
-                <div className="text-sm text-muted-foreground mb-2">
-                  Ensure you have the utility function{" "}
-                  <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                    cn
-                  </code>{" "}
-                  in{" "}
-                  <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                    lib/utils.ts
-                  </code>
-                </div>
-                <CodeBlock
-                  code={`npm install framer-motion lucide-react`}
-                  lang="bash"
-                />
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium">2. Copy the source code</p>
-                <div className="text-sm text-muted-foreground mb-2">
-                  Copy the following code to{" "}
-                  <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                    components/ui/auth-modal.tsx
-                  </code>
-                </div>
-                <CodeBlock
-                  code={authModalSource}
-                  lang="tsx"
-                  filename="components/ui/auth-modal.tsx"
-                />
-              </div>
-            </div>
-          }
-        />
-      </Section>
-
-      <Section title="Usage">
-        <div className="space-y-12">
-          <div className="space-y-4">
-            <h3 className="text-xl font-medium">Basic Usage</h3>
-            <div className="p-8 bg-muted/30 rounded-t-xl rounded-b-none border border-border flex items-center justify-center min-h-[200px]">
-              <AuthModal />
-            </div>
-            <CodeBlock
-              code={basicCode}
-              lang="tsx"
-              className="rounded-t-none mt-0"
-            />
-          </div>
-        </div>
-      </Section>
-
-      <Section title="Props">
-        <div className="grid grid-cols-1 divide-y border rounded-xl bg-muted/30">
-          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-            <div className="font-mono text-sm">triggerText</div>
-            <div className="text-sm text-muted-foreground">
-              Text on the trigger button (default: &quot;Sign up / Sign
-              in&quot;)
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-            <div className="font-mono text-sm">onLogin</div>
-            <div className="text-sm text-muted-foreground">
-              Callback when a provider is selected
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 p-4">
-            <div className="font-mono text-sm">className</div>
-            <div className="text-sm text-muted-foreground">
-              Additional CSS classes for the trigger button
-            </div>
-          </div>
-        </div>
-      </Section>
-    </>
-  );
+    <DocsPageLayout
+      title="Auth Modal"
+      description="An authentication modal with social login buttons and email form."
+      action={action}
+      preview={<AuthModal />}
+      previewCode={basicCode}
+      installPackageName="auth-modal"
+      installDependencies="framer-motion lucide-react"
+      installSourceCode={authModalSource}
+      usageCode={basicCode}
+      props={[
+        {
+          name: "triggerText",
+          type: "string",
+          default: '"Sign up / Sign in"',
+          description: "Text on the trigger button.",
+        },
+        {
+          name: "onLogin",
+          type: "(provider: string) => void",
+          description: "Callback when a provider is selected.",
+        },
+        {
+          name: "className",
+          type: "string",
+          description: "Additional CSS classes for the trigger button.",
+        },
+      ]}
+    />
+  )
 }
