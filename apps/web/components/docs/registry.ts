@@ -13,6 +13,10 @@ import { ShowcaseCardDocs } from "@/components/docs/showcase-card";
 import { SpotlightCardDocs } from "@/components/docs/spotlight-card";
 import { TestimonialMarqueeDocs } from "@/components/docs/testimonial-marquee";
 import { MagneticDockDocs } from "@/components/docs/magnetic-dock";
+import { HeroGeometricDocs } from "@/components/docs/hero-geometric";
+import { BorderBeamDocs } from "@/components/docs/border-beam";
+import { DitherGradientDocs } from "@/components/docs/dither-gradient";
+import { LiquidBlobDocs } from "@/components/docs/liquid-blob";
 
 export const docsRegistry: Record<string, any> = {
   "hyper-text": HyperTextDocs,
@@ -29,4 +33,8 @@ export const docsRegistry: Record<string, any> = {
   "spotlight-card": SpotlightCardDocs,
   "testimonial-marquee": TestimonialMarqueeDocs,
   "magnetic-dock": MagneticDockDocs,
+  "hero-geometric": HeroGeometricDocs,
+  "border-beam": BorderBeamDocs,
+  "dither-gradient": DitherGradientDocs,
+  "liquid-blob": LiquidBlobDocs,
 };

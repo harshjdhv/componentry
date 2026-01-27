@@ -146,7 +146,7 @@ ${ex.code}
     >
       <div className="space-y-0">
         {fullWidthPreview ? (
-          <div className="rounded-t-xl border border-border overflow-hidden">
+          <div className="relative rounded-t-xl border border-border overflow-hidden">
             {preview}
           </div>
         ) : (
@@ -222,7 +222,7 @@ ${ex.code}
                 </h3>
                 <div className="space-y-0">
                   {example.fullWidth ? (
-                    <div className="rounded-t-xl border border-border overflow-hidden">
+                    <div className="relative rounded-t-xl border border-border overflow-hidden">
                       {example.preview}
                     </div>
                   ) : (
