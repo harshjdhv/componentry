@@ -8,6 +8,11 @@ import { CircuitBoardDocs } from "@/components/docs/circuit-board";
 import { CollectionSurferDocs } from "@/components/docs/collection-surfer";
 import { CommandMenuDocs } from "@/components/docs/command-menu";
 import { FlightStatusCardDocs } from "@/components/docs/flight-status-card";
+import { GithubCalendarDocs } from "@/components/docs/github-calendar";
+import { ShowcaseCardDocs } from "@/components/docs/showcase-card";
+import { SpotlightCardDocs } from "@/components/docs/spotlight-card";
+import { TestimonialMarqueeDocs } from "@/components/docs/testimonial-marquee";
+import { MagneticDockDocs } from "@/components/docs/magnetic-dock";
 
 export const docsRegistry: Record<string, any> = {
   "hyper-text": HyperTextDocs,
@@ -19,4 +24,9 @@ export const docsRegistry: Record<string, any> = {
   "collection-surfer": CollectionSurferDocs,
   "command-menu": CommandMenuDocs,
   "flight-status-card": FlightStatusCardDocs,
+  "github-calendar": GithubCalendarDocs,
+  "showcase-card": ShowcaseCardDocs,
+  "spotlight-card": SpotlightCardDocs,
+  "testimonial-marquee": TestimonialMarqueeDocs,
+  "magnetic-dock": MagneticDockDocs,
 };
