@@ -5,6 +5,7 @@ import { TextAnimateDocs } from "@/components/docs/text-animate";
 import { TrueFocusDocs } from "@/components/docs/true-focus";
 import { ScrollBasedVelocityDocs } from "@/components/docs/scroll-based-velocity";
 import { CircuitBoardDocs } from "@/components/docs/circuit-board";
+import { CollectionSurferDocs } from "@/components/docs/collection-surfer";
 
 export const docsRegistry: Record<string, any> = {
   "hyper-text": HyperTextDocs,
@@ -13,4 +14,5 @@ export const docsRegistry: Record<string, any> = {
   "true-focus": TrueFocusDocs,
   "scroll-based-velocity": ScrollBasedVelocityDocs,
   "circuit-board": CircuitBoardDocs,
+  "collection-surfer": CollectionSurferDocs,
 };
