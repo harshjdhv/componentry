@@ -17,6 +17,11 @@ import { HeroGeometricDocs } from "@/components/docs/hero-geometric";
 import { BorderBeamDocs } from "@/components/docs/border-beam";
 import { DitherGradientDocs } from "@/components/docs/dither-gradient";
 import { LiquidBlobDocs } from "@/components/docs/liquid-blob";
+import { MagnetLinesDocs } from "@/components/docs/magnet-lines";
+import { MatrixRainDocs } from "@/components/docs/matrix-rain";
+import { NoiseTextureDocs } from "@/components/docs/noise-texture";
+import { ParticleGalaxyDocs } from "@/components/docs/particle-galaxy";
+import { PixelCanvasDocs } from "@/components/docs/pixel-canvas";
 
 export const docsRegistry: Record<string, any> = {
   "hyper-text": HyperTextDocs,
@@ -37,4 +42,9 @@ export const docsRegistry: Record<string, any> = {
   "border-beam": BorderBeamDocs,
   "dither-gradient": DitherGradientDocs,
   "liquid-blob": LiquidBlobDocs,
+  "magnet-lines": MagnetLinesDocs,
+  "matrix-rain": MatrixRainDocs,
+  "noise-texture": NoiseTextureDocs,
+  "particle-galaxy": ParticleGalaxyDocs,
+  "pixel-canvas": PixelCanvasDocs,
 };
