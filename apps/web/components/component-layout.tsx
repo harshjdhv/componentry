@@ -7,6 +7,7 @@ interface ComponentLayoutProps {
   children: React.ReactNode
   badge?: string
   date?: string
+  action?: React.ReactNode
 }
 
 export function ComponentLayout({
@@ -15,6 +16,7 @@ export function ComponentLayout({
   children,
   badge,
   date,
+  action,
 }: ComponentLayoutProps) {
   return (
     <div className="space-y-16">
@@ -35,13 +37,16 @@ export function ComponentLayout({
           </div>
         )}
 
-        {/* Title */}
-        <h1
-          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
-          style={{ fontFamily: "var(--font-serif)" }}
-        >
-          {title}
-        </h1>
+        {/* Title and Action */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h1
+            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
+            style={{ fontFamily: "var(--font-serif)" }}
+          >
+            {title}
+          </h1>
+          {action && <div className="shrink-0">{action}</div>}
+        </div>
 
         {/* Description */}
         <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">

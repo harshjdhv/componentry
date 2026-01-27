@@ -257,3 +257,48 @@ export function HyperTextDocs() {
         </>
     )
 }
+
+const pageContext = `
+# Hyper Text
+
+A text component that scrambles letters before revealing the final text on hover or load.
+
+## Installation
+
+### CLI
+\`\`\`bash
+npx shadcn@latest add "http://localhost:3000/r/hyper-text.json"
+\`\`\`
+
+### Manual
+1. Install dependencies
+\`\`\`bash
+npm install clsx tailwind-merge
+\`\`\`
+
+2. Copy source code
+\`\`\`tsx
+${hyperTextSource}
+\`\`\`
+
+## Usage
+\`\`\`tsx
+${importCode}
+\`\`\`
+
+## Examples
+
+### Custom Duration
+\`\`\`tsx
+${customDurationCode}
+\`\`\`
+
+### Hover Trigger Only
+\`\`\`tsx
+${hoverOnlyCode}
+\`\`\`
+`
+
+
+
+export const hyperTextPageContext = pageContext

@@ -5,7 +5,8 @@ import { getComponent } from "@/registry"
 import { InstallCommand } from "@/components/install-command"
 import { ComponentLayout, Section } from "@/components/component-layout"
 import { InstallationTabs } from "@/components/installation-tabs"
-import { docsRegistry } from "@/components/docs/registry"
+import { docsRegistry, docsContextRegistry } from "@/components/docs/registry"
+import { PageContextMenu } from "@/components/page-context-menu"
 
 // -----------------------------------------------------------------------------
 // NOTE: This entire file is structurally identical to hyper-text/page.tsx.
@@ -41,6 +42,7 @@ export default async function ComponentPage(props: PageProps) {
     const params = await props.params
     const component = getComponent(params.slug)
     const DocsComponent = docsRegistry[params.slug]
+    const pageContext = docsContextRegistry[params.slug]
 
     if (!component) {
         return notFound()
@@ -50,6 +52,7 @@ export default async function ComponentPage(props: PageProps) {
         <ComponentLayout
             title={component.title}
             description={component.description}
+            action={pageContext ? <PageContextMenu content={pageContext} /> : undefined}
         >
             {DocsComponent ? (
                 <DocsComponent />
