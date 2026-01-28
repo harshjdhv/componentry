@@ -71,86 +71,86 @@ function MyComponent() {
 }`
 
 export async function CommandMenuDocs() {
-    const sourceCode = (await readComponentSource("command-menu")) || "// Unable to load source code"
+  const sourceCode = (await readComponentSource("command-menu")) || "// Unable to load source code"
 
-    return (
-        <DocsPageLayout
-            title="Command Menu"
-            description="A macOS Spotlight-style command menu with animated search, keyboard navigation, and customizable groups. Features backdrop blur, smooth animations, and full keyboard support."
-            preview={<CommandMenuDemo />}
-            previewCode={basicUsageCode}
-            installPackageName="command-menu"
-            installDependencies="cmdk framer-motion lucide-react"
-            installSourceCode={sourceCode}
-            usageCode={basicUsageCode}
-            examples={[
-                {
-                    title: "Custom Shortcut & Labels",
-                    preview: <CommandMenuCustomDemo />,
-                    code: customShortcutCode,
-                },
-                {
-                    title: "Controlled State",
-                    preview: (
-                        <div className="flex items-center justify-center p-8 text-muted-foreground text-sm border border-dashed rounded-lg">
-                            See code for controlled state implementation
-                        </div>
-                    ),
-                    code: controlledCode,
-                }
-            ]}
-            props={[
-                {
-                    name: "groups",
-                    type: "array",
-                    description: "Array of menu groups with title and items. Each item has id, title, icon (optional), and onSelect callback.",
-                },
-                {
-                    name: "placeholder",
-                    type: "string",
-                    default: '"Search..."',
-                    description: "Placeholder text for the search input.",
-                },
-                {
-                    name: "emptyMessage",
-                    type: "string",
-                    default: '"No results found"',
-                    description: "Message shown when no results are found.",
-                },
-                {
-                    name: "brandName",
-                    type: "string",
-                    default: '"Command Menu"',
-                    description: "Brand name displayed in the footer.",
-                },
-                {
-                    name: "triggerLabel",
-                    type: "string",
-                    default: '"Search..."',
-                    description: "Label for the trigger button.",
-                },
-                {
-                    name: "triggerClassName",
-                    type: "string",
-                    description: "Additional CSS classes for the trigger button.",
-                },
-                {
-                    name: "shortcutKey",
-                    type: "string",
-                    default: '"K"',
-                    description: "Keyboard shortcut key used with Cmd/Ctrl.",
-                },
-                {
-                    name: "open",
-                    type: "boolean",
-                    description: "Controlled open state.",
-                },
-                {
-                    name: "onOpenChange",
-                    type: "function",
-                    description: "Callback when open state changes.",
-                },
-            ]}
-        />
-    )
+  return (
+    <DocsPageLayout
+      title="Command Menu"
+      description="A macOS Spotlight-style command menu with animated search, keyboard navigation, and customizable groups. Features backdrop blur, smooth animations, and full keyboard support."
+      preview={<CommandMenuDemo />}
+      previewCode={basicUsageCode}
+      installPackageName="command-menu"
+      installDependencies="cmdk framer-motion lucide-react clsx tailwind-merge"
+      installSourceCode={sourceCode}
+      usageCode={basicUsageCode}
+      examples={[
+        {
+          title: "Custom Shortcut & Labels",
+          preview: <CommandMenuCustomDemo />,
+          code: customShortcutCode,
+        },
+        {
+          title: "Controlled State",
+          preview: (
+            <div className="flex items-center justify-center p-8 text-muted-foreground text-sm border border-dashed rounded-lg">
+              See code for controlled state implementation
+            </div>
+          ),
+          code: controlledCode,
+        }
+      ]}
+      props={[
+        {
+          name: "groups",
+          type: "array",
+          description: "Array of menu groups with title and items. Each item has id, title, icon (optional), and onSelect callback.",
+        },
+        {
+          name: "placeholder",
+          type: "string",
+          default: '"Search..."',
+          description: "Placeholder text for the search input.",
+        },
+        {
+          name: "emptyMessage",
+          type: "string",
+          default: '"No results found"',
+          description: "Message shown when no results are found.",
+        },
+        {
+          name: "brandName",
+          type: "string",
+          default: '"Command Menu"',
+          description: "Brand name displayed in the footer.",
+        },
+        {
+          name: "triggerLabel",
+          type: "string",
+          default: '"Search..."',
+          description: "Label for the trigger button.",
+        },
+        {
+          name: "triggerClassName",
+          type: "string",
+          description: "Additional CSS classes for the trigger button.",
+        },
+        {
+          name: "shortcutKey",
+          type: "string",
+          default: '"K"',
+          description: "Keyboard shortcut key used with Cmd/Ctrl.",
+        },
+        {
+          name: "open",
+          type: "boolean",
+          description: "Controlled open state.",
+        },
+        {
+          name: "onOpenChange",
+          type: "function",
+          description: "Callback when open state changes.",
+        },
+      ]}
+    />
+  )
 }

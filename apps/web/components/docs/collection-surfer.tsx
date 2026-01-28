@@ -56,7 +56,7 @@ export async function CollectionSurferDocs() {
       }
       previewCode={defaultCode}
       installPackageName="collection-surfer"
-      installDependencies="framer-motion"
+      installDependencies="framer-motion clsx tailwind-merge"
       installSourceCode={sourceCode}
       usageCode={importCode}
       examples={[

@@ -54,6 +54,7 @@ export async function PixelCanvasDocs() {
       description="An interactive pixel grid with beautiful trailing effects. Pixels light up under your cursor and smoothly fade with color interpolation. Highly performant and perfect for dark hero sections."
       preview={<PixelCanvasDemo />}
       previewCode={basicUsageCode}
+      installDependencies="clsx tailwind-merge"
       installPackageName="pixel-canvas"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}

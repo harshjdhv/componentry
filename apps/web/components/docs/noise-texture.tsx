@@ -43,6 +43,7 @@ export async function NoiseTextureDocs() {
       preview={<NoiseTextureDemo />}
       previewCode={basicUsageCode}
       installPackageName="noise-texture"
+      installDependencies="clsx tailwind-merge"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}
       fullWidthPreview={true}

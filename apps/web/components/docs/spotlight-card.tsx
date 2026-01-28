@@ -127,7 +127,7 @@ export async function SpotlightCardDocs() {
             }
             previewCode={defaultSpotlightCode}
             installPackageName="spotlight-card"
-            installDependencies="framer-motion clsx tailwind-merge"
+            installDependencies="clsx tailwind-merge"
             installSourceCode={sourceCode}
             usageCode={defaultSpotlightCode}
             examples={[

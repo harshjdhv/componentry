@@ -57,6 +57,7 @@ export async function DitherGradientDocs() {
       preview={<DitherGradientDemo />}
       previewCode={basicUsageCode}
       installPackageName="dither-gradient"
+      installDependencies="clsx tailwind-merge"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}
       fullWidthPreview={true}

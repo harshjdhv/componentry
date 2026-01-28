@@ -113,7 +113,7 @@ export async function CircuitBoardDocs() {
             }
             previewCode={simpleFlowCode}
             installPackageName="circuit-board"
-            installDependencies="framer-motion lucide-react"
+            installDependencies="framer-motion clsx tailwind-merge lucide-react"
             installSourceCode={sourceCode}
             usageCode={simpleFlowCode}
             examples={[

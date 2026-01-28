@@ -58,7 +58,7 @@ export async function LiquidBlobDocs() {
       preview={<LiquidBlobDemo />}
       previewCode={basicUsageCode}
       installPackageName="liquid-blob"
-      installDependencies="framer-motion"
+      installDependencies="framer-motion clsx tailwind-merge"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}
       fullWidthPreview={true}

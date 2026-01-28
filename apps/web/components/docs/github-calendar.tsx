@@ -37,7 +37,7 @@ export async function GithubCalendarDocs() {
       }
       previewCode={basicUsageCode}
       installPackageName="github-calendar"
-      installDependencies="clsx tailwind-merge"
+      installDependencies="framer-motion clsx tailwind-merge"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}
       examples={[

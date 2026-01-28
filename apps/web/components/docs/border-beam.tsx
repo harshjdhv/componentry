@@ -77,68 +77,70 @@ export async function BorderBeamDocs() {
       preview={<BorderBeamDemo />}
       previewCode={basicUsageCode}
       installPackageName="border-beam"
-      installDependencies="tailwindcss-animate"
+      installDependencies="framer-motion clsx tailwind-merge"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}
       fullWidthPreview={true}
-      examples={[
-        {
-          title: "Custom Colors",
-          preview: <BorderBeamCustomDemo />,
-          code: customColorsCode,
-          fullWidth: true,
-        },
-        {
-          title: "Fast Animation",
-          preview: <BorderBeamFastDemo />,
-          code: fastBeamCode,
-          fullWidth: true,
-        },
-        {
-          title: "Delayed Start",
-          preview: <BorderBeamDelayedDemo />,
-          code: delayedBeamCode,
-          fullWidth: true,
-        },
-      ]}
-      props={[
-        {
-          name: "size",
-          type: "number",
-          default: "200",
-          description: "Length of the beam in pixels.",
-        },
-        {
-          name: "duration",
-          type: "number",
-          default: "15",
-          description: "Animation duration in seconds.",
-        },
-        {
-          name: "borderWidth",
-          type: "number",
-          default: "1.5",
-          description: "Width of the border/beam in pixels.",
-        },
-        {
-          name: "colorFrom",
-          type: "string",
-          default: '"#ffaa40"',
-          description: "Start color of the gradient.",
-        },
-        {
-          name: "colorTo",
-          type: "string",
-          default: '"#9c40ff"',
-          description: "End color of the gradient.",
-        },
-        {
-          name: "delay",
-          type: "number",
-          default: "0",
-          description: "Animation delay in seconds.",
-        },
-      ]}
+      examples={
+        [
+          {
+            title: "Custom Colors",
+            preview: <BorderBeamCustomDemo />,
+            code: customColorsCode,
+            fullWidth: true,
+          },
+          {
+            title: "Fast Animation",
+            preview: <BorderBeamFastDemo />,
+            code: fastBeamCode,
+            fullWidth: true,
+          },
+          {
+            title: "Delayed Start",
+            preview: <BorderBeamDelayedDemo />,
+            code: delayedBeamCode,
+            fullWidth: true,
+          },
+        ]}
+      props={
+        [
+          {
+            name: "size",
+            type: "number",
+            default: "200",
+            description: "Length of the beam in pixels.",
+          },
+          {
+            name: "duration",
+            type: "number",
+            default: "15",
+            description: "Animation duration in seconds.",
+          },
+          {
+            name: "borderWidth",
+            type: "number",
+            default: "1.5",
+            description: "Width of the border/beam in pixels.",
+          },
+          {
+            name: "colorFrom",
+            type: "string",
+            default: '"#ffaa40"',
+            description: "Start color of the gradient.",
+          },
+          {
+            name: "colorTo",
+            type: "string",
+            default: '"#9c40ff"',
+            description: "End color of the gradient.",
+          },
+          {
+            name: "delay",
+            type: "number",
+            default: "0",
+            description: "Animation delay in seconds.",
+          },
+        ]}
     />
   );
 }

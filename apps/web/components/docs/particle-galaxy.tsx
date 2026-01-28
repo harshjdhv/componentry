@@ -64,7 +64,7 @@ export async function ParticleGalaxyDocs() {
       preview={<ParticleGalaxyDemo />}
       previewCode={basicUsageCode}
       installPackageName="particle-galaxy"
-      installDependencies="three @react-three/fiber @react-three/drei"
+      installDependencies="three clsx tailwind-merge"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}
       fullWidthPreview={true}

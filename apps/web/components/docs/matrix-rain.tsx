@@ -41,6 +41,7 @@ export async function MatrixRainDocs() {
       description="A classic digital rain animation effect consisting of falling characters. Customizable colors, speed, and size. Perfect for hacker themes, sci-fi UIs, or just looking cool."
       preview={<MatrixRainDemo />}
       previewCode={basicUsageCode}
+      installDependencies="clsx tailwind-merge"
       installPackageName="matrix-rain"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}

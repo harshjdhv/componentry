@@ -24,7 +24,7 @@ export async function AuthModalDocs({ action }: { action?: React.ReactNode }) {
             preview={<AuthModal />}
             previewCode={basicCode}
             installPackageName="auth-modal"
-            installDependencies="framer-motion lucide-react"
+            installDependencies="framer-motion clsx tailwind-merge lucide-react"
             installSourceCode={sourceCode}
             usageCode={basicCode}
             props={[

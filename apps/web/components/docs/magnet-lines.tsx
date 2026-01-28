@@ -27,6 +27,7 @@ export async function MagnetLinesDocs() {
       preview={<MagnetLinesDemo />}
       previewCode={basicUsageCode}
       installPackageName="magnet-lines"
+      installDependencies="clsx tailwind-merge"
       installSourceCode={sourceCode}
       usageCode={basicUsageCode}
       fullWidthPreview={true}
