@@ -55,6 +55,37 @@ const getComponentNav = (): NavGroup[] => {
     .filter(Boolean) as NavGroup[];
 };
 
+const getLlmsText = () => {
+  const baseUrl = "https://componentry.fun";
+  let text = `# Componentry
+
+> Componentry is a collection of beautifully-designed, accessible components and visual effects. It is built with TypeScript, Tailwind CSS, and Framer Motion. Open Source. Copy and paste into your apps.
+
+## Overview`;
+
+  gettingStarted.items.forEach((item) => {
+    text += `\n- [${item.title}](${baseUrl}${item.href}): Getting started with Componentry.`;
+  });
+
+  text += `\n\n## Components`;
+
+  categoryOrder.forEach((category) => {
+    text += `\n\n### ${category}\n\n`;
+    const categoryComponents = Object.values(components)
+      .filter((c) => c.category === category)
+      .sort((a, b) => a.title.localeCompare(b.title));
+
+    categoryComponents.forEach((component) => {
+      text += `- [${component.title}](${baseUrl}/docs/components/${component.slug}): ${component.description}\n`;
+    });
+  });
+
+  return text;
+};
+
 export const docsConfig = {
   nav: [gettingStarted, ...getComponentNav()],
+  llms: {
+    text: getLlmsText(),
+  },
 };
