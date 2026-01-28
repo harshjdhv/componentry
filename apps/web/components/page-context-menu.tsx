@@ -104,7 +104,7 @@ export function PageContextMenu({ content }: PageContextMenuProps) {
                     onClick={handleCopy}
                     className={cn(
                         "flex items-center gap-2 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-l-md focus:outline-none",
-                        copied ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-700 dark:text-zinc-300"
+                        copied ? "text-foreground" : "text-zinc-700 dark:text-zinc-300"
                     )}
                 >
                     {copied ? (
