@@ -1,178 +1,302 @@
 "use client"
 
-import * as React from "react"
+import type React from "react"
 import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
-import { ArrowRight, Check, Command, Github, Loader2, Sparkles } from "lucide-react"
-
-import { Button } from "@workspace/ui/components/button"
-import { SpotlightCard } from "@workspace/ui/components/spotlight-card"
-import { InteractiveHoverButton } from "@workspace/ui/components/interactive-hover-button"
+import { useEffect } from "react"
+import { motion } from "framer-motion"
+import { ArrowRight, Sparkles, Layers, Zap, Box, Github, ArrowUpRight } from "lucide-react"
 import { Logomark } from "@/components/logos/logomark"
-import { HeroButtons } from "@/components/landing/hero-buttons"
+import Lenis from "lenis"
 
-// --- Components ---
+function useSmoothScroll() {
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    })
 
-function Header() {
+    function raf(time: number) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+
+    requestAnimationFrame(raf)
+
+    return () => {
+      lenis.destroy()
+    }
+  }, [])
+}
+
+function NoiseOverlay() {
   return (
-    <header className="fixed top-0 inset-x-0 z-50 px-6 py-6 flex items-center justify-between pointer-events-none">
-      <Link href="/" className="pointer-events-auto flex items-center gap-2 group">
-        <Logomark className="w-6 h-6 text-foreground opacity-90 transition-opacity group-hover:opacity-100" />
-        <span className="font-medium tracking-tight text-sm text-foreground/90">Componentry</span>
-      </Link>
-      <div className="pointer-events-auto flex items-center gap-6 text-sm font-medium text-muted-foreground/80">
-        <Link href="/docs" className="hover:text-foreground transition-colors">Documentation</Link>
-        <a href="https://github.com/harshjdhv/componentry" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
-      </div>
-    </header>
+    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+      <svg className="absolute inset-0 h-full w-full opacity-[0.08] dark:opacity-[0.06]" style={{ mixBlendMode: "overlay" }}>
+        <filter id="noise">
+          <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noise)" />
+      </svg>
+    </div>
   )
 }
 
-function Hero() {
+function GradientOrbs() {
   return (
-    <section className="min-h-[80vh] flex flex-col items-center justify-center px-6 relative z-10 pt-20">
-      <div className="max-w-2xl mx-auto text-center space-y-8">
-        <motion.div
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <motion.div
+        className="absolute -top-[30%] -right-[10%] w-[800px] h-[800px] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(200,200,255,0.03) 0%, transparent 70%)" }}
+        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(200,200,255,0.02) 0%, transparent 70%)" }}
+        animate={{ scale: [1.1, 1, 1.1], opacity: [0.2, 0.4, 0.2] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </div>
+  )
+}
+
+function GridLines() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div
+        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)`,
+          backgroundSize: "80px 80px",
+        }}
+      />
+      <div className="absolute inset-0" style={{
+        background: "radial-gradient(ellipse at center, transparent 0%, var(--background) 70%)"
+      }} />
+    </div>
+  )
+}
+
+function AnimatedText({ text, className = "" }: { text: string; className?: string }) {
+  return (
+    <span className={className}>
+      {text.split("").map((char, i) => (
+        <motion.span
+          key={i}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.5, delay: i * 0.03, ease: [0.22, 1, 0.36, 1] }}
+          className="inline-block"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border/50 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
-            v1.0.0 Stable
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium tracking-tight text-foreground mb-6">
-            Interface primitives for <br />
-            <span className="text-muted-foreground">serious products.</span>
-          </h1>
-          <p className="text-lg text-muted-foreground/80 leading-relaxed max-w-lg mx-auto font-light">
-            A collection of robust, accessible components designed for density and precision.
-            Built to be used, not just viewed.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <HeroButtons />
-        </motion.div>
-      </div>
-    </section>
+          {char === " " ? "\u00A0" : char}
+        </motion.span>
+      ))}
+    </span>
   )
 }
 
-// --- Interaction Showcase ---
-
-function ShowcaseSection() {
+function FloatingElement({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   return (
-    <section className="px-6 pb-32 max-w-5xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+    <motion.div
+      className={className}
+      animate={{ y: [-8, 8, -8] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay }}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
-        {/* Left Column: Description */}
-        <div className="md:sticky md:top-32 space-y-6 pt-12">
-          <h2 className="text-2xl font-serif">Engineered interactions.</h2>
-          <p className="text-muted-foreground leading-relaxed">
-            We prioritize feel over flash. Every interaction is tuned for weight, response time, and accessibility.
-            Try the components on the right—they are real, functional, and production-ready.
-          </p>
+function OrbitingElement({ className = "", duration = 20, radius = 300, startAngle = 0 }: { className?: string; duration?: number; radius?: number; startAngle?: number }) {
+  return (
+    <motion.div
+      className={`absolute ${className}`}
+      style={{
+        left: "50%",
+        top: "50%",
+      }}
+      animate={{
+        rotate: 360,
+      }}
+      transition={{
+        duration,
+        repeat: Infinity,
+        ease: "linear",
+      }}
+    >
+      <motion.div
+        style={{
+          x: radius,
+          rotate: startAngle,
+        }}
+        className="w-2 h-2 rounded-full bg-foreground/20"
+      />
+    </motion.div>
+  )
+}
 
-          <div className="flex flex-col gap-4 py-8">
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Check className="w-4 h-4 text-primary" />
-              <span>Keyboard accessible</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Check className="w-4 h-4 text-primary" />
-              <span>Type-safe API</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Check className="w-4 h-4 text-primary" />
-              <span>Dark mode included</span>
-            </div>
+function CodePreviewCard({ className = "", delay = 0 }: { className?: string; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      <motion.div
+        className="w-64 rounded-xl border border-border/30 bg-card/40 backdrop-blur-md shadow-2xl shadow-black/5 dark:shadow-white/5 overflow-hidden"
+        animate={{ y: [-5, 5, -5] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border/30">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+          <span className="ml-2 text-[10px] text-muted-foreground/50">component.tsx</span>
+        </div>
+        <div className="p-3 font-mono text-[10px] leading-relaxed">
+          <div className="text-muted-foreground/40">{"// Premium UI"}</div>
+          <div><span className="text-purple-400/70">import</span> <span className="text-foreground/60">{"{ Button }"}</span></div>
+          <div className="text-muted-foreground/40 mt-2">{"// ..."}</div>
+          <div className="mt-2">
+            <span className="text-foreground/40">{"<"}</span>
+            <span className="text-blue-400/70">Button</span>
+            <span className="text-foreground/40">{" "}</span>
+            <span className="text-green-400/70">variant</span>
+            <span className="text-foreground/40">{"="}</span>
+            <span className="text-amber-400/70">{'"shine"'}</span>
+            <span className="text-foreground/40">{">"}</span>
+          </div>
+          <div className="pl-2 text-foreground/50">Click me</div>
+          <div>
+            <span className="text-foreground/40">{"</"}</span>
+            <span className="text-blue-400/70">Button</span>
+            <span className="text-foreground/40">{">"}</span>
           </div>
         </div>
+      </motion.div>
+    </motion.div>
+  )
+}
 
-        {/* Right Column: Live Components */}
-        <div className="space-y-8">
-
-          {/* Item 1: The Input */}
-          <div className="p-8 border border-border/40 rounded-xl bg-card/30 backdrop-blur-sm">
-            <div className="mb-6">
-              <h3 className="text-sm font-medium mb-1">Input Fields</h3>
-              <p className="text-xs text-muted-foreground">Focus states with ring offsets.</p>
+function ComponentPreviewCard({ className = "", delay = 0 }: { className?: string; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      <motion.div
+        className="w-56 rounded-xl border border-border/30 bg-card/40 backdrop-blur-md shadow-2xl shadow-black/5 dark:shadow-white/5 overflow-hidden"
+        animate={{ y: [5, -5, 5] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <div className="p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-foreground/10 to-foreground/5 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-foreground/40" />
             </div>
-            <div className="space-y-4 max-w-sm">
-              <div className="grid gap-2">
-                <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Email address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="user@example.com"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="password" className="text-sm font-medium leading-none">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  value="securepassword"
-                  readOnly
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
-                />
-              </div>
+            <div>
+              <div className="text-xs font-medium text-foreground/70">Border Beam</div>
+              <div className="text-[10px] text-muted-foreground/50">Animated effect</div>
             </div>
           </div>
-
-          {/* Item 2: The Buttons */}
-          <div className="p-8 border border-border/40 rounded-xl bg-card/30 backdrop-blur-sm">
-            <div className="mb-6">
-              <h3 className="text-sm font-medium mb-1">Buttons</h3>
-              <p className="text-xs text-muted-foreground">Weighted presses and loading states.</p>
-            </div>
-            <div className="flex flex-wrap gap-4">
-              <Button>Primary Action</Button>
-              <Button variant="secondary">Secondary</Button>
-              <Button variant="outline">Outline</Button>
-              <Button variant="ghost" size="icon">
-                <Sparkles className="w-4 h-4" />
-              </Button>
-              <Button disabled>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving
-              </Button>
-            </div>
-            <div className="mt-8 pt-8 border-t border-border/30">
-              <p className="text-xs text-muted-foreground mb-4">Specialized Interactions</p>
-              <div className="flex items-center gap-4">
-                <InteractiveHoverButton />
-              </div>
+          <div className="h-20 rounded-lg border border-border/30 bg-background/50 relative overflow-hidden">
+            <motion.div
+              className="absolute inset-0 border-2 border-transparent rounded-lg"
+              style={{
+                background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+                backgroundSize: "200% 100%",
+              }}
+              animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-[10px] text-muted-foreground/30">Preview</div>
             </div>
           </div>
-
-          {/* Item 3: Spotlight Card */}
-          <SpotlightCard className="p-8">
-            <div className="relative z-10">
-              <div className="w-10 h-10 rounded-lg bg-foreground/5 border border-foreground/10 flex items-center justify-center mb-4">
-                <Command className="w-5 h-5 text-foreground/70" />
-              </div>
-              <h3 className="text-lg font-medium mb-2">Spotlight Effect</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                A subtle radial gradient that follows the cursor.
-                Useful for highlighting active cards in a grid without overwhelming the user.
-                <br /><br />
-                It feels natural, almost like a flashlight in a dark room.
-              </p>
-            </div>
-          </SpotlightCard>
-
+          <div className="flex gap-2">
+            <div className="flex-1 h-7 rounded-md bg-foreground/10 flex items-center justify-center text-[10px] text-foreground/50">Copy</div>
+            <div className="flex-1 h-7 rounded-md bg-foreground flex items-center justify-center text-[10px] text-background/80">Use</div>
+          </div>
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function FloatingBadge({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      <motion.div
+        animate={{ y: [-3, 3, -3], rotate: [-1, 1, -1] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="px-3 py-1.5 rounded-full border border-border/10 bg-background/50 backdrop-blur-md shadow-sm text-[10px] text-muted-foreground/80 whitespace-nowrap"
+      >
+        {text}
+      </motion.div>
+    </motion.div>
+  )
+}
+
+
+
+function ConnectingLines() {
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+      <motion.line
+        x1="10%"
+        y1="20%"
+        x2="30%"
+        y2="50%"
+        stroke="currentColor"
+        strokeWidth="1"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 2, delay: 1 }}
+      />
+      <motion.line
+        x1="90%"
+        y1="30%"
+        x2="70%"
+        y2="50%"
+        stroke="currentColor"
+        strokeWidth="1"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 2, delay: 1.2 }}
+      />
+      <motion.line
+        x1="15%"
+        y1="70%"
+        x2="35%"
+        y2="55%"
+        stroke="currentColor"
+        strokeWidth="1"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 2, delay: 1.4 }}
+      />
+      <motion.line
+        x1="85%"
+        y1="75%"
+        x2="65%"
+        y2="55%"
+        stroke="currentColor"
+        strokeWidth="1"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 2, delay: 1.6 }}
+      />
+    </svg>
   )
 }
 
@@ -180,71 +304,310 @@ function ShowcaseSection() {
 
 
 
-// --- Closing Section ---
 
-function ClosingSection() {
+
+
+
+export default function Page(): React.JSX.Element {
+  useSmoothScroll()
+
   return (
-    <section className="px-6 py-32 flex flex-col items-center justify-center text-center">
-      <div className="max-w-xl mx-auto space-y-8">
-        <h2 className="text-3xl md:text-4xl font-serif font-medium tracking-tight text-foreground">
-          Ready to build?
-        </h2>
-        <p className="text-muted-foreground leading-relaxed text-lg font-light">
-          Componentry is open source and free to use. <br />
-          Copy the code, customize it, and make it yours.
-        </p>
+    <div className="min-h-svh relative">
+      <NoiseOverlay />
+      <GridLines />
+      <GradientOrbs />
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-          <Link
-            href="/docs"
-            className="group relative inline-flex h-11 items-center justify-center overflow-hidden rounded-full bg-zinc-900 px-8 font-medium text-zinc-50 transition-all duration-300 hover:bg-zinc-900/90 hover:ring-2 hover:ring-zinc-900/20 hover:ring-offset-2 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90 dark:hover:ring-zinc-50/20"
-          >
-            <span className="mr-2">Read the Docs</span>
-            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+      {/* Navigation */}
+      <motion.nav
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="fixed top-0 left-0 right-0 z-40 px-6 py-4"
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Logomark className="w-4 h-4 text-background" />
+            </div>
+            <span className="font-semibold tracking-tight hidden sm:block">Componentry</span>
           </Link>
-          <a
-            href="https://github.com/harshjdhv/componentry"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
+          <div className="flex items-center gap-3">
+            <Link
+              href="/docs"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
+            >
+              Components
+            </Link>
+            <a
+              href="https://github.com/harshjdhv/componentry"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm border border-border/50 rounded-full px-4 py-1.5 hover:bg-accent transition-colors"
+            >
+              <Github className="w-4 h-4" />
+              <span className="hidden sm:inline">GitHub</span>
+            </a>
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* Hero Section */}
+      <section
+        className="min-h-svh flex flex-col items-center justify-center px-6 pt-20 pb-12 relative"
+      >
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mb-8"
           >
-            View on GitHub
-          </a>
+            <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium tracking-wider uppercase text-muted-foreground border border-border/50 rounded-full bg-card/50 backdrop-blur-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              Now Open Source
+            </span>
+          </motion.div>
+
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.9] mb-8" style={{ fontFamily: "var(--font-serif)" }}>
+            <AnimatedText text="Crafted Interfaces." />
+            <br />
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="text-muted-foreground/60"
+            >
+              Zero Abstraction.
+            </motion.span>
+          </h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1 }}
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10"
+          >
+            Production-ready animation primitives. Framer Motion + Tailwind.<br className="hidden sm:block" />
+            Copy the source. Own the implementation.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <Link
+              href="/docs"
+              className="group relative inline-flex items-center justify-center gap-2 bg-foreground text-background px-8 py-4 rounded-full text-sm font-medium overflow-hidden transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-foreground/20 active:scale-[0.98]"
+            >
+              <span className="relative z-10">Browse Components</span>
+              <ArrowRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-0 left-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" style={{ transform: 'skewX(-20deg)' }} />
+              </div>
+            </Link>
+            <a
+              href="https://github.com/harshjdhv/componentry"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-sm font-medium border border-border/50 bg-card/50 backdrop-blur-sm hover:bg-accent hover:border-border transition-all"
+            >
+              <Github className="w-4 h-4" />
+              Star on GitHub
+            </a>
+          </motion.div>
         </div>
-      </div>
-    </section>
-  )
-}
 
-function Footer() {
-  return (
-    <footer className="px-6 py-12 border-t border-border/40">
-      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-2">
-          <Logomark className="w-5 h-5 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground font-medium">Componentry</span>
+        {/* Connecting Lines */}
+        <ConnectingLines />
+
+        {/* Left Side Elements */}
+        <CodePreviewCard className="absolute top-[25%] left-[3%] hidden xl:block" delay={0.8} />
+        <FloatingBadge text="Copy & Paste" className="absolute top-[18%] left-[18%] hidden lg:block" delay={1.4} />
+        <FloatingElement className="absolute bottom-[30%] left-[5%] hidden lg:block" delay={0}>
+          <div className="w-14 h-14 rounded-2xl border border-border/30 bg-card/30 backdrop-blur-sm flex items-center justify-center">
+            <Layers className="w-5 h-5 text-muted-foreground/50" />
+          </div>
+        </FloatingElement>
+        <FloatingBadge text="TypeScript" className="absolute bottom-[22%] left-[16%] hidden lg:block" delay={1.6} />
+
+        {/* Right Side Elements */}
+        <ComponentPreviewCard className="absolute top-[22%] right-[3%] hidden xl:block" delay={1} />
+        <FloatingBadge text="Tailwind CSS" className="absolute top-[16%] right-[20%] hidden lg:block" delay={1.5} />
+        <FloatingElement className="absolute bottom-[35%] right-[6%] hidden lg:block" delay={1.5}>
+          <div className="w-16 h-16 rounded-2xl border border-border/30 bg-card/30 backdrop-blur-sm flex items-center justify-center">
+            <Zap className="w-6 h-6 text-muted-foreground/50" />
+          </div>
+        </FloatingElement>
+        <FloatingBadge text="Framer Motion" className="absolute bottom-[25%] right-[18%] hidden lg:block" delay={1.7} />
+
+        {/* Small Floating Icons */}
+        <FloatingElement className="absolute top-[45%] left-[6%] hidden md:block" delay={2}>
+          <div className="w-10 h-10 rounded-xl border border-border/20 bg-card/20 backdrop-blur-sm flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-muted-foreground/30" />
+          </div>
+        </FloatingElement>
+        <FloatingElement className="absolute top-[50%] right-[5%] hidden md:block" delay={2.5}>
+          <div className="w-12 h-12 rounded-xl border border-border/20 bg-card/20 backdrop-blur-sm flex items-center justify-center">
+            <Box className="w-5 h-5 text-muted-foreground/30" />
+          </div>
+        </FloatingElement>
+
+        {/* Orbiting Dots */}
+        <div className="absolute inset-0 hidden lg:block pointer-events-none">
+          <OrbitingElement duration={25} radius={350} startAngle={0} />
+          <OrbitingElement duration={30} radius={400} startAngle={90} />
+          <OrbitingElement duration={35} radius={300} startAngle={180} />
+          <OrbitingElement duration={40} radius={450} startAngle={270} />
         </div>
 
-        <p className="text-sm text-muted-foreground/60 text-center md:text-right">
-          Built by <a href="https://twitter.com/harshjdhv" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors underline decoration-border/50 underline-offset-4 hover:decoration-foreground">Harsh Jadhav</a>.
-          Source code is available on <a href="https://github.com/harshjdhv/componentry" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors underline decoration-border/50 underline-offset-4 hover:decoration-foreground">GitHub</a>.
-        </p>
-      </div>
-    </footer>
-  )
-}
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.5 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="w-6 h-10 rounded-full border-2 border-border/50 flex items-start justify-center p-2"
+          >
+            <motion.div
+              className="w-1 h-2 bg-muted-foreground/50 rounded-full"
+              animate={{ opacity: [1, 0.3, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </motion.div>
+        </motion.div>
+      </section>
 
-export default function Page() {
-  return (
-    <div className="min-h-screen bg-background text-foreground antialiased selection:bg-foreground/10">
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 pointer-events-none mix-blend-overlay fixed" />
-      <div className="relative">
-        <Header />
-        <Hero />
-        <ShowcaseSection />
-        <ClosingSection />
-        <Footer />
-      </div>
+
+
+
+
+      {/* Philosophy / Why Trust */}
+      <section className="py-32 px-6 relative z-10">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight mb-6" style={{ fontFamily: "var(--font-serif)" }}>
+              The Architecture
+            </h2>
+          </motion.div>
+
+          <div className="divide-y divide-border/20 border-y border-border/20">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="py-6 md:py-8 grid grid-cols-1 md:grid-cols-[100px_1fr] gap-4"
+            >
+              <span className="font-mono text-xs text-muted-foreground/50 pt-1">01</span>
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-1">It lives in your repo.</h3>
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                  No abstraction layer. No waiting for maintainers. You have full control over the source code.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="py-6 md:py-8 grid grid-cols-1 md:grid-cols-[100px_1fr] gap-4"
+            >
+              <span className="font-mono text-xs text-muted-foreground/50 pt-1">02</span>
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-1">Consumes your config.</h3>
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                  Built on standard Tailwind classes. Automatically inherits your project&apos;s fonts, colors, and spacing.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="py-6 md:py-8 grid grid-cols-1 md:grid-cols-[100px_1fr] gap-4"
+            >
+              <span className="font-mono text-xs text-muted-foreground/50 pt-1">03</span>
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-1">Zero bloat.</h3>
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                  Copy only the components you need. No huge bundle to tree-shake.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-32 md:py-40 px-6 relative z-10 border-t border-foreground/5 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-foreground/[0.02] pointer-events-none" />
+        <div className="max-w-3xl mx-auto text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight mb-10" style={{ fontFamily: "var(--font-serif)" }}>
+              Ship faster.
+            </h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/docs"
+                className="group relative inline-flex items-center justify-center gap-2 bg-foreground text-background px-8 py-4 rounded-full text-sm font-medium overflow-hidden transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-foreground/20 active:scale-[0.98]"
+              >
+                <span className="relative z-10">Start Building</span>
+                <ArrowRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="absolute top-0 left-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" style={{ transform: 'skewX(-20deg)' }} />
+                </div>
+              </Link>
+              <a
+                href="https://github.com/harshjdhv/componentry"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-sm font-medium border border-border/50 hover:bg-accent hover:border-border transition-all"
+              >
+                View Source
+                <ArrowUpRight className="w-4 h-4" />
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 px-6 border-t border-border/30 relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-foreground flex items-center justify-center">
+              <Logomark className="w-3 h-3 text-background" />
+            </div>
+            <span className="text-sm text-muted-foreground">Built with obsession by Harsh</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <Link href="/docs" className="hover:text-foreground transition-colors">Components</Link>
+            <a href="https://github.com/harshjdhv/componentry" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
+            <a href="https://twitter.com/harshjdhv" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Twitter</a>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
