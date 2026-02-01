@@ -1,15 +1,29 @@
 "use client"
 
-import React, { useRef } from "react"
+import React from "react"
 import Link from "next/link"
-import { motion, useScroll, useTransform } from "framer-motion"
-import { ArrowRight, Command, Search, Layout, MousePointer2, Zap, Terminal, Component, CreditCard, Settings } from "lucide-react"
+import { motion } from "framer-motion"
+import { ArrowRight, Search, Zap } from "lucide-react"
+import { MagnetLinesDemo } from "../components/docs/previews/magnet-lines-preview"
+import { LiquidBlobDemo } from "../components/docs/previews/liquid-blob-preview"
+import { PixelCanvasDemo } from "../components/docs/previews/pixel-canvas-preview"
+import { MatrixRainDemo } from "../components/docs/previews/matrix-rain-preview"
+import {
+    MagneticDock,
+    DockIconHome,
+    DockIconSearch,
+    DockIconFolder,
+    DockIconMail,
+    DockIconMusic,
+    DockIconSettings,
+    DockIconTrash,
+} from "@workspace/ui/components/magnetic-dock"
 
 export default function LandingPage() {
-    const containerRef = useRef(null)
+
 
     return (
-        <div className="min-h-screen w-full bg-[#FFFFFF] text-slate-950 font-sans selection:bg-slate-200" ref={containerRef}>
+        <div className="min-h-screen w-full bg-[#FFFFFF] text-slate-950 font-sans selection:bg-slate-200">
 
             {/* --- Navigation --- */}
             <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none mix-blend-exclusion text-white">
@@ -201,214 +215,377 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* --- Featured Components Section (Dark) --- */}
-            <section className="bg-[#050505] text-white py-32 px-6 rounded-t-[3rem] relative z-20 shadow-2xl">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-24">
-                        <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Featured Components</h2>
-                        <p className="text-slate-400">Explore our most popular copy-paste primitives.</p>
+            {/* --- Dark Section Wrapper --- */}
+            <div className="bg-black text-white">
+
+                {/* --- The Collection (Redesigned) --- */}
+                <section className="py-32 md:py-40 px-6 relative overflow-hidden bg-black">
+                    {/* Premium background effects */}
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                        <div className="absolute top-[10%] right-[5%] w-[700px] h-[700px] bg-indigo-600/8 rounded-full blur-[150px]" />
+                        <div className="absolute bottom-[20%] left-[-5%] w-[500px] h-[500px] bg-violet-600/8 rounded-full blur-[120px]" />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Card 1: Button/Interaction */}
-                        <div className="group relative aspect-[4/3] rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden hover:border-neutral-700 transition-colors">
-                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-800/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <button className="px-6 py-2.5 rounded-lg bg-white text-black font-medium shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-shadow scale-100 active:scale-95 duration-200">
-                                    Hover Me
-                                </button>
-                            </div>
-                            <span className="absolute bottom-4 left-4 text-xs font-mono text-neutral-500 bg-neutral-950/50 px-2 py-1 rounded border border-neutral-800">
-                                Glow Button
-                            </span>
+                    {/* Large background text like hero */}
+                    <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 select-none overflow-hidden pointer-events-none opacity-[0.03]">
+                        <h1 className="text-[20vw] font-black text-white text-center leading-[0.8] tracking-tighter whitespace-nowrap" aria-hidden="true">
+                            PRIMITIVES
+                        </h1>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto relative z-10">
+                        {/* Header - Hero inspired typography */}
+                        <div className="mb-24 max-w-3xl">
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-md bg-white/5 border border-white/10 text-[11px] font-mono font-bold text-white/70 mb-8"
+                            >
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                                </span>
+                                <span className="tracking-wide uppercase">Live Components</span>
+                            </motion.div>
+
+                            <motion.h2
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
+                                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-8"
+                                style={{ fontFamily: "var(--font-serif)" }}
+                            >
+                                <span className="bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/50">
+                                    Built Different.
+                                </span>
+                            </motion.h2>
+
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2 }}
+                                className="text-lg md:text-xl text-white/50 max-w-[45ch] leading-relaxed font-medium tracking-tight"
+                            >
+                                Not mockups. Not screenshots. Real, interactive primitives engineered for the craft-obsessed.
+                            </motion.p>
                         </div>
 
-                        {/* Card 2: Stacked/Depth */}
-                        <div className="group relative aspect-[4/3] rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden hover:border-neutral-700 transition-colors">
-                            <div className="absolute inset-0 bg-[#0A0A0A]" />
-                            <div className="absolute inset-0 flex items-center justify-center flex-col">
-                                <div className="w-48 h-16 bg-neutral-800 rounded-xl border border-neutral-700 shadow-xl z-20 flex items-center px-4 animate-in slide-in-from-bottom-4 duration-700">
-                                    <div className="h-2 w-2 rounded-full bg-red-500 mr-2" />
-                                    <div className="h-2 w-20 bg-neutral-600 rounded-full" />
-                                </div>
-                                <div className="w-40 h-16 bg-neutral-800/50 rounded-xl border border-neutral-700/50 -mt-12 z-10 scale-90 blur-[1px]" />
-                            </div>
-                            <span className="absolute bottom-4 left-4 text-xs font-mono text-neutral-500 bg-neutral-950/50 px-2 py-1 rounded border border-neutral-800">
-                                Stacked Toast
-                            </span>
-                        </div>
+                        {/* Asymmetric Bento Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5 lg:gap-6" style={{ perspective: '1500px' }}>
 
-                        {/* Card 3: Input/Command */}
-                        <div className="group relative aspect-[4/3] rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden hover:border-neutral-700 transition-colors">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-64 bg-black border border-neutral-800 rounded-lg p-2 shadow-2xl">
-                                    <div className="flex items-center px-3 py-2 border-b border-neutral-800 mb-2">
-                                        <Command className="w-4 h-4 text-neutral-500 mr-3" />
-                                        <div className="h-2 w-24 bg-neutral-800 rounded-full" />
+                            {/* Card 1: Magnet Lines - Large Featured */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-7 group relative h-[450px] lg:h-[500px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                {/* Card shadow */}
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 rounded-3xl blur-xl translate-y-4 scale-95 -z-10" />
+
+                                {/* Glass card */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] to-white/[0.02] rounded-3xl border border-white/10" />
+
+                                {/* Component Display */}
+                                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                                    <div className="absolute inset-0 flex items-center justify-center scale-[1.8] opacity-60">
+                                        <MagnetLinesDemo />
                                     </div>
-                                    <div className="space-y-1">
-                                        <div className="h-8 rounded flex items-center px-2 bg-neutral-900">
-                                            <div className="h-2 w-16 bg-neutral-700 rounded-full" />
+                                </div>
+
+                                {/* Content */}
+                                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                                    <div className="flex items-end justify-between">
+                                        <div>
+                                            <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-2 block">Background</span>
+                                            <h3 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Magnet Lines</h3>
+                                            <p className="text-sm text-white/50 mt-2 max-w-xs">Cursor-reactive magnetic field visualization with WebGL acceleration.</p>
                                         </div>
-                                        <div className="h-8 rounded flex items-center px-2">
-                                            <div className="h-2 w-12 bg-neutral-800 rounded-full" />
+                                        <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                                            <ArrowRight className="w-5 h-5 text-white/70" />
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <span className="absolute bottom-4 left-4 text-xs font-mono text-neutral-500 bg-neutral-950/50 px-2 py-1 rounded border border-neutral-800">
-                                Command Menu
-                            </span>
-                        </div>
-                    </div>
 
-                    <div className="flex justify-center mt-12">
-                        <button className="px-6 py-2 rounded-full border border-neutral-800 text-sm font-medium hover:bg-neutral-900 transition-colors">
-                            View all components
-                        </button>
-                    </div>
-                </div>
-            </section>
+                                {/* Floating tag */}
+                                <motion.div
+                                    animate={{ y: [0, -4, 0] }}
+                                    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                                    className="absolute top-6 right-6 px-3 py-1.5 bg-white text-black rounded-full text-[10px] font-bold shadow-2xl"
+                                >
+                                    Interactive
+                                </motion.div>
+                            </motion.div>
 
-            {/* --- Typography Curve / Scale --- */}
-            <section className="bg-black text-white py-24 overflow-hidden relative">
-                <div className="max-w-7xl mx-auto flex justify-center py-12">
-                    <div className="relative">
-                        {/* Pseudo-wave text effect using simple transforms */}
-                        <div className="flex text-8xl md:text-[10rem] font-bold tracking-tighter opacity-20 select-none">
-                            <span className="translate-y-12">C</span>
-                            <span className="translate-y-6">O</span>
-                            <span className="translate-y-2">M</span>
-                            <span className="translate-y-0">P</span>
-                            <span className="translate-y-0">O</span>
-                            <span className="translate-y-2">N</span>
-                            <span className="translate-y-6">E</span>
-                            <span className="translate-y-12">N</span>
-                            <span className="translate-y-20">T</span>
-                            <span className="translate-y-28">S</span>
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <p className="text-xl md:text-2xl font-light text-neutral-400 max-w-md text-center">
-                                Primitives for the modern web. <br />
-                                <span className="text-white">Copy. Paste. Ship.</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                            {/* Card 2: Liquid Blob - Has its own dark bg */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-5 group relative h-[450px] lg:h-[500px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 rounded-3xl blur-xl translate-y-4 scale-95 -z-10" />
 
-            {/* --- Bento Grid Section --- */}
-            <section className="bg-black pb-32 px-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-4 h-[600px]">
-
-                        {/* Large Item */}
-                        <div className="col-span-2 row-span-2 rounded-3xl bg-neutral-900 border border-neutral-800 p-8 flex flex-col justify-between group overflow-hidden relative">
-                            <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity">
-                                <Layout className="w-24 h-24 text-white" />
-                            </div>
-                            <div className="z-10 bg-neutral-950 border border-neutral-800 rounded-xl p-4 shadow-2xl group-hover:-translate-y-2 transition-transform duration-500">
-                                <div className="flex gap-4 mb-4">
-                                    <div className="h-10 w-10 rounded bg-neutral-800" />
-                                    <div className="space-y-2">
-                                        <div className="h-4 w-32 bg-neutral-800 rounded" />
-                                        <div className="h-3 w-20 bg-neutral-800 rounded" />
-                                    </div>
+                                {/* Component fills the card - has its own zinc-900 bg */}
+                                <div className="absolute inset-0 rounded-3xl overflow-hidden border border-white/10">
+                                    <LiquidBlobDemo />
                                 </div>
-                                <div className="h-24 bg-neutral-900 rounded border-2 border-dashed border-neutral-800" />
+
+                                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                                    <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-2 block">Visual Effect</span>
+                                    <h3 className="text-2xl font-bold text-white tracking-tight">Liquid Blob</h3>
+                                    <p className="text-sm text-white/50 mt-2">Organic animated shape that responds to cursor movement.</p>
+                                </div>
+
+                                <motion.div
+                                    animate={{ scale: [1, 1.1, 1] }}
+                                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                                    className="absolute top-6 right-6 w-3 h-3 bg-purple-400 rounded-full shadow-lg shadow-purple-400/50"
+                                />
+                            </motion.div>
+
+                            {/* Card 3: Magnetic Dock - Full width with background text */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-12 group relative h-[280px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 rounded-3xl blur-xl translate-y-4 scale-95 -z-10" />
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-white/[0.02] rounded-3xl border border-white/10" />
+
+                                {/* Background text */}
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+                                    <span className="text-[12rem] md:text-[16rem] font-black text-white/[0.03] tracking-tighter leading-none">
+                                        DOCK
+                                    </span>
+                                </div>
+
+                                {/* Dock component - directly without wrapper */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <MagneticDock
+                                        items={[
+                                            { id: "home", label: "Home", icon: <DockIconHome />, isActive: true },
+                                            { id: "search", label: "Search", icon: <DockIconSearch /> },
+                                            { id: "folder", label: "Finder", icon: <DockIconFolder /> },
+                                            { id: "mail", label: "Mail", icon: <DockIconMail />, badge: 3 },
+                                            { id: "music", label: "Music", icon: <DockIconMusic /> },
+                                            { id: "settings", label: "Settings", icon: <DockIconSettings /> },
+                                            { id: "trash", label: "Trash", icon: <DockIconTrash /> },
+                                        ]}
+                                    />
+                                </div>
+
+                                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-between">
+                                    <div>
+                                        <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-2 block">Navigation</span>
+                                        <h3 className="text-2xl font-bold text-white tracking-tight">Magnetic Dock</h3>
+                                    </div>
+                                    <p className="text-sm text-white/50 max-w-md text-right">macOS-inspired dock with physics-based magnetic scaling. Hover to experience.</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Card 4: Matrix Rain - Has its own dark bg */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-6 group relative h-[380px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 rounded-3xl blur-xl translate-y-4 scale-95 -z-10" />
+
+                                {/* Full bleed component - has its own bg */}
+                                <div className="absolute inset-0 rounded-3xl overflow-hidden border border-white/10 bg-black">
+                                    <MatrixRainDemo />
+                                </div>
+
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/95 via-black/70 to-transparent">
+                                    <span className="text-[10px] font-mono text-emerald-400/60 uppercase tracking-wider mb-2 block">Iconic</span>
+                                    <h3 className="text-xl font-bold text-white tracking-tight">Matrix Rain</h3>
+                                    <p className="text-sm text-white/50 mt-1">Classic digital rain effect with customizable colors.</p>
+                                </div>
+
+                                <div className="absolute top-5 right-5 px-2 py-1 bg-emerald-500/20 backdrop-blur-sm rounded border border-emerald-500/30">
+                                    <span className="text-[10px] font-mono text-emerald-400">01101</span>
+                                </div>
+                            </motion.div>
+
+                            {/* Card 5: Pixel Canvas - Has neutral-950 bg */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-6 group relative h-[380px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 rounded-3xl blur-xl translate-y-4 scale-95 -z-10" />
+
+                                {/* Full bleed component - has its own bg */}
+                                <div className="absolute inset-0 rounded-3xl overflow-hidden border border-white/10">
+                                    <PixelCanvasDemo />
+                                </div>
+
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-neutral-950/95 via-neutral-950/70 to-transparent">
+                                    <span className="text-[10px] font-mono text-fuchsia-400/60 uppercase tracking-wider mb-2 block">Interactive</span>
+                                    <h3 className="text-xl font-bold text-white tracking-tight">Pixel Canvas</h3>
+                                    <p className="text-sm text-white/50 mt-1">Cursor-reactive pixel grid with stunning color trails.</p>
+                                </div>
+
+                                <motion.div
+                                    animate={{ opacity: [0.5, 1, 0.5] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                    className="absolute top-5 right-5 flex gap-1"
+                                >
+                                    <div className="w-2 h-2 bg-fuchsia-400 rounded-sm" />
+                                    <div className="w-2 h-2 bg-violet-400 rounded-sm" />
+                                    <div className="w-2 h-2 bg-cyan-400 rounded-sm" />
+                                </motion.div>
+                            </motion.div>
+                        </div>
+
+                        {/* CTA - Hero inspired button */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 }}
+                            className="mt-20 md:mt-28 flex flex-col sm:flex-row items-center justify-center gap-4"
+                        >
+                            <Link
+                                href="/components"
+                                className="h-14 px-10 rounded-xl bg-white text-black font-bold text-sm tracking-wide flex items-center justify-center gap-3 hover:bg-white/90 transition-all shadow-2xl shadow-white/10 active:scale-[0.98]"
+                            >
+                                Explore All Components
+                                <ArrowRight className="w-4 h-4" />
+                            </Link>
+                            <Link
+                                href="/docs"
+                                className="h-14 px-10 rounded-xl border border-white/20 bg-white/5 backdrop-blur-sm text-white font-medium text-sm tracking-wide flex items-center justify-center hover:bg-white/10 transition-all"
+                            >
+                                Read Documentation
+                            </Link>
+                        </motion.div>
+
+                        {/* Stats row */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.5 }}
+                            className="mt-20 pt-12 border-t border-white/5 grid grid-cols-3 gap-8 max-w-2xl mx-auto text-center"
+                        >
+                            <div>
+                                <div className="text-3xl md:text-4xl font-black text-white tracking-tight">50+</div>
+                                <div className="text-sm text-white/40 mt-1">Components</div>
                             </div>
                             <div>
-                                <h3 className="text-white text-xl font-bold">Layouts</h3>
-                                <p className="text-neutral-500 text-sm">Responsive sidebar, dashboard, and marketing layouts.</p>
+                                <div className="text-3xl md:text-4xl font-black text-white tracking-tight">100%</div>
+                                <div className="text-sm text-white/40 mt-1">Accessible</div>
                             </div>
-                        </div>
-
-                        {/* Small Item */}
-                        <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-6 flex flex-col justify-between group hover:bg-neutral-800/50 transition-colors">
-                            <div className="flex justify-between items-start">
-                                <div className="p-2 bg-neutral-800 rounded-lg">
-                                    <MousePointer2 className="w-5 h-5 text-white" />
-                                </div>
-                                <div className="h-2 w-2 bg-green-500 rounded-full" />
+                            <div>
+                                <div className="text-3xl md:text-4xl font-black text-white tracking-tight">0</div>
+                                <div className="text-sm text-white/40 mt-1">Dependencies</div>
                             </div>
-                            <div className="text-white font-medium">Interactions</div>
-                        </div>
-
-                        {/* Small Item */}
-                        <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-6 flex flex-col justify-between group hover:bg-neutral-800/50 transition-colors">
-                            <div className="flex justify-between items-start">
-                                <div className="p-2 bg-neutral-800 rounded-lg">
-                                    <Zap className="w-5 h-5 text-white" />
-                                </div>
-                            </div>
-                            <div className="text-white font-medium">Animations</div>
-                        </div>
-
-                        {/* Wide Item */}
-                        <div className="col-span-2 rounded-3xl bg-neutral-900 border border-neutral-800 p-6 flex items-center justify-between group relative overflow-hidden">
-                            <div className="absolute inset-0 bg-neutral-950/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="z-10">
-                                <h3 className="text-white font-bold mb-1">Dark Mode Ready</h3>
-                                <p className="text-neutral-500 text-sm">Automatic variable switching.</p>
-                            </div>
-                            <div className="flex gap-2 z-10">
-                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-black">
-                                    <div className="w-4 h-4 rounded-full bg-black" />
-                                </div>
-                                <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center border border-neutral-700">
-                                    <div className="w-4 h-4 rounded-full bg-white" />
-                                </div>
-                            </div>
-                        </div>
+                        </motion.div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* --- CTA Section --- */}
-            <section className="bg-black pb-24 px-6 md:px-12">
-                <div className="max-w-7xl mx-auto rounded-[3rem] bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-800 p-12 md:p-24 text-center overflow-hidden relative">
-                    {/* Abstract blurred blobs */}
-                    <div className="absolute top-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+                {/* --- Philosophy / Divider (Dark Mode) --- */}
+                <section className="py-24 md:py-32 px-6 border-t border-neutral-900 bg-black text-white relative">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -z-10" />
 
-                    <div className="relative z-10">
-                        <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tighter mb-6">
-                            Ship your next project<br />
-                            faster than ever.
+                    <div className="max-w-4xl mx-auto text-center space-y-12 relative z-10">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white leading-[1.1] tracking-tight">
+                                &quot;The best design is the one<br className="hidden md:block" /> you hardly notice.&quot;
+                            </h2>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            className="grid md:grid-cols-3 gap-8 text-left max-w-3xl mx-auto pt-12"
+                        >
+                            <div className="space-y-3">
+                                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-4 border border-white/10">
+                                    <span className="font-mono font-bold text-sm text-white">01</span>
+                                </div>
+                                <h3 className="font-bold text-white">Precision</h3>
+                                <p className="text-sm text-slate-400 leading-relaxed">
+                                    Every pixel is calculated. Spacing, typography, and motion are tuned for a cohesive feel.
+                                </p>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-4 border border-white/10">
+                                    <span className="font-mono font-bold text-sm text-white">02</span>
+                                </div>
+                                <h3 className="font-bold text-white">Fluidity</h3>
+                                <p className="text-sm text-slate-400 leading-relaxed">
+                                    Animations that respect physics. Interactions that feel natural, not forced.
+                                </p>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-4 border border-white/10">
+                                    <span className="font-mono font-bold text-sm text-white">03</span>
+                                </div>
+                                <h3 className="font-bold text-white">Restraint</h3>
+                                <p className="text-sm text-slate-400 leading-relaxed">
+                                    No unnecessary flourishes. Just clean, functional design that stands the test of time.
+                                </p>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
+
+                {/* --- CTA / Footer Mock --- */}
+                <section className="py-24 md:py-32 px-6 overflow-hidden relative border-t border-neutral-900">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-neutral-900/40 via-black to-black" />
+
+                    <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
+                        <h2 className="text-5xl md:text-7xl font-bold tracking-tighter" style={{ fontFamily: "var(--font-serif)" }}>
+                            Start Building.
                         </h2>
-                        <p className="text-neutral-400 max-w-xl mx-auto mb-10 text-lg">
-                            Join thousands of developers building better software with Componentry.
-                            Free and open source.
+                        <p className="text-lg text-slate-400 max-w-xl mx-auto">
+                            Stop reinventing the wheel. Use the system that powers the next generation of web applications.
                         </p>
-                        <div className="flex flex-col md:flex-row gap-4 justify-center">
-                            <Link href="/components" className="px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2">
-                                Get Started <ArrowRight className="w-4 h-4" />
+                        <div className="flex items-center justify-center gap-4 pt-8">
+                            <Link href="/docs" className="h-12 px-8 rounded-full bg-white text-slate-950 font-bold text-sm tracking-wide flex items-center hover:scale-105 transition-transform">
+                                Read the Docs
                             </Link>
-                            <Link href="https://github.com/harshjdhv/componentry" className="px-8 py-4 rounded-full bg-neutral-800 text-white font-bold border border-neutral-700 hover:bg-neutral-700 transition-colors">
-                                Star on GitHub
+                            <Link href="https://github.com/harshjdhv/componentry" className="h-12 px-8 rounded-full border border-slate-800 bg-slate-900/50 text-white font-medium text-sm tracking-wide flex items-center hover:bg-slate-800 transition-colors">
+                                <span className="mr-2">GitHub</span>
                             </Link>
                         </div>
                     </div>
-                </div>
-            </section>
 
-            {/* --- Footer --- */}
-            <footer className="bg-black text-neutral-500 py-12 px-6 border-t border-neutral-900">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2 text-white font-bold">
-                        <div className="w-4 h-4 bg-white rounded-full" />
-                        Componentry
+                    <div className="relative z-10 max-w-7xl mx-auto mt-32 pt-12 border-t border-neutral-900 flex flex-col md:flex-row justify-between items-center text-sm text-slate-600">
+                        <p>&copy; 2024 Componentry. All rights reserved.</p>
+                        <div className="flex gap-8 mt-4 md:mt-0">
+                            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
+                            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+                            <Link href="https://twitter.com/harshjdhv" className="hover:text-white transition-colors">Twitter</Link>
+                        </div>
                     </div>
-                    <div className="flex gap-8 text-sm">
-                        <Link href="#" className="hover:text-white transition-colors">Twitter</Link>
-                        <Link href="#" className="hover:text-white transition-colors">GitHub</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Discord</Link>
-                    </div>
-                    <div className="text-xs">
-                        © 2024 Harsh Jadhav. All rights reserved.
-                    </div>
-                </div>
-            </footer>
+                </section>
+            </div>
         </div>
     )
 }
