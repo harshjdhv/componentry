@@ -265,12 +265,12 @@ function CTACard() {
         </p>
       </div>
       <Link
-        href="https://studio.componentry.fun"
+        href="https://x.com/harshjdhv"
         target="_blank"
         rel="noopener noreferrer"
         className="group flex items-center justify-center gap-2 w-full py-2 px-3 rounded-lg bg-foreground text-background hover:opacity-90 text-xs font-medium transition-all shadow-sm"
       >
-        Explore Studio
+        Connect on X
         <svg
           className="h-3 w-3 opacity-70 group-hover:translate-x-0.5 transition-transform"
           fill="none"

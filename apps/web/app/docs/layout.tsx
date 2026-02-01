@@ -6,6 +6,7 @@ import { CommandMenu } from "@/components/command-menu"
 import { DocsSidebar } from "@/components/docs-sidebar"
 import { TableOfContents } from "@/components/table-of-contents"
 import { Logomark } from "@/components/logos/logomark"
+import { GitHubStarButton } from "@/components/github-star-button"
 
 export const metadata: Metadata = {
   title: "Components Documentation",
@@ -40,31 +41,15 @@ export default function DocsLayout({
               <Logomark className="h-5 w-5" />
               <span className="font-semibold">COMPONENTRY</span>
             </Link>
-
-            {/* Nav Divider */}
-            <div className="hidden md:block h-4 w-px bg-border/60" />
-
-            <nav className="hidden md:flex items-center gap-1">
-              <Link
-                href="/docs"
-                className="px-3 py-1.5 text-sm font-medium rounded-md text-foreground bg-accent/50 transition-colors"
-              >
-                Docs
-              </Link>
-              <a
-                href="https://github.com/harshjdhv/componentry"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                GitHub
-              </a>
-            </nav>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-2">
             <CommandMenu />
-            <div className="hidden md:block h-4 w-px bg-border/60" />
+
+            <div className="hidden md:flex items-center">
+              <GitHubStarButton />
+            </div>
+
             <ThemeToggle />
           </div>
         </div>
