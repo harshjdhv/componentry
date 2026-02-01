@@ -3,7 +3,7 @@
 import React, { useRef } from "react"
 import Link from "next/link"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { ArrowRight, Command, Search, Layout, MousePointer2, Zap, Terminal, Layers, Component, CreditCard, Bell, Settings } from "lucide-react"
+import { ArrowRight, Command, Search, Layout, MousePointer2, Zap, Terminal, Component, CreditCard, Settings } from "lucide-react"
 
 export default function LandingPage() {
     const containerRef = useRef(null)
@@ -94,66 +94,102 @@ export default function LandingPage() {
                         </motion.div>
                     </div>
 
-                    {/* Right Column (Boxy Grid Design) */}
-                    <div className="relative w-full flex items-center justify-center lg:justify-end order-1 lg:order-2">
-                        <div className="grid grid-cols-2 gap-3 w-full max-w-[500px]">
-                            {/* Item 1 - Large abstract card */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 }}
-                                className="col-span-2 h-48 bg-white rounded-2xl border border-slate-200 shadow-2xl shadow-slate-200/50 p-8 flex flex-col justify-between overflow-hidden relative"
-                            >
-                                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-bl-[4rem] -mr-10 -mt-10" />
-                                <div className="relative z-10 flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-slate-950 flex items-center justify-center text-white shadow-lg">
-                                        <Layers className="w-5 h-5" />
-                                    </div>
-                                    <div className="text-sm font-bold text-slate-950 tracking-tight">Components</div>
-                                </div>
-                                <div className="space-y-3 z-10">
-                                    <div className="h-2 w-32 bg-slate-100 rounded-sm" />
-                                    <div className="h-2 w-20 bg-slate-100 rounded-sm" />
-                                </div>
-                            </motion.div>
+                    {/* Right Column - Dramatic 3D Floating Card */}
+                    <div className="relative w-full flex items-center justify-center order-1 lg:order-2" style={{ perspective: '1200px' }}>
+                        {/* Ambient glow */}
+                        <div className="absolute w-96 h-96 bg-gradient-to-br from-slate-300/30 via-slate-200/20 to-transparent rounded-full blur-3xl -z-10" />
 
-                            {/* Item 2 - Toggle Card */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
-                                className="h-44 bg-slate-950 rounded-2xl p-6 flex flex-col justify-between text-white shadow-xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500 ease-out"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-black" />
-                                <div className="relative z-10 flex justify-between items-start">
-                                    <span className="text-[10px] font-mono text-slate-500 tracking-wider">THEME</span>
-                                    <div className="w-8 h-5 rounded-full bg-slate-800 border border-slate-700 relative group-hover:border-slate-500 transition-colors">
-                                        <div className="absolute right-0.5 top-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                        {/* The floating card */}
+                        <motion.div
+                            initial={{ opacity: 0, rotateX: 25, rotateY: -15, scale: 0.9 }}
+                            animate={{ opacity: 1, rotateX: 12, rotateY: -8, scale: 1 }}
+                            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                            whileHover={{ rotateX: 8, rotateY: -4, scale: 1.02 }}
+                            className="relative w-full max-w-[400px] cursor-pointer group"
+                            style={{ transformStyle: 'preserve-3d' }}
+                        >
+                            {/* Shadow layer */}
+                            <div className="absolute inset-0 bg-slate-950/15 rounded-3xl blur-2xl translate-y-6 scale-95" />
+
+                            {/* Component Grid */}
+                            <div className="relative grid grid-cols-2 gap-4 p-6 bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-2xl">
+
+                                {/* Button Component */}
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Button</span>
+                                    <div className="space-y-2">
+                                        <button className="w-full h-9 rounded-lg bg-slate-950 text-white text-xs font-bold hover:bg-slate-800 transition-colors">
+                                            Primary
+                                        </button>
+                                        <button className="w-full h-9 rounded-lg border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-colors">
+                                            Secondary
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="relative z-10 space-y-2">
-                                    <div className="h-1.5 w-12 bg-slate-800 rounded-sm" />
-                                    <div className="h-1.5 w-20 bg-slate-800 rounded-sm" />
-                                </div>
-                            </motion.div>
 
-                            {/* Item 3 - List Card */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 }}
-                                className="h-44 bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 p-6 flex flex-col justify-center gap-4 hover:scale-[1.02] transition-transform duration-500 ease-out"
-                            >
-                                {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center gap-3">
-                                        <div className={`w-5 h-5 rounded-md shrink-0 flex items-center justify-center border ${i === 1 ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
-                                            {i === 1 && <div className="w-1.5 h-1.5 rounded-full bg-current" />}
+                                {/* Toggle Component */}
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Toggle</span>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-slate-600">Dark mode</span>
+                                            <div className="w-10 h-6 rounded-full bg-slate-950 relative">
+                                                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow" />
+                                            </div>
                                         </div>
-                                        <div className="h-1.5 w-full bg-slate-100 rounded-full" />
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-slate-600">Notifications</span>
+                                            <div className="w-10 h-6 rounded-full bg-slate-200 relative">
+                                                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow" />
+                                            </div>
+                                        </div>
                                     </div>
-                                ))}
+                                </div>
+
+                                {/* Input Component */}
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Input</span>
+                                    <div className="h-10 rounded-lg border border-slate-200 bg-white px-3 flex items-center">
+                                        <Search className="w-4 h-4 text-slate-400 mr-2" />
+                                        <span className="text-xs text-slate-400">Search...</span>
+                                    </div>
+                                </div>
+
+                                {/* Badge Component */}
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Badge</span>
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="px-2 py-1 rounded-md bg-slate-950 text-white text-[10px] font-bold">New</span>
+                                        <span className="px-2 py-1 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-bold">Active</span>
+                                        <span className="px-2 py-1 rounded-md bg-amber-100 text-amber-700 text-[10px] font-bold">Pending</span>
+                                    </div>
+                                </div>
+
+                                {/* Card Component - Full Width */}
+                                <div className="col-span-2 bg-slate-950 rounded-2xl p-4 text-white">
+                                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-3 block">Card</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                                            <Zap className="w-5 h-5" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-bold">Component Library</div>
+                                            <div className="text-xs text-slate-400">50+ primitives ready to use</div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-slate-500" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Floating accent */}
+                            <motion.div
+                                animate={{ y: [0, -6, 0] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                                className="absolute -top-3 -right-3 px-3 py-1.5 bg-slate-950 text-white rounded-full text-[10px] font-bold shadow-xl"
+                            >
+                                50+ Components
                             </motion.div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
 
