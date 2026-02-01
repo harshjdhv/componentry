@@ -16,7 +16,7 @@ export function ComponentPreview({
     return (
         <div
             className={cn(
-                "preview flex min-h-[350px] w-full justify-center p-10 items-center rounded-t-xl border-b border-border bg-muted/30 overflow-x-auto",
+                "preview flex min-h-[350px] w-full justify-center p-10 items-center rounded-t-xl border border-border bg-muted/30 dark:bg-[#0A0A0A] overflow-x-auto relative",
                 {
                     "items-center": align === "center",
                     "items-start": align === "start",

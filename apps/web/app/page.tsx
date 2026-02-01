@@ -1,813 +1,535 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import Link from "next/link"
-import { useEffect, useState, useRef } from "react"
-import { motion, useScroll, useTransform, useInView } from "framer-motion"
-import { ArrowRight, Sparkles, Layers, Zap, Box, Github, ArrowUpRight, Copy, Palette, Code2, Blocks, MousePointerClick, Gauge, Users, Star, GitFork, Download } from "lucide-react"
+import { motion } from "framer-motion"
+import { ArrowRight, Search, Zap } from "lucide-react"
+import { MagnetLinesDemo } from "../components/docs/previews/magnet-lines-preview"
+import { LiquidBlob } from "@workspace/ui/components/liquid-blob"
+import { PixelCanvasDemo } from "../components/docs/previews/pixel-canvas-preview"
+import { MatrixRain } from "@workspace/ui/components/matrix-rain"
 import { Logomark } from "@/components/logos/logomark"
-import Lenis from "lenis"
+import { GitHubStarButton } from "@/components/github-star-button"
+import {
+    MagneticDock,
+    DockIconHome,
+    DockIconSearch,
+    DockIconFolder,
+    DockIconMail,
+    DockIconMusic,
+    DockIconSettings,
+    DockIconTrash,
+} from "@workspace/ui/components/magnetic-dock"
 
-function useSmoothScroll() {
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    })
+export default function LandingPage() {
 
-    function raf(time: number) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
 
-    requestAnimationFrame(raf)
+    return (
+        <div className="min-h-screen w-full bg-[#FFFFFF] text-slate-950 font-sans selection:bg-slate-200">
 
-    return () => {
-      lenis.destroy()
-    }
-  }, [])
-}
+            {/* --- Navigation (mix-blend for landing) --- */}
+            <header className="fixed top-0 left-0 right-0 z-50 mix-blend-exclusion">
+                <div className="flex h-14 items-center justify-between px-4 md:px-6">
+                    <div className="flex items-center gap-4 md:gap-6">
+                        <Link
+                            href="/"
+                            className="flex items-center gap-2.5 text-sm font-medium text-white hover:text-white/90 transition-colors"
+                        >
+                            <Logomark className="h-5 w-5" />
+                            <span className="font-semibold uppercase tracking-tight">Componentry</span>
+                        </Link>
+                    </div>
 
-function NoiseOverlay() {
-  return (
-    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
-      <svg className="absolute inset-0 h-full w-full opacity-[0.08] dark:opacity-[0.06]" style={{ mixBlendMode: "overlay" }}>
-        <filter id="noise">
-          <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
-          <feColorMatrix type="saturate" values="0" />
-        </filter>
-        <rect width="100%" height="100%" filter="url(#noise)" />
-      </svg>
-    </div>
-  )
-}
+                    <div className="flex items-center gap-2">
+                        <nav className="hidden md:flex items-center gap-1">
+                            <Link
+                                href="/docs"
+                                className="px-3 py-1.5 text-sm text-white/70 hover:text-white transition-colors"
+                            >
+                                Docs
+                            </Link>
+                            <Link
+                                href="/changelog"
+                                className="px-3 py-1.5 text-sm text-white/70 hover:text-white transition-colors"
+                            >
+                                Changelog
+                            </Link>
+                            <Link
+                                href="https://github.com/harshjdhv/componentry"
+                                target="_blank"
+                                className="px-3 py-1.5 text-sm text-white/70 hover:text-white transition-colors"
+                            >
+                                GitHub
+                            </Link>
+                        </nav>
+                    </div>
+                </div>
+            </header>
 
-function GradientOrbs() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <motion.div
-        className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)" }}
-        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute -bottom-60 -left-60 w-[800px] h-[800px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)" }}
-        animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(255,255,255,0.015) 0%, transparent 50%)" }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-      />
-    </div>
-  )
-}
 
-function GridLines() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div
-        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-        }}
-      />
-      <div className="absolute inset-0" style={{
-        background: "radial-gradient(ellipse at center, transparent 0%, var(--background) 70%)"
-      }} />
-    </div>
-  )
-}
+            {/* --- Hero Section --- */}
+            <section className="relative px-6 pt-32 pb-40 md:pt-48 md:pb-56 overflow-hidden">
+                <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+                    {/* Left Column (Content) */}
+                    <div className="flex flex-col items-start text-left space-y-8 order-2 lg:order-1">
 
-function AnimatedText({ text, className = "" }: { text: string; className?: string }) {
-  return (
-    <span className={className}>
-      {text.split("").map((char, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: i * 0.03, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-block"
-        >
-          {char === " " ? "\u00A0" : char}
-        </motion.span>
-      ))}
-    </span>
-  )
-}
+                        <div className="space-y-6">
+                            <motion.h1
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
+                                className="text-6xl sm:text-7xl md:text-8xl lg:text-[5.5rem] xl:text-[6rem] font-black tracking-tight leading-[0.95] text-balance max-w-[25ch] text-slate-950"
+                                style={{ fontFamily: "var(--font-serif)" }}
+                            >
+                                Components for Perfectionists.
+                            </motion.h1>
 
-function FloatingElement({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  return (
-    <motion.div
-      className={className}
-      animate={{ y: [-8, 8, -8] }}
-      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay }}
-    >
-      {children}
-    </motion.div>
-  )
-}
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.3, duration: 0.8 }}
+                                className="text-lg text-slate-800 max-w-[40ch] leading-relaxed font-medium tracking-tight"
+                            >
+                                Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source.
+                            </motion.p>
+                        </div>
 
-function OrbitingElement({ className = "", duration = 20, radius = 300, startAngle = 0 }: { className?: string; duration?: number; radius?: number; startAngle?: number }) {
-  return (
-    <motion.div
-      className={`absolute ${className}`}
-      style={{
-        left: "50%",
-        top: "50%",
-      }}
-      animate={{
-        rotate: 360,
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        ease: "linear",
-      }}
-    >
-      <motion.div
-        style={{
-          x: radius,
-          rotate: startAngle,
-        }}
-        className="w-2 h-2 rounded-full bg-foreground/20"
-      />
-    </motion.div>
-  )
-}
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.8 }}
+                            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto pt-2"
+                        >
+                            <Link href="/docs" className="group h-12 px-6 rounded-lg bg-slate-950 text-white font-bold text-sm tracking-wide flex items-center justify-center gap-2 hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-950/30 transition-all shadow-xl shadow-slate-950/20 active:scale-[0.98]">
+                                Browse Components <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                            </Link>
+                            <GitHubStarButton className="h-12 px-5" theme="landing" />
+                        </motion.div>
+                    </div>
 
-function CodePreviewCard({ className = "", delay = 0 }: { className?: string; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      <motion.div
-        className="w-64 rounded-xl border border-border/30 bg-card/40 backdrop-blur-md shadow-2xl shadow-black/5 dark:shadow-white/5 overflow-hidden"
-        animate={{ y: [-5, 5, -5] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border/30">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
-          <span className="ml-2 text-[10px] text-muted-foreground/50">component.tsx</span>
-        </div>
-        <div className="p-3 font-mono text-[10px] leading-relaxed">
-          <div className="text-muted-foreground/40">{"// Premium UI"}</div>
-          <div><span className="text-purple-400/70">import</span> <span className="text-foreground/60">{"{ Button }"}</span></div>
-          <div className="text-muted-foreground/40 mt-2">{"// ..."}</div>
-          <div className="mt-2">
-            <span className="text-foreground/40">{"<"}</span>
-            <span className="text-blue-400/70">Button</span>
-            <span className="text-foreground/40">{" "}</span>
-            <span className="text-green-400/70">variant</span>
-            <span className="text-foreground/40">{"="}</span>
-            <span className="text-amber-400/70">{'"shine"'}</span>
-            <span className="text-foreground/40">{">"}</span>
-          </div>
-          <div className="pl-2 text-foreground/50">Click me</div>
-          <div>
-            <span className="text-foreground/40">{"</"}</span>
-            <span className="text-blue-400/70">Button</span>
-            <span className="text-foreground/40">{">"}</span>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  )
-}
+                    {/* Right Column - Dramatic 3D Floating Card */}
+                    <div className="relative w-full flex items-center justify-center order-1 lg:order-2" style={{ perspective: '1200px' }}>
 
-function ComponentPreviewCard({ className = "", delay = 0 }: { className?: string; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      <motion.div
-        className="w-56 rounded-xl border border-border/30 bg-card/40 backdrop-blur-md shadow-2xl shadow-black/5 dark:shadow-white/5 overflow-hidden"
-        animate={{ y: [5, -5, 5] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="p-4 space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-foreground/10 to-foreground/5 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-foreground/40" />
+                        {/* The floating card */}
+                        <motion.div
+                            initial={{ opacity: 0, rotateX: 25, rotateY: -15, scale: 0.9 }}
+                            animate={{ opacity: 1, rotateX: 12, rotateY: -8, scale: 1 }}
+                            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                            whileHover={{ rotateX: 5, rotateY: -2, scale: 1.03, y: -8 }}
+                            className="relative w-full max-w-[400px] cursor-pointer group"
+                            style={{ transformStyle: 'preserve-3d' }}
+                        >
+                            {/* Shadow layer */}
+                            <div className="absolute inset-0 bg-slate-950/15 rounded-3xl blur-2xl translate-y-6 scale-95" />
+
+                            {/* Component Grid */}
+                            <div className="relative grid grid-cols-2 gap-4 p-6 bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-2xl">
+
+                                {/* Button Component */}
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Button</span>
+                                    <div className="space-y-2">
+                                        <button className="w-full h-9 rounded-lg bg-slate-950 text-white text-xs font-bold hover:bg-slate-800 transition-colors">
+                                            Primary
+                                        </button>
+                                        <button className="w-full h-9 rounded-lg border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-colors">
+                                            Secondary
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Toggle Component */}
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Toggle</span>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-slate-600">Dark mode</span>
+                                            <div className="w-10 h-6 rounded-full bg-slate-950 relative">
+                                                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow" />
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-slate-600">Notifications</span>
+                                            <div className="w-10 h-6 rounded-full bg-slate-200 relative">
+                                                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Input Component */}
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Input</span>
+                                    <div className="h-10 rounded-lg border border-slate-200 bg-white px-3 flex items-center">
+                                        <Search className="w-4 h-4 text-slate-400 mr-2" />
+                                        <span className="text-xs text-slate-400">Search...</span>
+                                    </div>
+                                </div>
+
+                                {/* Badge Component */}
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Badge</span>
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="px-2 py-1 rounded-md bg-slate-950 text-white text-[10px] font-bold">New</span>
+                                        <span className="px-2 py-1 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-bold">Active</span>
+                                        <span className="px-2 py-1 rounded-md bg-amber-100 text-amber-700 text-[10px] font-bold">Pending</span>
+                                    </div>
+                                </div>
+
+                                {/* Card Component - Full Width */}
+                                <div className="col-span-2 bg-slate-950 rounded-2xl p-4 text-white">
+                                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-3 block">Card</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                                            <Zap className="w-5 h-5" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-bold">Component Library</div>
+                                            <div className="text-xs text-slate-400">50+ primitives ready to use</div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-slate-500" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Floating accent */}
+                        </motion.div>
+                    </div>
+                </div>
+
+                {/* Large Background Text */}
+                <div className="absolute bottom-0 left-0 right-0 select-none overflow-hidden pointer-events-none opacity-20">
+                    <h1 className="text-[15vw] font-bold text-slate-100 text-center leading-[0.7] tracking-tighter" aria-hidden="true">
+                        SYSTEM
+                    </h1>
+                </div>
+            </section>
+
+            {/* --- DARK Section: The Collection --- */}
+            <div className="py-8">
+                <section className="py-20 md:py-28 px-6 relative overflow-hidden bg-neutral-950 rounded-[2.5rem] md:rounded-[3rem]">
+                    {/* Large background text for dark section */}
+                    <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 select-none overflow-hidden pointer-events-none opacity-[0.03]">
+                        <h1 className="text-[20vw] font-black text-white text-center leading-[0.8] tracking-tighter whitespace-nowrap" aria-hidden="true">
+                            COMPONENTS
+                        </h1>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto relative z-10">
+                        {/* Header - Dark mode typography */}
+                        <div className="mb-20 max-w-3xl">
+                            <motion.h2
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
+                                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-8 text-white"
+                                style={{ fontFamily: "var(--font-serif)" }}
+                            >
+                                The Collection.
+                            </motion.h2>
+
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2 }}
+                                className="text-lg md:text-xl text-slate-400 max-w-[45ch] leading-relaxed font-medium tracking-tight"
+                            >
+                                Copy, paste, and ship. Every component is production-ready and designed to make your interfaces unforgettable.
+                            </motion.p>
+                        </div>
+
+                        {/* Asymmetric Bento Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5 lg:gap-6" style={{ perspective: '1500px' }}>
+
+                            {/* Card 1: Magnet Lines - Large Featured */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-7 group relative h-[450px] lg:h-[500px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                {/* Card background */}
+                                <div className="absolute inset-0 bg-slate-900 rounded-3xl border border-slate-800" />
+
+                                {/* Component Display */}
+                                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                                    <div className="absolute inset-0 flex items-center justify-center scale-[1.8] opacity-60">
+                                        <MagnetLinesDemo />
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-slate-900 to-transparent">
+                                    <div className="flex items-end justify-between">
+                                        <div>
+                                            <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-2 block">Background</span>
+                                            <h3 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Magnet Lines</h3>
+                                            <p className="text-sm text-white/50 mt-2 max-w-xs">Cursor-reactive magnetic field visualization with WebGL acceleration.</p>
+                                        </div>
+                                        <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">
+                                            <ArrowRight className="w-5 h-5 text-white/70" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* Card 2: Liquid Blob */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-5 group relative h-[450px] lg:h-[500px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                {/* Base background */}
+                                <div className="absolute inset-0 rounded-3xl overflow-hidden border border-slate-800 bg-neutral-950" />
+
+                                {/* Bottom gradient - z-10 */}
+                                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent z-10 pointer-events-none" />
+
+                                {/* Blob component - z-20 (above gradient) */}
+                                <div className="absolute inset-0 z-20">
+                                    <LiquidBlob interactive className="h-full w-full" />
+                                </div>
+
+                                {/* Text content - z-30 (above blob) */}
+                                <div className="absolute bottom-0 left-0 right-0 p-8 z-30">
+                                    <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-2 block">Visual Effect</span>
+                                    <h3 className="text-2xl font-bold text-white tracking-tight">Liquid Blob</h3>
+                                    <p className="text-sm text-white/50 mt-2">Organic animated shape that responds to cursor movement.</p>
+                                </div>
+
+                                <motion.div
+                                    animate={{ scale: [1, 1.1, 1] }}
+                                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                                    className="absolute top-6 right-6 w-3 h-3 bg-purple-500 rounded-full shadow-lg shadow-purple-500/50 z-30"
+                                />
+                            </motion.div>
+
+                            {/* Card 3: Magnetic Dock - Full width */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-12 group relative h-[280px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                <div className="absolute inset-0 bg-neutral-950 rounded-3xl border border-slate-800" />
+
+                                {/* Background text */}
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+                                    <span className="text-[12rem] md:text-[16rem] font-black text-white/[0.04] tracking-tighter leading-none">
+                                        DOCK
+                                    </span>
+                                </div>
+
+                                {/* Dock component */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <MagneticDock
+                                        items={[
+                                            { id: "home", label: "Home", icon: <DockIconHome />, isActive: true },
+                                            { id: "search", label: "Search", icon: <DockIconSearch /> },
+                                            { id: "folder", label: "Finder", icon: <DockIconFolder /> },
+                                            { id: "mail", label: "Mail", icon: <DockIconMail />, badge: 3 },
+                                            { id: "music", label: "Music", icon: <DockIconMusic /> },
+                                            { id: "settings", label: "Settings", icon: <DockIconSettings /> },
+                                            { id: "trash", label: "Trash", icon: <DockIconTrash /> },
+                                        ]}
+                                    />
+                                </div>
+
+                                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-slate-900/90 to-transparent flex items-end justify-between">
+                                    <div>
+                                        <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-2 block">Navigation</span>
+                                        <h3 className="text-2xl font-bold text-white tracking-tight">Magnetic Dock</h3>
+                                    </div>
+                                    <p className="text-sm text-white/50 max-w-md text-right">macOS-inspired dock with physics-based magnetic scaling. Hover to experience.</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Card 4: Matrix Rain */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-6 group relative h-[380px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                {/* Full bleed component */}
+                                <div className="absolute inset-0 rounded-3xl overflow-hidden border border-slate-800 bg-black">
+                                    <MatrixRain variant="cyan" className="!bg-black" />
+                                </div>
+
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-900/95 via-slate-900/70 to-transparent">
+                                    <span className="text-[10px] font-mono text-emerald-400/60 uppercase tracking-wider mb-2 block">Iconic</span>
+                                    <h3 className="text-xl font-bold text-white tracking-tight">Matrix Rain</h3>
+                                    <p className="text-sm text-white/50 mt-1">Classic digital rain effect with customizable colors.</p>
+                                </div>
+
+                                <div className="absolute top-5 right-5 px-2 py-1 bg-emerald-500/20 backdrop-blur-sm rounded border border-emerald-500/30">
+                                    <span className="text-[10px] font-mono text-emerald-400">01101</span>
+                                </div>
+                            </motion.div>
+
+                            {/* Card 5: Pixel Canvas */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30, rotateX: 8 }}
+                                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                className="lg:col-span-6 group relative h-[380px] rounded-3xl overflow-hidden"
+                                style={{ transformStyle: 'preserve-3d' }}
+                            >
+                                {/* Full bleed component */}
+                                <div className="absolute inset-0 rounded-3xl overflow-hidden border border-slate-800">
+                                    <PixelCanvasDemo />
+                                </div>
+
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-neutral-950/95 via-neutral-950/70 to-transparent">
+                                    <span className="text-[10px] font-mono text-fuchsia-400/60 uppercase tracking-wider mb-2 block">Interactive</span>
+                                    <h3 className="text-xl font-bold text-white tracking-tight">Pixel Canvas</h3>
+                                    <p className="text-sm text-white/50 mt-1">Cursor-reactive pixel grid with stunning color trails.</p>
+                                </div>
+
+                                <motion.div
+                                    animate={{ opacity: [0.5, 1, 0.5] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                    className="absolute top-5 right-5 flex gap-1"
+                                >
+                                    <div className="w-2 h-2 bg-fuchsia-400 rounded-sm" />
+                                    <div className="w-2 h-2 bg-violet-400 rounded-sm" />
+                                    <div className="w-2 h-2 bg-cyan-400 rounded-sm" />
+                                </motion.div>
+                            </motion.div>
+                        </div>
+                    </div>
+                </section>
             </div>
-            <div>
-              <div className="text-xs font-medium text-foreground/70">Border Beam</div>
-              <div className="text-[10px] text-muted-foreground/50">Animated effect</div>
+
+            {/* --- Philosophy / Divider (Light Mode) --- */}
+            <section className="py-24 md:py-32 px-6 bg-white text-slate-950 relative">
+                <div className="max-w-4xl mx-auto text-center space-y-16">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                        className="space-y-6"
+                    >
+                        <span className="text-xs font-mono uppercase tracking-widest text-slate-400">Philosophy</span>
+                        <h2
+                            className="text-4xl md:text-5xl lg:text-7xl text-slate-950 leading-[1.05] tracking-tight"
+                            style={{ fontFamily: "var(--font-serif)" }}
+                        >
+                            &quot;The best design is the one<br className="hidden md:block" /> you hardly notice.&quot;
+                        </h2>
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2, duration: 0.8 }}
+                        className="grid md:grid-cols-3 gap-10 text-left max-w-4xl mx-auto pt-16"
+                    >
+                        <motion.div
+                            whileHover={{ y: -4 }}
+                            className="space-y-4 p-6 rounded-2xl hover:bg-slate-50 transition-colors cursor-default"
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center">
+                                <span className="font-mono font-bold text-sm text-white">01</span>
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-950">Precision</h3>
+                            <p className="text-sm text-slate-500 leading-relaxed">
+                                Every pixel is calculated. Spacing, typography, and motion are tuned for a cohesive feel.
+                            </p>
+                        </motion.div>
+                        <motion.div
+                            whileHover={{ y: -4 }}
+                            className="space-y-4 p-6 rounded-2xl hover:bg-slate-50 transition-colors cursor-default"
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center">
+                                <span className="font-mono font-bold text-sm text-white">02</span>
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-950">Fluidity</h3>
+                            <p className="text-sm text-slate-500 leading-relaxed">
+                                Animations that respect physics. Interactions that feel natural, not forced.
+                            </p>
+                        </motion.div>
+                        <motion.div
+                            whileHover={{ y: -4 }}
+                            className="space-y-4 p-6 rounded-2xl hover:bg-slate-50 transition-colors cursor-default"
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center">
+                                <span className="font-mono font-bold text-sm text-white">03</span>
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-950">Restraint</h3>
+                            <p className="text-sm text-slate-500 leading-relaxed">
+                                No unnecessary flourishes. Just clean, functional design that stands the test of time.
+                            </p>
+                        </motion.div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* --- Footer --- */}
+            <div className="pt-8">
+                <footer className="py-20 md:py-32 bg-black relative overflow-hidden rounded-t-[2.5rem] md:rounded-t-[3rem]">
+                    {/* Large background text */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+                        <span className="text-[20vw] md:text-[15vw] font-black text-white/[0.03] tracking-tighter leading-none whitespace-nowrap">
+                            COMPONENTRY
+                        </span>
+                    </div>
+
+                    <div className="relative z-10 max-w-7xl mx-auto px-6">
+                        {/* Main content */}
+                        <div className="flex flex-col items-center text-center space-y-12">
+                            {/* Big bold headline */}
+                            <h2
+                                className="text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight leading-[0.95]"
+                                style={{ fontFamily: "var(--font-serif)" }}
+                            >
+                                Build Something<br />
+                                <span className="text-white/40">Beautiful.</span>
+                            </h2>
+
+                            {/* Links row */}
+                            <div className="flex items-center gap-6 md:gap-10 text-sm md:text-base font-medium">
+                                <Link href="/docs" className="text-white/60 hover:text-white transition-colors">Docs</Link>
+                                <span className="text-white/20">·</span>
+                                <Link href="/components" className="text-white/60 hover:text-white transition-colors">Components</Link>
+                                <span className="text-white/20">·</span>
+                                <Link href="https://github.com/harshjdhv/componentry" target="_blank" className="text-white/60 hover:text-white transition-colors">GitHub</Link>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="w-24 h-px bg-white/10" />
+
+                            {/* Attribution */}
+                            <div className="space-y-4">
+                                <p className="text-white/40 text-xs uppercase tracking-widest">
+                                    Crafted with care by
+                                </p>
+                                <Link
+                                    href="https://x.com/harshjdhv"
+                                    target="_blank"
+                                    className="group inline-flex items-center gap-3 text-white text-2xl md:text-3xl font-bold hover:text-white/80 transition-colors tracking-tight"
+                                >
+                                    @harshjdhv
+                                    <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
             </div>
-          </div>
-          <div className="h-20 rounded-lg border border-border/30 bg-background/50 relative overflow-hidden">
-            <motion.div
-              className="absolute inset-0 border-2 border-transparent rounded-lg"
-              style={{
-                background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
-                backgroundSize: "200% 100%",
-              }}
-              animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-[10px] text-muted-foreground/30">Preview</div>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <div className="flex-1 h-7 rounded-md bg-foreground/10 flex items-center justify-center text-[10px] text-foreground/50">Copy</div>
-            <div className="flex-1 h-7 rounded-md bg-foreground flex items-center justify-center text-[10px] text-background/80">Use</div>
-          </div>
         </div>
-      </motion.div>
-    </motion.div>
-  )
-}
-
-function FloatingBadge({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      <motion.div
-        animate={{ y: [-3, 3, -3], rotate: [-1, 1, -1] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="px-3 py-1.5 rounded-full border border-border/30 bg-card/50 backdrop-blur-sm text-[10px] text-muted-foreground/70 whitespace-nowrap"
-      >
-        {text}
-      </motion.div>
-    </motion.div>
-  )
-}
-
-function ConnectingLines() {
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
-      <motion.line
-        x1="10%"
-        y1="20%"
-        x2="30%"
-        y2="50%"
-        stroke="currentColor"
-        strokeWidth="1"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 2, delay: 1 }}
-      />
-      <motion.line
-        x1="90%"
-        y1="30%"
-        x2="70%"
-        y2="50%"
-        stroke="currentColor"
-        strokeWidth="1"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 2, delay: 1.2 }}
-      />
-      <motion.line
-        x1="15%"
-        y1="70%"
-        x2="35%"
-        y2="55%"
-        stroke="currentColor"
-        strokeWidth="1"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 2, delay: 1.4 }}
-      />
-      <motion.line
-        x1="85%"
-        y1="75%"
-        x2="65%"
-        y2="55%"
-        stroke="currentColor"
-        strokeWidth="1"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 2, delay: 1.6 }}
-      />
-    </svg>
-  )
-}
-
-function MarqueeItem({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-4 px-6 py-3 mx-2 rounded-full border border-border/30 bg-card/30 backdrop-blur-sm">
-      {children}
-    </div>
-  )
-}
-
-function InfiniteMarquee() {
-  const items = [
-    "Handcrafted with precision",
-    "Built for developers",
-    "Open source forever",
-    "Pixel-perfect details",
-    "Smooth animations",
-    "Dark mode ready",
-    "TypeScript first",
-    "Tailwind powered",
-  ]
-
-  return (
-    <div className="relative overflow-hidden py-4">
-      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
-      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
-      <motion.div
-        className="flex"
-        animate={{ x: [0, -1920] }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-      >
-        {[...items, ...items, ...items, ...items].map((item, i) => (
-          <MarqueeItem key={i}>
-            <Sparkles className="w-3.5 h-3.5 text-muted-foreground/50" />
-            <span className="text-sm text-muted-foreground whitespace-nowrap">{item}</span>
-          </MarqueeItem>
-        ))}
-      </motion.div>
-    </div>
-  )
-}
-
-function FeatureCard({ icon: Icon, title, description, delay = 0 }: { icon: React.ComponentType<{ className?: string }>; title: string; description: string; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative"
-    >
-      <div className="relative h-full rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm p-6 transition-all duration-500 hover:border-border hover:bg-card/50">
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-foreground/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative z-10">
-          <div className="w-12 h-12 rounded-xl bg-foreground/5 border border-border/50 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-foreground/10 transition-all duration-300">
-            <Icon className="w-5 h-5 text-foreground/70" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{title}</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-        </div>
-      </div>
-    </motion.div>
-  )
-}
-
-function BentoCard({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden group hover:border-border transition-colors duration-300 ${className}`}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
-function AnimatedCounter({ value, suffix = "", prefix = "" }: { value: number; suffix?: string; prefix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: "-100px" })
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    if (inView) {
-      const duration = 2000
-      const steps = 60
-      const increment = value / steps
-      let current = 0
-      const timer = setInterval(() => {
-        current += increment
-        if (current >= value) {
-          setCount(value)
-          clearInterval(timer)
-        } else {
-          setCount(Math.floor(current))
-        }
-      }, duration / steps)
-      return () => clearInterval(timer)
-    }
-  }, [inView, value])
-
-  return (
-    <span ref={ref}>
-      {prefix}{count.toLocaleString()}{suffix}
-    </span>
-  )
-}
-
-function StatCard({ icon: Icon, value, suffix, label, delay = 0 }: { icon: React.ComponentType<{ className?: string }>; value: number; suffix?: string; label: string; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className="text-center"
-    >
-      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-foreground/5 border border-border/50 mb-4">
-        <Icon className="w-5 h-5 text-foreground/60" />
-      </div>
-      <div className="text-4xl md:text-5xl font-bold tracking-tight mb-2" style={{ fontFamily: "var(--font-serif)" }}>
-        <AnimatedCounter value={value} suffix={suffix} />
-      </div>
-      <div className="text-sm text-muted-foreground">{label}</div>
-    </motion.div>
-  )
-}
-
-function TestimonialCard({ quote, author, role, delay = 0 }: { quote: string; author: string; role: string; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      className="relative"
-    >
-      <div className="h-full rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm p-6 hover:border-border transition-colors duration-300">
-        <div className="flex gap-1 mb-4">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} className="w-4 h-4 fill-foreground/20 text-foreground/20" />
-          ))}
-        </div>
-        <p className="text-foreground/80 leading-relaxed mb-6">&ldquo;{quote}&rdquo;</p>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-foreground/10 to-foreground/5 flex items-center justify-center">
-            <span className="text-sm font-medium text-foreground/60">{author[0]}</span>
-          </div>
-          <div>
-            <div className="text-sm font-medium">{author}</div>
-            <div className="text-xs text-muted-foreground">{role}</div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  )
-}
-
-export default function Page(): React.JSX.Element {
-  useSmoothScroll()
-  const { scrollYProgress } = useScroll()
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
-  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95])
-
-  return (
-    <div className="min-h-svh relative">
-      <NoiseOverlay />
-      <GridLines />
-      <GradientOrbs />
-
-      {/* Navigation */}
-      <motion.nav
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="fixed top-0 left-0 right-0 z-40 px-6 py-4"
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Logomark className="w-4 h-4 text-background" />
-            </div>
-            <span className="font-semibold tracking-tight hidden sm:block">Componentry</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/docs"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
-            >
-              Components
-            </Link>
-            <a
-              href="https://github.com/harshjdhv/componentry"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm border border-border/50 rounded-full px-4 py-1.5 hover:bg-accent transition-colors"
-            >
-              <Github className="w-4 h-4" />
-              <span className="hidden sm:inline">GitHub</span>
-            </a>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* Hero Section */}
-      <motion.section
-        style={{ opacity: heroOpacity, scale: heroScale }}
-        className="min-h-svh flex flex-col items-center justify-center px-6 pt-20 pb-12 relative"
-      >
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-8"
-          >
-            <span className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium tracking-wider uppercase text-muted-foreground border border-border/50 rounded-full bg-card/50 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              Now Open Source
-            </span>
-          </motion.div>
-
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.9] mb-8" style={{ fontFamily: "var(--font-serif)" }}>
-            <AnimatedText text="Premium UI" />
-            <br />
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="text-muted-foreground/60"
-            >
-              Components
-            </motion.span>
-          </h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1 }}
-            className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10"
-          >
-            A curated collection of handcrafted React components. Meticulously designed,
-            beautifully animated, and built for modern interfaces.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Link
-              href="/docs"
-              className="group relative inline-flex items-center justify-center gap-2 bg-foreground text-background px-8 py-4 rounded-full text-sm font-medium overflow-hidden transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <span className="relative z-10">Explore Components</span>
-              <ArrowRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/80 to-foreground"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "100%" }}
-                transition={{ duration: 0.5 }}
-              />
-            </Link>
-            <a
-              href="https://github.com/harshjdhv/componentry"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-sm font-medium border border-border/50 bg-card/50 backdrop-blur-sm hover:bg-accent hover:border-border transition-all"
-            >
-              <Github className="w-4 h-4" />
-              Star on GitHub
-            </a>
-          </motion.div>
-        </div>
-
-        {/* Connecting Lines */}
-        <ConnectingLines />
-
-        {/* Left Side Elements */}
-        <CodePreviewCard className="absolute top-[25%] left-[3%] hidden xl:block" delay={0.8} />
-        <FloatingBadge text="Copy & Paste" className="absolute top-[18%] left-[18%] hidden lg:block" delay={1.4} />
-        <FloatingElement className="absolute bottom-[30%] left-[5%] hidden lg:block" delay={0}>
-          <div className="w-14 h-14 rounded-2xl border border-border/30 bg-card/30 backdrop-blur-sm flex items-center justify-center">
-            <Layers className="w-5 h-5 text-muted-foreground/50" />
-          </div>
-        </FloatingElement>
-        <FloatingBadge text="TypeScript" className="absolute bottom-[22%] left-[16%] hidden lg:block" delay={1.6} />
-
-        {/* Right Side Elements */}
-        <ComponentPreviewCard className="absolute top-[22%] right-[3%] hidden xl:block" delay={1} />
-        <FloatingBadge text="Tailwind CSS" className="absolute top-[16%] right-[20%] hidden lg:block" delay={1.5} />
-        <FloatingElement className="absolute bottom-[35%] right-[6%] hidden lg:block" delay={1.5}>
-          <div className="w-16 h-16 rounded-2xl border border-border/30 bg-card/30 backdrop-blur-sm flex items-center justify-center">
-            <Zap className="w-6 h-6 text-muted-foreground/50" />
-          </div>
-        </FloatingElement>
-        <FloatingBadge text="Framer Motion" className="absolute bottom-[25%] right-[18%] hidden lg:block" delay={1.7} />
-
-        {/* Small Floating Icons */}
-        <FloatingElement className="absolute top-[45%] left-[6%] hidden md:block" delay={2}>
-          <div className="w-10 h-10 rounded-xl border border-border/20 bg-card/20 backdrop-blur-sm flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-muted-foreground/30" />
-          </div>
-        </FloatingElement>
-        <FloatingElement className="absolute top-[50%] right-[5%] hidden md:block" delay={2.5}>
-          <div className="w-12 h-12 rounded-xl border border-border/20 bg-card/20 backdrop-blur-sm flex items-center justify-center">
-            <Box className="w-5 h-5 text-muted-foreground/30" />
-          </div>
-        </FloatingElement>
-
-        {/* Orbiting Dots */}
-        <div className="absolute inset-0 hidden lg:block pointer-events-none">
-          <OrbitingElement duration={25} radius={350} startAngle={0} />
-          <OrbitingElement duration={30} radius={400} startAngle={90} />
-          <OrbitingElement duration={35} radius={300} startAngle={180} />
-          <OrbitingElement duration={40} radius={450} startAngle={270} />
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="w-6 h-10 rounded-full border-2 border-border/50 flex items-start justify-center p-2"
-          >
-            <motion.div
-              className="w-1 h-2 bg-muted-foreground/50 rounded-full"
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </motion.div>
-        </motion.div>
-      </motion.section>
-
-      {/* Marquee */}
-      <section className="py-8 border-y border-border/30 bg-card/20 backdrop-blur-sm relative z-10">
-        <InfiniteMarquee />
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 md:py-32 px-6 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase text-muted-foreground border border-border/50 rounded-full mb-6">
-              Why Componentry
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight mb-4" style={{ fontFamily: "var(--font-serif)" }}>
-              Built for developers who care
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Every component is crafted with attention to detail, performance, and developer experience.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <FeatureCard
-              icon={Copy}
-              title="Copy & Paste"
-              description="No npm install. No dependencies to manage. Just copy the code and it's yours."
-              delay={0}
-            />
-            <FeatureCard
-              icon={Palette}
-              title="Fully Customizable"
-              description="Every component uses CSS variables. Adapt colors, spacing, and styles to match your brand."
-              delay={0.1}
-            />
-            <FeatureCard
-              icon={Code2}
-              title="TypeScript Native"
-              description="Full type safety out of the box. Autocomplete everything, catch errors early."
-              delay={0.2}
-            />
-            <FeatureCard
-              icon={Blocks}
-              title="Composable"
-              description="Components are built to work together. Mix and match to create unique interfaces."
-              delay={0.3}
-            />
-            <FeatureCard
-              icon={MousePointerClick}
-              title="Interactive"
-              description="Smooth animations and micro-interactions that feel native and responsive."
-              delay={0.4}
-            />
-            <FeatureCard
-              icon={Gauge}
-              title="Performance First"
-              description="Lightweight code with zero runtime overhead. Your bundle stays small."
-              delay={0.5}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-24 md:py-32 px-6 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase text-muted-foreground border border-border/50 rounded-full mb-6">
-              Testimonials
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight mb-4" style={{ fontFamily: "var(--font-serif)" }}>
-              Loved by developers
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              See what others are saying about Componentry.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <TestimonialCard
-              quote="The attention to detail in these components is incredible. Every animation feels smooth and intentional."
-              author="Sarah Chen"
-              role="Frontend Developer"
-              delay={0}
-            />
-            <TestimonialCard
-              quote="Finally, a component library that doesn't need hours of customization. It just works beautifully out of the box."
-              author="Marcus Rodriguez"
-              role="Design Engineer"
-              delay={0.1}
-            />
-            <TestimonialCard
-              quote="Copy, paste, done. The simplicity of the workflow combined with the quality of the components is unmatched."
-              author="Alex Kim"
-              role="Indie Hacker"
-              delay={0.2}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-32 px-6 relative z-10">
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight mb-6" style={{ fontFamily: "var(--font-serif)" }}>
-              Start building today
-            </h2>
-            <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-              Copy, paste, and customize. Every component is yours to use and modify freely.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/docs"
-                className="group inline-flex items-center justify-center gap-2 bg-foreground text-background px-8 py-4 rounded-full text-sm font-medium hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Get Started
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <a
-                href="https://github.com/harshjdhv/componentry"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-sm font-medium border border-border/50 hover:bg-accent hover:border-border transition-all"
-              >
-                View Source
-                <ArrowUpRight className="w-4 h-4" />
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 px-6 border-t border-border/30 relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-foreground flex items-center justify-center">
-              <Logomark className="w-3 h-3 text-background" />
-            </div>
-            <span className="text-sm text-muted-foreground">Built with obsession by Harsh</span>
-          </div>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="/docs" className="hover:text-foreground transition-colors">Components</Link>
-            <a href="https://github.com/harshjdhv/componentry" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
-            <a href="https://twitter.com/harshjdhv" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Twitter</a>
-          </div>
-        </div>
-      </footer>
-    </div>
-  )
+    )
 }

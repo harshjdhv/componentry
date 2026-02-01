@@ -152,6 +152,27 @@ export function CommandMenu() {
                         ))}
                       </Command.Group>
                     ))}
+                    <Command.Group
+                      heading="Resources"
+                      className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground/60"
+                    >
+                      <Command.Item
+                        value="llms.txt"
+                        onSelect={() => {
+                          runCommand(() => window.open("/llms.txt", "_blank"))
+                        }}
+                        className="group/item relative flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors hover:bg-accent/70 hover:text-accent-foreground aria-[selected='true']:bg-accent aria-[selected='true']:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground group-aria-[selected='true']/item:bg-primary/10 group-aria-[selected='true']/item:text-primary transition-colors">
+                          <FileText className="h-4 w-4" />
+                        </div>
+                        <div className="flex flex-1 flex-col gap-0.5">
+                          <span className="font-medium">llms.txt</span>
+                          <span className="text-xs text-muted-foreground/60">AI Context</span>
+                        </div>
+                        <ArrowRight className="h-4 w-4 opacity-0 transition-all group-aria-selected/item:opacity-100 group-aria-selected/item:translate-x-0 -translate-x-2 text-muted-foreground" />
+                      </Command.Item>
+                    </Command.Group>
                   </Command.List>
 
                   <div className="flex items-center justify-between border-t border-border/50 bg-muted/30 px-4 py-2.5">

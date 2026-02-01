@@ -2,7 +2,9 @@
 
 import * as React from "react"
 
-const PACKAGE_MANAGERS = ["pnpm", "npm", "yarn", "bun"] as const
+import { CopyButton } from "@/components/copy-button"
+
+const PACKAGE_MANAGERS = ["npm", "pnpm", "yarn", "bun"] as const
 type PackageManager = (typeof PACKAGE_MANAGERS)[number]
 
 const COMMANDS: Record<PackageManager, string> = {
@@ -12,82 +14,65 @@ const COMMANDS: Record<PackageManager, string> = {
   bun: "bunx shadcn@latest add",
 }
 
+
 interface InstallCommandProps {
   component: string
 }
 
 export function InstallCommand({ component }: InstallCommandProps) {
-  const [selected, setSelected] = React.useState<PackageManager>("pnpm")
+  const [selected, setSelected] = React.useState<PackageManager>("npm")
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   const componentUrl = `${baseUrl}/r/${component}.json`
   const command = `${COMMANDS[selected]} "${componentUrl}"`
 
-  const [hasCopied, setHasCopied] = React.useState(false)
-
-  const copyToClipboard = React.useCallback(() => {
-    navigator.clipboard.writeText(command)
-    setHasCopied(true)
-    setTimeout(() => setHasCopied(false), 2000)
-  }, [command])
-
   return (
-    <div className="space-y-3">
-      <div className="flex gap-1 p-1 bg-muted/50 rounded-md w-fit">
-        {PACKAGE_MANAGERS.map((pm) => (
-          <button
-            key={pm}
-            onClick={() => setSelected(pm)}
-            className={`px-3 py-1.5 text-xs font-mono rounded transition-colors ${
-              selected === pm
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {pm}
-          </button>
-        ))}
+    <div className="relative rounded-xl overflow-hidden border border-border bg-zinc-100 dark:bg-zinc-950">
+      <div className="flex items-center border-b border-border/10 bg-white/50 dark:bg-zinc-900/50 p-2">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border/10 bg-white dark:bg-zinc-800/50 shadow-sm dark:shadow-none">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-muted-foreground"
+            >
+              <polyline points="4 17 10 11 4 5" />
+              <line x1="12" x2="20" y1="19" y2="19" />
+            </svg>
+          </div>
+          <div className="flex items-center gap-1 rounded-md bg-zinc-200/50 dark:bg-zinc-950 p-1 ring-1 ring-border/10">
+            {PACKAGE_MANAGERS.map((pm) => (
+              <button
+                key={pm}
+                onClick={() => setSelected(pm)}
+                className={`rounded px-2 py-1 text-xs font-medium transition-all ${selected === pm
+                  ? "bg-white dark:bg-zinc-800 text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
+              >
+                {pm}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-      <div className="relative group">
-        <pre className="p-3 bg-muted/30 text-sm font-mono rounded-md overflow-x-auto whitespace-nowrap pr-12">
-          {command}
+
+      <div className="relative">
+        <pre className="overflow-x-auto p-4 text-sm font-mono leading-relaxed text-zinc-100">
+          <span className="text-zinc-400 dark:text-zinc-500 mr-2">$</span>
+          <span className="text-purple-600 dark:text-purple-400">{selected === "npm" ? "npx" : selected === "pnpm" ? "pnpm dlx" : selected === "yarn" ? "yarn dlx" : "bunx"}</span>
+          <span className="text-zinc-600 dark:text-zinc-400"> shadcn@latest add</span>
+          {" "}
+          <span className="text-green-600 dark:text-green-400">{`"${componentUrl}"`}</span>
         </pre>
-        <button
-          onClick={copyToClipboard}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-background/80 transition-colors text-muted-foreground hover:text-foreground"
-          aria-label="Copy command"
-        >
-          {hasCopied ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-            </svg>
-          )}
-        </button>
+        <CopyButton code={command} />
       </div>
     </div>
   )
