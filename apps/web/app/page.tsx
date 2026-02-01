@@ -209,11 +209,7 @@ export default function LandingPage() {
             <div className="py-8">
                 <section className="py-20 md:py-28 px-6 relative overflow-hidden bg-neutral-950 rounded-[2.5rem] md:rounded-[3rem]">
                     {/* Large background text for dark section */}
-                    <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 select-none overflow-hidden pointer-events-none opacity-[0.03]">
-                        <h1 className="text-[20vw] font-black text-white text-center leading-[0.8] tracking-tighter whitespace-nowrap" aria-hidden="true">
-                            COMPONENTS
-                        </h1>
-                    </div>
+
 
                     <div className="max-w-7xl mx-auto relative z-10">
                         {/* Header - Dark mode typography */}
@@ -327,9 +323,7 @@ export default function LandingPage() {
                                     <span className="text-[12rem] md:text-[16rem] font-black text-white/[0.04] tracking-tighter leading-none">
                                         DOCK
                                     </span>
-                                </div>
-
-                                {/* Dock component */}
+                                </div>                                {/* Dock component */}
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <MagneticDock
                                         items={[
