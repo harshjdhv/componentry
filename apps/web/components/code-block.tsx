@@ -1,33 +1,28 @@
-import { codeToHtml } from "shiki"
-import { CopyButton } from "./copy-button"
+import { highlightCode } from "@/lib/shiki";
+import { CopyButton } from "./copy-button";
+import type { BundledLanguage } from "shiki";
 
 interface CodeBlockProps {
-  code: string
-  lang?: string
-  className?: string
-  filename?: string
+  code: string;
+  lang?: string;
+  className?: string;
+  filename?: string;
 }
 
-export async function CodeBlock({ code, lang = "tsx", className, filename }: CodeBlockProps) {
-  const html = await codeToHtml(code.trim(), {
-    lang,
-    themes: {
-      light: "github-light",
-      dark: "github-dark",
-    },
-    transformers: [
-      {
-        name: "line-numbers",
-        code(node) {
-          if (!node.properties.class) node.properties.class = ""
-          node.properties.class += " grid counter-reset-line"
-        },
-        line(node, line) {
-          node.properties["data-line"] = line
-        },
-      },
-    ],
-  })
+/**
+ * Server Component CodeBlock with cached Shiki highlighting.
+ * 
+ * PERFORMANCE: Uses a singleton highlighter pattern to avoid the
+ * expensive (~200-500ms) cost of creating a new highlighter per render.
+ */
+export async function CodeBlock({
+  code,
+  lang = "tsx",
+  className,
+  filename
+}: CodeBlockProps) {
+  // Use our cached highlighter for instant highlighting
+  const html = await highlightCode(code.trim(), lang as BundledLanguage);
 
   return (
     <>
@@ -85,5 +80,5 @@ export async function CodeBlock({ code, lang = "tsx", className, filename }: Cod
         </div>
       </div>
     </>
-  )
+  );
 }

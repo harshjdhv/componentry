@@ -27,7 +27,6 @@ const SidebarItem = React.memo(
     return (
       <Link
         href={href}
-        prefetch={false}
         className={`
           group relative flex items-center py-1.5 px-3 ml-2 text-sm rounded-md
           ${isActive

@@ -1,12 +1,10 @@
-"use client";
-
 import type React from "react";
+import { Suspense } from "react";
 import { InstallCommand } from "@/components/install-command";
 import { CodeBlock } from "@/components/code-block";
 import { Section, ComponentLayout } from "@/components/component-layout";
 import { InstallationTabs } from "@/components/installation-tabs";
 import { PageContextMenu } from "@/components/page-context-menu";
-
 import { ComponentPreview } from "@/components/component-preview";
 
 export interface PropItem {
@@ -66,7 +64,24 @@ export interface DocsPageLayoutProps {
   fullWidthPreview?: boolean;
 }
 
-export function DocsPageLayout({
+// Loading skeleton for code blocks
+function CodeBlockSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={`h-48 w-full bg-muted/20 rounded-xl border border-border animate-pulse ${className || ""}`}
+    />
+  );
+}
+
+/**
+ * Server Component version of DocsPageLayout.
+ * 
+ * PERFORMANCE: This is a Server Component that:
+ * - Renders CodeBlock async with streaming via Suspense
+ * - Only client components (InstallCommand, InstallationTabs) are interactive
+ * - Reduces initial JS bundle by keeping static content server-rendered
+ */
+export async function DocsPageLayout({
   title,
   description,
   preview,
@@ -95,25 +110,23 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
 \`\`\`
 
 ### Manual
-${
-  installDependencies
-    ? `1. Install dependencies
+${installDependencies
+      ? `1. Install dependencies
 \`\`\`bash
 npm install ${installDependencies}
 \`\`\`
 `
-    : ""
-}
+      : ""
+    }
 
-${
-  installSourceCode
-    ? `${installDependencies ? "2" : "1"}. Copy source code
+${installSourceCode
+      ? `${installDependencies ? "2" : "1"}. Copy source code
 \`\`\`tsx
 ${installSourceCode}
 \`\`\`
 `
-    : ""
-}
+      : ""
+    }
 
 ## Usage
 \`\`\`tsx
@@ -122,15 +135,15 @@ ${usageCode}
 
 ## Examples
 ${examples
-  .map(
-    (ex) => `
+      .map(
+        (ex) => `
 ### ${ex.title}
 \`\`\`tsx
 ${ex.code}
 \`\`\`
 `,
-  )
-  .join("\n")}
+      )
+      .join("\n")}
 `;
 
   return (
@@ -144,6 +157,7 @@ ${ex.code}
         </div>
       }
     >
+      {/* Main Preview + Code Block */}
       <div className="space-y-0">
         {fullWidthPreview ? (
           <div className="relative rounded-t-xl border border-border overflow-hidden">
@@ -152,9 +166,12 @@ ${ex.code}
         ) : (
           <ComponentPreview>{preview}</ComponentPreview>
         )}
-        <CodeBlock code={previewCode} lang="tsx" className="rounded-t-none" />
+        <Suspense fallback={<CodeBlockSkeleton className="rounded-t-none" />}>
+          <CodeBlock code={previewCode} lang="tsx" className="rounded-t-none" />
+        </Suspense>
       </div>
 
+      {/* Installation Section */}
       <Section title="Installation">
         <InstallationTabs
           cliContent={<InstallCommand component={installPackageName} />}
@@ -175,10 +192,12 @@ ${ex.code}
                       lib/utils.ts
                     </code>
                   </p>
-                  <CodeBlock
-                    code={`npm install ${installDependencies}`}
-                    lang="bash"
-                  />
+                  <Suspense fallback={<CodeBlockSkeleton />}>
+                    <CodeBlock
+                      code={`npm install ${installDependencies}`}
+                      lang="bash"
+                    />
+                  </Suspense>
                 </div>
               )}
               {installSourceCode && (
@@ -193,14 +212,16 @@ ${ex.code}
                         `components/ui/${installPackageName}.tsx`}
                     </code>
                   </p>
-                  <CodeBlock
-                    code={installSourceCode}
-                    lang="tsx"
-                    filename={
-                      installSourceFilename ||
-                      `components/ui/${installPackageName}.tsx`
-                    }
-                  />
+                  <Suspense fallback={<CodeBlockSkeleton />}>
+                    <CodeBlock
+                      code={installSourceCode}
+                      lang="tsx"
+                      filename={
+                        installSourceFilename ||
+                        `components/ui/${installPackageName}.tsx`
+                      }
+                    />
+                  </Suspense>
                 </div>
               )}
             </div>
@@ -208,10 +229,14 @@ ${ex.code}
         />
       </Section>
 
+      {/* Usage Section */}
       <Section title="Usage">
-        <CodeBlock code={usageCode} lang="tsx" />
+        <Suspense fallback={<CodeBlockSkeleton />}>
+          <CodeBlock code={usageCode} lang="tsx" />
+        </Suspense>
       </Section>
 
+      {/* Examples Section */}
       {examples.length > 0 && (
         <Section title="Examples">
           <div className="space-y-10">
@@ -228,11 +253,13 @@ ${ex.code}
                   ) : (
                     <ComponentPreview>{example.preview}</ComponentPreview>
                   )}
-                  <CodeBlock
-                    code={example.code}
-                    lang="tsx"
-                    className="rounded-t-none"
-                  />
+                  <Suspense fallback={<CodeBlockSkeleton className="rounded-t-none" />}>
+                    <CodeBlock
+                      code={example.code}
+                      lang="tsx"
+                      className="rounded-t-none"
+                    />
+                  </Suspense>
                 </div>
               </div>
             ))}
@@ -240,6 +267,7 @@ ${ex.code}
         </Section>
       )}
 
+      {/* Props Table */}
       {props.length > 0 && (
         <Section title="Props">
           <div className="my-6 w-full overflow-y-auto rounded-lg border">
