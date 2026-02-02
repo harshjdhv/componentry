@@ -68,17 +68,17 @@ export default function LandingPage() {
 
 
             {/* --- Hero Section --- */}
-            <section className="relative px-6 pt-32 pb-40 md:pt-48 md:pb-56 overflow-hidden">
+            <section className="relative px-6 pt-24 pb-32 md:pt-48 md:pb-56 overflow-hidden">
                 <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
                     {/* Left Column (Content) */}
-                    <div className="flex flex-col items-start text-left space-y-8 order-2 lg:order-1">
+                    <div className="flex flex-col items-start text-left space-y-8">
 
                         <div className="space-y-6">
                             <motion.h1
                                 initial={{ opacity: 0, scale: 0.98 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
-                                className="text-6xl sm:text-7xl md:text-8xl lg:text-[5.5rem] xl:text-[6rem] font-black tracking-tight leading-[0.95] text-balance max-w-[25ch] text-slate-950"
+                                className="text-5xl sm:text-7xl md:text-8xl lg:text-[5.5rem] xl:text-[6rem] font-black tracking-tight leading-[0.95] text-balance max-w-[25ch] text-slate-950"
                                 style={{ fontFamily: "var(--font-serif)" }}
                             >
                                 Components for Perfectionists.
@@ -103,12 +103,12 @@ export default function LandingPage() {
                             <Link href="/docs" className="group h-12 px-6 rounded-lg bg-slate-950 text-white font-bold text-sm tracking-wide flex items-center justify-center gap-2 hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-950/30 transition-all shadow-xl shadow-slate-950/20 active:scale-[0.98]">
                                 Browse Components <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
                             </Link>
-                            <GitHubStarButton className="h-12 px-5" theme="landing" />
+                            <GitHubStarButton className="h-12 px-5 justify-center" theme="landing" />
                         </motion.div>
                     </div>
 
                     {/* Right Column - Dramatic 3D Floating Card */}
-                    <div className="relative w-full flex items-center justify-center order-1 lg:order-2" style={{ perspective: '1200px' }}>
+                    <div className="relative w-full flex items-center justify-center" style={{ perspective: '1200px' }}>
 
                         {/* The floating card */}
                         <motion.div
@@ -123,7 +123,7 @@ export default function LandingPage() {
                             <div className="absolute inset-0 bg-slate-950/15 rounded-3xl blur-2xl translate-y-6 scale-95" />
 
                             {/* Component Grid */}
-                            <div className="relative grid grid-cols-2 gap-4 p-6 bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-2xl">
+                            <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-2xl">
 
                                 {/* Button Component */}
                                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
@@ -177,7 +177,7 @@ export default function LandingPage() {
                                 </div>
 
                                 {/* Card Component - Full Width */}
-                                <div className="col-span-2 bg-slate-950 rounded-2xl p-4 text-white">
+                                <div className="sm:col-span-2 bg-slate-950 rounded-2xl p-4 text-white">
                                     <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-3 block">Card</span>
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
