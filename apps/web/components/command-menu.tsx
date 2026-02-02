@@ -8,12 +8,82 @@ import { Search, FileText, Hash, ArrowRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { docsConfig } from "@/config/docs"
 
+// Pre-compute nav groups at module level
+const navGroups = docsConfig.nav
+
+// Memoized search item component
+const SearchItem = React.memo(function SearchItem({
+  title,
+  groupTitle,
+  icon,
+  onSelect
+}: {
+  title: string
+  groupTitle: string
+  icon: React.ReactNode
+  onSelect: () => void
+}) {
+  return (
+    <Command.Item
+      value={`${groupTitle} ${title}`}
+      onSelect={onSelect}
+      className="group/item relative flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors hover:bg-accent/70 hover:text-accent-foreground aria-[selected='true']:bg-accent aria-[selected='true']:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50"
+    >
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground group-aria-[selected='true']/item:bg-primary/10 group-aria-[selected='true']/item:text-primary transition-colors">
+        {icon}
+      </div>
+      <div className="flex flex-1 flex-col gap-0.5">
+        <span className="font-medium">{title}</span>
+        <span className="text-xs text-muted-foreground/60">{groupTitle}</span>
+      </div>
+      <ArrowRight className="h-4 w-4 opacity-0 transition-all group-aria-selected/item:opacity-100 group-aria-selected/item:translate-x-0 -translate-x-2 text-muted-foreground" />
+    </Command.Item>
+  )
+}, (prev, next) => prev.title === next.title && prev.groupTitle === next.groupTitle)
+
+// Memoized search group
+const SearchGroup = React.memo(function SearchGroup({
+  title,
+  items,
+  onSelect
+}: {
+  title: string
+  items: readonly { title: string; href: string }[]
+  onSelect: (href: string) => void
+}) {
+  const isGettingStarted = title === "Getting Started"
+
+  return (
+    <Command.Group
+      heading={title}
+      className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground/60"
+    >
+      {items.map((navItem) => (
+        <SearchItem
+          key={navItem.href}
+          title={navItem.title}
+          groupTitle={title}
+          icon={isGettingStarted ? <FileText className="h-4 w-4" /> : <Hash className="h-4 w-4" />}
+          onSelect={() => onSelect(navItem.href)}
+        />
+      ))}
+    </Command.Group>
+  )
+}, (prev, next) => prev.title === next.title)
+
 export function CommandMenu() {
   const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const [mounted, setMounted] = React.useState(false)
 
+  // Mount check
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Keyboard shortcut handler
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -29,19 +99,34 @@ export function CommandMenu() {
     return () => document.removeEventListener("keydown", down)
   }, [])
 
+  // Focus input when opening
   React.useEffect(() => {
     if (open) {
-      setTimeout(() => {
+      // Use requestAnimationFrame for better timing
+      requestAnimationFrame(() => {
         inputRef.current?.focus()
-      }, 0)
+      })
     } else {
       setQuery("")
     }
   }, [open])
 
-  const runCommand = React.useCallback((command: () => unknown) => {
+  // Stable navigation handler
+  const handleSelect = React.useCallback((href: string) => {
     setOpen(false)
-    command()
+    router.push(href)
+  }, [router])
+
+  // Stable close handler
+  const handleClose = React.useCallback(() => setOpen(false), [])
+
+  // Clear query handler
+  const handleClearQuery = React.useCallback(() => setQuery(""), [])
+
+  // Open llms.txt handler
+  const handleOpenLlms = React.useCallback(() => {
+    setOpen(false)
+    window.open("/llms.txt", "_blank")
   }, [])
 
   return (
@@ -58,24 +143,24 @@ export function CommandMenu() {
         </kbd>
       </button>
 
-      {typeof document !== "undefined" && ReactDOM.createPortal(
-        <AnimatePresence>
+      {mounted && ReactDOM.createPortal(
+        <AnimatePresence mode="sync">
           {open && (
             <>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
+                transition={{ duration: 0.12 }}
                 className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
-                onClick={() => setOpen(false)}
+                onClick={handleClose}
               />
               <motion.div
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{
-                  duration: 0.2,
+                  duration: 0.15,
                   ease: [0.32, 0.72, 0, 1]
                 }}
                 className="fixed left-1/2 top-1/2 z-[101] w-full max-w-[680px] -translate-x-1/2 -translate-y-1/2 p-4"
@@ -98,14 +183,12 @@ export function CommandMenu() {
                       autoFocus
                     />
                     {query && (
-                      <motion.button
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        onClick={() => setQuery("")}
+                      <button
+                        onClick={handleClearQuery}
                         className="rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                       >
                         Clear
-                      </motion.button>
+                      </button>
                     )}
                     <kbd className="hidden sm:inline-flex h-6 items-center gap-1 rounded-md border bg-muted/50 px-2 font-mono text-[10px] font-medium text-muted-foreground">
                       ESC
@@ -121,46 +204,22 @@ export function CommandMenu() {
                       <p className="text-xs text-muted-foreground/60">Try searching for something else</p>
                     </Command.Empty>
 
-                    {docsConfig.nav.map((group) => (
-                      <Command.Group
+                    {navGroups.map((group) => (
+                      <SearchGroup
                         key={group.title}
-                        heading={group.title}
-                        className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground/60"
-                      >
-                        {group.items.map((navItem) => (
-                          <Command.Item
-                            key={navItem.href}
-                            value={`${group.title} ${navItem.title}`}
-                            onSelect={() => {
-                              runCommand(() => router.push(navItem.href))
-                            }}
-                            className="group/item relative flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors hover:bg-accent/70 hover:text-accent-foreground aria-[selected='true']:bg-accent aria-[selected='true']:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50"
-                          >
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground group-aria-[selected='true']/item:bg-primary/10 group-aria-[selected='true']/item:text-primary transition-colors">
-                              {group.title === "Getting Started" ? (
-                                <FileText className="h-4 w-4" />
-                              ) : (
-                                <Hash className="h-4 w-4" />
-                              )}
-                            </div>
-                            <div className="flex flex-1 flex-col gap-0.5">
-                              <span className="font-medium">{navItem.title}</span>
-                              <span className="text-xs text-muted-foreground/60">{group.title}</span>
-                            </div>
-                            <ArrowRight className="h-4 w-4 opacity-0 transition-all group-aria-selected/item:opacity-100 group-aria-selected/item:translate-x-0 -translate-x-2 text-muted-foreground" />
-                          </Command.Item>
-                        ))}
-                      </Command.Group>
+                        title={group.title}
+                        items={group.items}
+                        onSelect={handleSelect}
+                      />
                     ))}
+
                     <Command.Group
                       heading="Resources"
                       className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground/60"
                     >
                       <Command.Item
                         value="llms.txt"
-                        onSelect={() => {
-                          runCommand(() => window.open("/llms.txt", "_blank"))
-                        }}
+                        onSelect={handleOpenLlms}
                         className="group/item relative flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors hover:bg-accent/70 hover:text-accent-foreground aria-[selected='true']:bg-accent aria-[selected='true']:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50"
                       >
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground group-aria-[selected='true']/item:bg-primary/10 group-aria-[selected='true']/item:text-primary transition-colors">
