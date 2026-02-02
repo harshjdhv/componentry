@@ -215,31 +215,31 @@ export default function HeroGeometric({
 
             {/* Content */}
             {(title1 || title2 || description) && (
-                <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center pt-20 pb-20">
+                <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center pt-8 pb-8 md:pt-20 md:pb-20">
                     <div className="w-full max-w-[1200px] px-6 flex flex-col items-center">
                         {/* Headline */}
-                        <div className="flex flex-col items-center text-center mb-5 md:mb-7">
+                        <div className="flex flex-col items-center text-center gap-2 md:gap-4 mb-8 md:mb-12">
                             {title1 && (
-                                <div className="overflow-hidden pb-8 md:pb-12">
+                                <div className="overflow-hidden">
                                     <motion.h1
                                         initial={{ y: "100%", opacity: 0 }}
                                         animate={{ y: "0%", opacity: 1 }}
                                         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                                        className="text-[12cqi] leading-[0.9] tracking-tighter text-[#131313]"
+                                        className="text-[12cqi] md:text-[8cqi] lg:text-[6cqi] leading-[0.9] tracking-tighter text-[#131313]"
                                     >
-                                        <span className="font-serif italic font-light block md:inline mr-4 md:mr-6 text-[#1a1a1a]">
+                                        <span className="font-serif italic font-light text-[#1a1a1a]">
                                             {title1}
                                         </span>
                                     </motion.h1>
                                 </div>
                             )}
                             {title2 && (
-                                <div className="overflow-hidden pb-8 md:pb-12">
+                                <div className="overflow-hidden">
                                     <motion.h1
                                         initial={{ y: "100%", opacity: 0 }}
                                         animate={{ y: "0%", opacity: 1 }}
                                         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
-                                        className="text-[12cqi] leading-[0.9] tracking-tighter font-bold text-black mt-2 md:mt-0"
+                                        className="text-[12cqi] md:text-[8cqi] lg:text-[6cqi] leading-[0.9] tracking-tighter font-bold text-black"
                                     >
                                         {title2}
                                     </motion.h1>
@@ -249,7 +249,7 @@ export default function HeroGeometric({
 
                         {/* Subheadline */}
                         {description && (
-                            <div className="max-w-[580px] text-center mb-8">
+                            <div className="max-w-[480px] text-center mb-8">
                                 <motion.p
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}

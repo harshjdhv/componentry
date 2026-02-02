@@ -12,7 +12,6 @@ const basicUsageCode = `import { HeroGeometric } from "@/components/ui/hero-geom
 <HeroGeometric 
     title1="Elevate" 
     title2="Your Brand" 
-    description="Scale your SaaS in minutes"
 />`;
 
 const warmThemeCode = `import { HeroGeometric } from "@/components/ui/hero-geometric"

@@ -25,7 +25,7 @@ interface HeroGeometricPreviewProps {
 function HeroGeometricPreviewWrapper({
   title1 = "Elevate",
   title2 = "Your Brand",
-  description = "Scale your SaaS in minutes",
+  description,
   color1,
   color2,
   speed,
@@ -67,7 +67,7 @@ export function HeroGeometricDemo() {
     <HeroGeometricPreviewWrapper
       title1="Elevate"
       title2="Your Brand"
-      description="Scale your SaaS in minutes"
+    // description="Scale your SaaS in minutes"
     />
   );
 }
