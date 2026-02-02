@@ -83,9 +83,14 @@ const getLlmsText = () => {
   return text;
 };
 
+// Pre-compute nav at module load time (runs once)
+const componentNav = getComponentNav();
+const llmsText = getLlmsText();
+const precomputedNav = Object.freeze([gettingStarted, ...componentNav]);
+
 export const docsConfig = {
-  nav: [gettingStarted, ...getComponentNav()],
+  nav: precomputedNav,
   llms: {
-    text: getLlmsText(),
+    text: llmsText,
   },
-};
+} as const;
