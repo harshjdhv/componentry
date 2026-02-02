@@ -14,10 +14,52 @@ export function GitHubStarButton({ className, theme = "default" }: GitHubStarBut
     const [stars, setStars] = useState<number | null>(null)
 
     useEffect(() => {
-        fetch('https://api.github.com/repos/harshjdhv/componentry')
-            .then(res => res.json())
-            .then(data => setStars(data.stargazers_count))
-            .catch(() => setStars(null))
+        const fetchStars = async () => {
+            try {
+                const CACHE_KEY = "github-stars-cache"
+                const CACHE_EXPIRY = 15 * 60 * 1000 // 15 minutes
+
+                const cached = localStorage.getItem(CACHE_KEY)
+                let shouldUseCache = false
+
+                if (cached) {
+                    try {
+                        const { count, timestamp } = JSON.parse(cached)
+                        if (typeof count === "number") {
+                            // If fresh, use it and skip fetch
+                            if (Date.now() - timestamp < CACHE_EXPIRY) {
+                                setStars(count)
+                                shouldUseCache = true
+                            } else {
+                                // If stale, set it temporarily but continue to fetch
+                                setStars(count)
+                            }
+                        }
+                    } catch (e) {
+                        // Invalid cache, ignore
+                    }
+                }
+
+                if (shouldUseCache) return
+
+                const res = await fetch("https://api.github.com/repos/harshjdhv/componentry")
+                if (!res.ok) throw new Error("Failed to fetch")
+
+                const data = await res.json()
+                if (typeof data.stargazers_count === "number") {
+                    setStars(data.stargazers_count)
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({
+                        count: data.stargazers_count,
+                        timestamp: Date.now()
+                    }))
+                }
+            } catch (error) {
+                // If fetch fails, we keep whatever was in state (stale cache or null)
+                console.error("Error fetching GitHub stars:", error)
+            }
+        }
+
+        fetchStars()
     }, [])
 
     const isLanding = theme === "landing"
