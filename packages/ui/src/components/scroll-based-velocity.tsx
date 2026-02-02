@@ -37,12 +37,21 @@ function ParallaxText({ children, baseVelocity = 100, className }: ParallaxProps
         clamp: false,
     });
 
-    const x = useTransform(baseX, (v) => `${wrap(-20, -45, v)}%`);
+    /**
+     * This is a magic wrapping for the length of the text - you
+     * have to replace for wrapping that works for you or dynamically
+     * calculate
+     */
+    const x = useTransform(baseX, (v) => `${wrap(-12.5, 0, v)}%`);
 
     const directionFactor = useRef<number>(1);
     useAnimationFrame((t, delta) => {
         let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
 
+        /**
+         * This is what changes the direction of the scroll once we
+         * switch scrolling directions.
+         */
         if (velocityFactor.get() < 0) {
             directionFactor.current = -1;
         } else if (velocityFactor.get() > 0) {
@@ -55,15 +64,14 @@ function ParallaxText({ children, baseVelocity = 100, className }: ParallaxProps
     });
 
     return (
-        <div className="overflow-hidden whitespace-nowrap flex flex-nowrap">
+        <div className="overflow-hidden whitespace-nowrap flex flex-nowrap" style={{ width: '100%' }}>
             <motion.div
-                className={cn("flex whitespace-nowrap gap-10", className)}
+                className={cn("flex whitespace-nowrap", className)}
                 style={{ x }}
             >
-                <span className="block mr-10">{children}</span>
-                <span className="block mr-10">{children}</span>
-                <span className="block mr-10">{children}</span>
-                <span className="block mr-10">{children}</span>
+                {Array.from({ length: 8 }).map((_, i) => (
+                    <span key={i} className="block mr-10 last:mr-10">{children}</span>
+                ))}
             </motion.div>
         </div>
     );

@@ -99,7 +99,30 @@ This file allows users to install the component via CLI:
 npx shadcn@latest add "https://componentry.fun/r/{component-name}.json"
 ```
 
-### Template
+### 🛠️ Automatic Generation (Recommended)
+
+We have a helper script that automatically generates or updates the registry JSON file from your component source code.
+
+Run this command from the project root:
+
+```bash
+node scripts/generate-registry.js {component-name}
+```
+
+**Example:**
+```bash
+node scripts/generate-registry.js scroll-based-velocity
+```
+
+This script handles all the tedious formatting rules for you:
+- Reads the component source file
+- Escapes all quotes and newlines correctly
+- Updates import paths (e.g., changing `@workspace/ui/lib/utils` to `@/lib/utils`)
+- Preserves existing metadata if the file already exists
+
+### Manual Creation (Template)
+
+If you prefer to create the file manually, follow this structure:
 
 ```json
 {
@@ -124,25 +147,14 @@ npx shadcn@latest add "https://componentry.fun/r/{component-name}.json"
 }
 ```
 
-### ⚠️ CRITICAL Rules for `content` Field
+### ⚠️ CRITICAL Rules for `content` Field (Manual Mode)
+
+If doing this manually, you must ensure the `content` string follows these rules (which the script handles automatically):
 
 1. **Replace import path**: Change `@workspace/ui/lib/utils` → `@/lib/utils`
 2. **Escape all quotes**: Use `\"` instead of `"`
 3. **Escape newlines**: Use `\n` for line breaks
 4. **Include the `type` field** inside each file object
-
-### How to Generate the Content String
-
-```javascript
-// In Node.js or browser console:
-const code = fs.readFileSync('packages/ui/src/components/my-component.tsx', 'utf8');
-const escaped = code
-  .replace(/@workspace\/ui\/lib\/utils/g, '@/lib/utils')
-  .replace(/\\/g, '\\\\')
-  .replace(/"/g, '\\"')
-  .replace(/\n/g, '\\n');
-console.log(escaped);
-```
 
 ---
 
