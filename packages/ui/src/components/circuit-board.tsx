@@ -170,10 +170,7 @@ function CircuitBoard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border",
-        isDark
-          ? "bg-neutral-950/50 border-neutral-800/50"
-          : "bg-white/80 border-neutral-200/60",
+        "relative overflow-hidden",
         className
       )}
       style={{ width, height }}

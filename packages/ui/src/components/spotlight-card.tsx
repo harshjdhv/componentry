@@ -474,6 +474,7 @@ interface TiltSpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
   scale?: number
   borderRadius?: number
   glareOpacity?: number
+  spotlightColor?: string
 }
 
 function TiltSpotlightCard({
@@ -484,6 +485,7 @@ function TiltSpotlightCard({
   scale = 1.02,
   borderRadius = 16,
   glareOpacity = 0.2,
+  spotlightColor = "rgba(120, 119, 198, 0.3)",
   ...props
 }: TiltSpotlightCardProps) {
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -493,6 +495,7 @@ function TiltSpotlightCard({
     scale: 1,
   })
   const [glarePosition, setGlarePosition] = React.useState({ x: 50, y: 50 })
+  const [spotlightPosition, setSpotlightPosition] = React.useState({ x: 0, y: 0 })
   const [isHovered, setIsHovered] = React.useState(false)
 
   const handleMouseMove = React.useCallback(
@@ -512,6 +515,10 @@ function TiltSpotlightCard({
       setGlarePosition({
         x: (mouseX / rect.width) * 100,
         y: (mouseY / rect.height) * 100,
+      })
+      setSpotlightPosition({
+        x: mouseX,
+        y: mouseY,
       })
     },
     [maxTilt, scale]
@@ -563,6 +570,21 @@ function TiltSpotlightCard({
             )
           `,
           opacity: isHovered ? 1 : 0,
+        }}
+      />
+
+      {/* Spotlight effect */}
+      <div
+        className="absolute pointer-events-none transition-opacity duration-300"
+        style={{
+          left: spotlightPosition.x,
+          top: spotlightPosition.y,
+          width: "400px",
+          height: "400px",
+          transform: "translate(-50%, -50%)",
+          background: `radial-gradient(circle, ${spotlightColor} 0%, transparent 70%)`,
+          opacity: isHovered ? 0.4 : 0,
+          filter: "blur(20px)",
         }}
       />
 
