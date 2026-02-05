@@ -3,7 +3,7 @@
 import React, { Suspense, lazy } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ArrowRight, Search, Zap } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Logomark } from "@/components/logos/logomark"
 import { GitHubStarButton } from "@/components/github-star-button"
 
@@ -29,91 +29,6 @@ import {
 const ComponentPlaceholder = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse bg-slate-800/50 rounded-3xl ${className}`} />
 )
-
-// Memoized hero card component (static content)
-const HeroCard = React.memo(function HeroCard() {
-  return (
-    <div className="relative w-full flex items-center justify-center" style={{ perspective: '1200px' }}>
-      <motion.div
-        initial={{ opacity: 0, rotateX: 25, rotateY: -15, scale: 0.9 }}
-        animate={{ opacity: 1, rotateX: 12, rotateY: -8, scale: 1 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        whileHover={{ rotateX: 5, rotateY: -2, scale: 1.03, y: -8 }}
-        className="relative w-full max-w-[320px] sm:max-w-[400px] cursor-pointer group scale-90 sm:scale-100"
-        style={{ transformStyle: 'preserve-3d' }}
-      >
-        <div className="absolute inset-0 bg-slate-950/15 rounded-3xl blur-2xl translate-y-6 scale-95" />
-        <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-2xl">
-          {/* Button Component */}
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Button</span>
-            <div className="space-y-2">
-              <button className="w-full h-9 rounded-lg bg-slate-950 text-white text-xs font-bold hover:bg-slate-800 transition-colors">
-                Primary
-              </button>
-              <button className="w-full h-9 rounded-lg border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-colors">
-                Secondary
-              </button>
-            </div>
-          </div>
-
-          {/* Toggle Component */}
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Toggle</span>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-600">Dark mode</span>
-                <div className="w-10 h-6 rounded-full bg-slate-950 relative">
-                  <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow" />
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-600">Notifications</span>
-                <div className="w-10 h-6 rounded-full bg-slate-200 relative">
-                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Input Component */}
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Input</span>
-            <div className="h-10 rounded-lg border border-slate-200 bg-white px-3 flex items-center">
-              <Search className="w-4 h-4 text-slate-400 mr-2" />
-              <span className="text-xs text-slate-400">Search...</span>
-            </div>
-          </div>
-
-          {/* Badge Component */}
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3 block">Badge</span>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-2 py-1 rounded-md bg-slate-950 text-white text-[10px] font-bold">New</span>
-              <span className="px-2 py-1 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-bold">Active</span>
-              <span className="px-2 py-1 rounded-md bg-amber-100 text-amber-700 text-[10px] font-bold">Pending</span>
-            </div>
-          </div>
-
-          {/* Card Component - Full Width */}
-          <div className="sm:col-span-2 bg-slate-950 rounded-2xl p-4 text-white">
-            <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-3 block">Card</span>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                <Zap className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-bold">Component Library</div>
-                <div className="text-xs text-slate-400">50+ primitives ready to use</div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-500" />
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  )
-})
 
 // Dock items config - defined once
 const dockItems = [
@@ -171,54 +86,103 @@ export default function LandingPage() {
 
 
       {/* --- Hero Section --- */}
-      <section className="relative px-6 pt-24 pb-32 md:pt-48 md:pb-56 overflow-hidden">
-        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-          {/* Left Column (Content) */}
-          <div className="flex flex-col items-start text-left space-y-8">
-
-            <div className="space-y-6">
-              <motion.h1
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
-                className="text-[2.75rem] sm:text-7xl md:text-8xl lg:text-[5.5rem] xl:text-[6rem] font-black tracking-tight leading-[0.95] text-balance max-w-[25ch] text-slate-950"
-                style={{ fontFamily: "var(--font-serif)" }}
-              >
-                Components for Perfectionists.
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                className="text-lg text-slate-800 max-w-[40ch] leading-relaxed font-medium tracking-tight"
-              >
-                Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source.
-              </motion.p>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.8 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto pt-2"
-            >
-              <Link href="/docs" className="group h-12 px-6 rounded-lg bg-slate-950 text-white font-bold text-sm tracking-wide flex items-center justify-center gap-2 hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-950/30 transition-all shadow-xl shadow-slate-950/20 active:scale-[0.98]">
-                Browse Components <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-              <GitHubStarButton className="h-12 px-5 justify-center" theme="landing" />
-            </motion.div>
-          </div>
-
-          {/* Right Column - Dramatic 3D Floating Card */}
-          <HeroCard />
+      <section className="relative px-6 pt-32 pb-24 md:pt-48 md:pb-36 lg:pt-56 lg:pb-44 overflow-hidden">
+        {/* Ambient Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[10%] left-[20%] w-[600px] h-[600px] rounded-full bg-violet-200/30 blur-[120px]"
+          />
+          <motion.div
+            animate={{ scale: [1.1, 1, 1.1], opacity: [0.25, 0.4, 0.25] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-[15%] right-[15%] w-[500px] h-[500px] rounded-full bg-sky-200/30 blur-[120px]"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute bottom-[10%] left-[40%] w-[400px] h-[400px] rounded-full bg-rose-200/20 blur-[120px]"
+          />
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: `linear-gradient(rgba(0,0,0,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.12) 1px, transparent 1px)`,
+              backgroundSize: '64px 64px'
+            }}
+          />
         </div>
 
-        {/* Large Background Text */}
-        <div className="absolute bottom-0 left-0 right-0 select-none overflow-hidden pointer-events-none opacity-20">
-          <h1 className="text-[15vw] font-bold text-slate-100 text-center leading-[0.7] tracking-tighter" aria-hidden="true">
-            SYSTEM
-          </h1>
+        <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200/60 shadow-[0_1px_6px_rgba(0,0,0,0.04)] text-[13px] text-slate-600 font-medium mb-10 md:mb-14">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              Open Source · 50+ Components
+            </div>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[2.75rem] sm:text-7xl md:text-8xl lg:text-[6.5rem] font-black tracking-[-0.035em] leading-[0.9] text-slate-950"
+            style={{ fontFamily: "var(--font-serif)" }}
+          >
+            Components for
+            <br />
+            <span className="bg-gradient-to-r from-slate-950 via-slate-600 to-slate-400 bg-clip-text text-transparent">
+              Perfectionists.
+            </span>
+          </motion.h1>
+
+          {/* Subheadline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8 md:mt-10 text-lg md:text-xl text-slate-500 max-w-xl leading-relaxed tracking-tight font-medium"
+          >
+            Beautifully crafted components you can copy and paste into your apps. Accessible. Customizable. Open Source.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col sm:flex-row items-center gap-4 mt-10 md:mt-14"
+          >
+            <Link href="/docs" className="group h-12 px-8 rounded-full bg-slate-950 text-white font-semibold text-sm tracking-wide flex items-center gap-2.5 hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-950/25 transition-all active:scale-[0.98] shadow-xl shadow-slate-950/20">
+              Browse Components
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <GitHubStarButton className="h-12 px-6 rounded-full justify-center" theme="landing" />
+          </motion.div>
+
+          {/* Tech Stack */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 1.2 }}
+            className="mt-20 md:mt-28 flex items-center gap-6 md:gap-8 text-[11px] text-slate-400 font-mono uppercase tracking-[0.2em]"
+          >
+            <span>React</span>
+            <span className="w-1 h-1 rounded-full bg-slate-200" />
+            <span>Next.js</span>
+            <span className="w-1 h-1 rounded-full bg-slate-200" />
+            <span>Tailwind CSS</span>
+            <span className="w-1 h-1 rounded-full bg-slate-200" />
+            <span>Framer Motion</span>
+          </motion.div>
         </div>
       </section>
 
