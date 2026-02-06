@@ -165,7 +165,7 @@ export default function LandingPage() {
               Browse Components
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
-            <GitHubStarButton className="h-12 px-6 rounded-full justify-center" theme="landing" />
+            <GitHubStarButton className="justify-center" theme="landing" />
           </motion.div>
 
           {/* Tech Stack */}

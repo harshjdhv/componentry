@@ -69,10 +69,10 @@ export function GitHubStarButton({ className, theme = "default" }: GitHubStarBut
             href="https://github.com/harshjdhv/componentry"
             target="_blank"
             className={cn(
-                "group relative inline-flex h-9 items-center gap-2 rounded-md md:rounded-lg border px-3 text-sm font-medium transition-all",
+                "group relative inline-flex items-center gap-2.5 border text-sm font-semibold transition-all",
                 isLanding
-                    ? "border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900"
-                    : "border-yellow-500/15 bg-yellow-500/[0.02] text-muted-foreground hover:bg-yellow-500/10 hover:text-foreground",
+                    ? "h-12 px-8 rounded-full border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900"
+                    : "h-9 px-3 rounded-md md:rounded-lg border-yellow-500/15 bg-yellow-500/[0.02] text-muted-foreground hover:bg-yellow-500/10 hover:text-foreground",
                 className
             )}
         >
