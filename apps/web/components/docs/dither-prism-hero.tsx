@@ -1,11 +1,6 @@
 import React from "react";
-import {
-    DitherPrismHeroDemo,
-    DitherPrismHeroCyberpunkDemo,
-    DitherPrismHeroSunsetDemo,
-    DitherPrismHeroOceanDemo,
-    DitherPrismHeroIntenseDemo,
-} from "@/components/docs/previews/dither-prism-hero-preview";
+import { DitherPrismHeroPlayground } from "@/components/docs/previews/dither-prism-hero-playground";
+import { LiveCodeBlock } from "@/components/live-code-block";
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { readComponentSource } from "@/lib/source-code";
 
@@ -17,46 +12,6 @@ const basicUsageCode = `import { DitherPrismHero } from "@/components/ui/dither-
     description="Move your cursor to interact"
 />`;
 
-const cyberpunkCode = `<DitherPrismHero 
-    color1="#0a0a0a"
-    color2="#00ff88"
-    color3="#00ffff"
-    title1="Cyber"
-    title2="Punk"
-    ditherIntensity={0.25}
-    prismIntensity={0.7}
-/>`;
-
-const sunsetCode = `<DitherPrismHero 
-    color1="#1a0a0a"
-    color2="#ff6b35"
-    color3="#ffd93d"
-    title1="Golden"
-    title2="Hour"
-    ditherIntensity={0.12}
-    prismIntensity={0.4}
-/>`;
-
-const oceanCode = `<DitherPrismHero 
-    color1="#0a1628"
-    color2="#0ea5e9"
-    color3="#22d3ee"
-    title1="Deep"
-    title2="Ocean"
-    speed={0.7}
-    showParticles={true}
-    particleCount={100}
-/>`;
-
-const intenseCode = `<DitherPrismHero 
-    ditherIntensity={0.3}
-    prismIntensity={0.9}
-    mouseIntensity={1.0}
-    speed={1.5}
-    title1="Maximum"
-    title2="Impact"
-/>`;
-
 export async function DitherPrismHeroDocs() {
     const sourceCode =
         (await readComponentSource("dither-prism-hero")) ||
@@ -65,40 +20,15 @@ export async function DitherPrismHeroDocs() {
     return (
         <DocsPageLayout
             title="Dither Prism Hero"
-            description="A breathtaking WebGL hero background that combines advanced dithering techniques (8x8 Bayer matrix + animated blue noise), prismatic color refraction, holographic iridescence, morphing crystal patterns, mouse-reactive ripples, floating particles, and cinematic scanlines - all rendered in real-time with GLSL shaders. This component will leave users in awe."
-            preview={<DitherPrismHeroDemo />}
-            previewCode={basicUsageCode}
+            description="A breathtaking WebGL hero background featuring advanced dithering, prismatic refraction, holographic iridescence, and mouse-reactive ripples - rendered in real-time with GLSL."
+            preview={<DitherPrismHeroPlayground />}
+            previewCode=""
             installPackageName="dither-prism-hero"
             installDependencies="framer-motion @react-three/fiber three"
             installSourceCode={sourceCode}
-            usageCode={basicUsageCode}
-            fullWidthPreview={true}
-            examples={[
-                {
-                    title: "Cyberpunk Theme",
-                    preview: <DitherPrismHeroCyberpunkDemo />,
-                    code: cyberpunkCode,
-                    fullWidth: true,
-                },
-                {
-                    title: "Sunset Theme",
-                    preview: <DitherPrismHeroSunsetDemo />,
-                    code: sunsetCode,
-                    fullWidth: true,
-                },
-                {
-                    title: "Ocean Theme",
-                    preview: <DitherPrismHeroOceanDemo />,
-                    code: oceanCode,
-                    fullWidth: true,
-                },
-                {
-                    title: "Maximum Intensity",
-                    preview: <DitherPrismHeroIntenseDemo />,
-                    code: intenseCode,
-                    fullWidth: true,
-                },
-            ]}
+            usageCode={<LiveCodeBlock defaultCode={basicUsageCode} />}
+            fullWidthPreview={false}
+            unstyledPreview={true}
             props={[
                 {
                     name: "title1",

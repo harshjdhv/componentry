@@ -396,7 +396,8 @@ const DitherPrismPlane = ({
             uDitherIntensity: { value: ditherIntensity },
             uPrismIntensity: { value: prismIntensity },
         }),
-        [color1, color2, color3, ditherIntensity, prismIntensity, mouseIntensity]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [] // Depend on nothing to keep reference stable
     );
 
     // Mouse tracking
@@ -535,15 +536,13 @@ const FloatingParticles = ({
 // ═══════════════════════════════════════════════════════════════════════════════
 // Main Component Props
 // ═══════════════════════════════════════════════════════════════════════════════
-interface DitherPrismHeroProps {
+interface DitherPrismHeroProps extends React.HTMLAttributes<HTMLDivElement> {
     /** First line of headline */
     title1?: string;
     /** Second line of headline */
     title2?: string;
     /** Subtitle text */
     description?: string;
-    /** Additional CSS classes */
-    className?: string;
     /** Primary color (deep/dark) */
     color1?: string;
     /** Secondary color (mid) */
@@ -587,6 +586,8 @@ export default function DitherPrismHero({
     particleColor = "#ffffff",
     className,
     children,
+    style,
+    ...props
 }: DitherPrismHeroProps) {
     const [mounted, setMounted] = useState(false);
 
@@ -600,7 +601,8 @@ export default function DitherPrismHero({
                 "relative w-full min-h-screen flex flex-col items-center overflow-hidden text-gray-900",
                 className
             )}
-            style={{ containerType: "size" }}
+            style={{ containerType: "size", ...style }}
+            {...props}
         >
             {/* WebGL Background */}
             {mounted && (

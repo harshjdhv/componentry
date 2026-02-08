@@ -49,7 +49,7 @@ export interface DocsPageLayoutProps {
   installSourceFilename?: string;
 
   /** Usage import code */
-  usageCode: string;
+  usageCode: string | React.ReactNode;
 
   /** Additional examples */
   examples?: ExampleItem[];
@@ -62,6 +62,9 @@ export interface DocsPageLayoutProps {
 
   /** If true, renders the main preview without the ComponentPreview wrapper (for full-width components like CollectionSurfer) */
   fullWidthPreview?: boolean;
+
+  /** If true, renders the preview component directly without any wrapper/borders. Useful for custom playgrounds that handle their own layout. */
+  unstyledPreview?: boolean;
 }
 
 // Loading skeleton for code blocks
@@ -95,6 +98,7 @@ export async function DocsPageLayout({
   props = [],
   action,
   fullWidthPreview = false,
+  unstyledPreview = false,
 }: DocsPageLayoutProps) {
   // Generate the page context markdown automatically
   const pageContext = `
@@ -159,16 +163,21 @@ ${ex.code}
     >
       {/* Main Preview + Code Block */}
       <div className="space-y-0">
-        {fullWidthPreview ? (
+        {unstyledPreview ? (
+          preview
+        ) : fullWidthPreview ? (
           <div className="relative rounded-t-xl border border-border overflow-hidden">
             {preview}
           </div>
         ) : (
           <ComponentPreview>{preview}</ComponentPreview>
         )}
-        <Suspense fallback={<CodeBlockSkeleton className="rounded-t-none" />}>
-          <CodeBlock code={previewCode} lang="tsx" className="rounded-t-none" />
-        </Suspense>
+
+        {previewCode && (
+          <Suspense fallback={<CodeBlockSkeleton className="rounded-t-none" />}>
+            <CodeBlock code={previewCode} lang="tsx" className="rounded-t-none" />
+          </Suspense>
+        )}
       </div>
 
       {/* Installation Section */}
@@ -232,7 +241,11 @@ ${ex.code}
       {/* Usage Section */}
       <Section title="Usage">
         <Suspense fallback={<CodeBlockSkeleton />}>
-          <CodeBlock code={usageCode} lang="tsx" />
+          {typeof usageCode === 'string' ? (
+            <CodeBlock code={usageCode} lang="tsx" />
+          ) : (
+            usageCode
+          )}
         </Suspense>
       </Section>
 
