@@ -70,6 +70,10 @@ const docsImportMap: Record<
     import("@/components/docs/hero-geometric").then((m) => ({
       default: m.HeroGeometricDocs,
     })),
+  "dither-prism-hero": () =>
+    import("@/components/docs/dither-prism-hero").then((m) => ({
+      default: m.DitherPrismHeroDocs,
+    })),
   "border-beam": () =>
     import("@/components/docs/border-beam").then((m) => ({
       default: m.BorderBeamDocs,

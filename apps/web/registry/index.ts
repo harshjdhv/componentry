@@ -111,6 +111,14 @@ export const components: Record<string, ComponentMetadata> = {
     category: "Hero Backgrounds",
     slug: "hero-geometric",
   },
+  "dither-prism-hero": {
+    title: "Dither Prism Hero",
+    description:
+      "Stunning WebGL hero with advanced dithering, prismatic refraction, holographic iridescence, and mouse-reactive effects.",
+    category: "Hero Backgrounds",
+    slug: "dither-prism-hero",
+    isNew: true,
+  },
 
   // Visual Effects
   "border-beam": {
