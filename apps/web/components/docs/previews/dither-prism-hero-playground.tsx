@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { RotateCcw, Copy, Check, Type, Palette, Sparkles, Layers, Sliders } from "lucide-react";
+import { RotateCcw, Copy, Check, Type, Palette, Sparkles, Layers } from "lucide-react";
 import DitherPrismHero from "@workspace/ui/components/dither-prism-hero";
 import { cn } from "@/lib/utils";
 import { Instrument_Serif } from "next/font/google";
@@ -92,17 +92,17 @@ const PRESETS = [
 // Reusable Control Components
 // -----------------------------------------------------------------------------
 
-const Label = ({ children, className, icon: Icon }: { children: React.ReactNode; className?: string; icon?: React.ElementType }) => (
-    <label className={cn("text-[10px] uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5 mb-2", className)}>
-        {Icon && <Icon className="w-3 h-3" />}
+const Label = ({ children, className, icon: Icon }: { children: React.ReactNode; className?: string; icon?: React.ComponentType<{ className?: string }> }) => (
+    <div className={cn("text-[11px] uppercase tracking-widest font-bold text-muted-foreground/70 flex items-center gap-1.5 mb-2.5", className)}>
+        {Icon && <Icon className="w-3.5 h-3.5" />}
         {children}
-    </label>
+    </div>
 );
 
 const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input
         className={cn(
-            "flex h-9 w-full rounded-md border border-input bg-background/50 px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 hover:bg-background/80",
+            "flex h-9 w-full rounded-lg border border-border/40 bg-background/50 px-3 py-1 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-background/80",
             className
         )}
         {...props}
@@ -112,20 +112,20 @@ const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputEleme
 const TextArea = ({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
     <textarea
         className={cn(
-            "flex min-h-[80px] w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none hover:bg-background/80",
+            "flex min-h-[80px] w-full rounded-lg border border-border/40 bg-background/50 px-3 py-2 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.05)] placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 resize-none hover:bg-background/80",
             className
         )}
         {...props}
     />
 );
 
-const Slider = ({ value, min, max, step, onChange, label }: { value: number; min: number; max: number; step: number; onChange: (val: number) => void; label: string }) => (
-    <div className="space-y-2">
-        <div className="flex justify-between items-center bg-muted/30 px-2 py-1.5 rounded-md border border-border/50">
-            <span className="text-xs font-medium text-foreground/80">{label}</span>
-            <span className="text-[10px] font-mono text-muted-foreground">{Number(value).toFixed(2)}</span>
+const Slider = ({ value, min, max, step, onChange, label, unit = "" }: { value: number; min: number; max: number; step: number; onChange: (val: number) => void; label: string; unit?: string }) => (
+    <div className="space-y-3 group">
+        <div className="flex justify-between items-center">
+            <span className="text-xs font-medium text-foreground/80 group-hover:text-foreground transition-colors">{label}</span>
+            <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-[4px] border border-border/20">{Number(value).toFixed(step < 0.1 ? 2 : 1)}{unit}</span>
         </div>
-        <div className="px-1">
+        <div className="relative flex items-center h-4">
             <input
                 type="range"
                 min={min}
@@ -133,16 +133,18 @@ const Slider = ({ value, min, max, step, onChange, label }: { value: number; min
                 step={step}
                 value={value}
                 onChange={(e) => onChange(parseFloat(e.target.value))}
-                className="w-full h-1.5 bg-secondary rounded-full appearance-none cursor-pointer accent-primary hover:accent-primary/80 transition-all [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+                className="w-full h-1 bg-secondary rounded-full appearance-none cursor-pointer hover:bg-secondary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20
+                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_2px_5px_rgba(0,0,0,0.2),0_0_0_1px_rgba(0,0,0,0.1)] [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
             />
         </div>
     </div>
 );
 
 const ColorPicker = ({ value, onChange, label }: { value: string; onChange: (val: string) => void; label: string }) => (
-    <div className="flex items-center gap-3 p-1.5 pr-3 rounded-lg border border-border bg-background/50 hover:bg-background/80 transition-colors group">
-        <div className="h-8 w-10 shrink-0 rounded border border-white/10 overflow-hidden relative shadow-sm group-hover:ring-1 group-hover:ring-ring/50 transition-all">
+    <div className="flex items-center gap-3 p-2 rounded-xl border border-border/40 bg-background/50 hover:bg-background/80 hover:border-border/60 transition-all group cursor-pointer shadow-sm">
+        <div className="h-9 w-9 shrink-0 rounded-full border border-border/50 overflow-hidden relative shadow-inner">
             <div className="absolute inset-0" style={{ backgroundColor: value }} />
+            <div className="absolute inset-0 ring-1 ring-inset ring-black/5" />
             <input
                 type="color"
                 value={value}
@@ -150,30 +152,30 @@ const ColorPicker = ({ value, onChange, label }: { value: string; onChange: (val
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
         </div>
-        <div className="flex flex-col min-w-0">
-            <span className="text-xs font-medium text-foreground/90 truncate">{label}</span>
+        <div className="flex flex-col min-w-0 flex-1">
+            <span className="text-xs font-medium text-foreground/90 truncate group-hover:text-primary transition-colors">{label}</span>
             <span className="text-[10px] font-mono text-muted-foreground uppercase truncate opacity-70 group-hover:opacity-100 transition-opacity">{value}</span>
         </div>
     </div>
 );
 
 const Switch = ({ checked, onChange, label }: { checked: boolean; onChange: (val: boolean) => void; label: string }) => (
-    <div className="flex items-center justify-between p-2 rounded-lg border border-border bg-muted/20">
+    <div className="flex items-center justify-between p-3 rounded-xl border border-border/40 bg-background/50">
         <span className="text-xs font-medium text-foreground/80">{label}</span>
         <button
             role="switch"
             aria-checked={checked}
             onClick={() => onChange(!checked)}
             className={cn(
-                "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                checked ? "bg-primary" : "bg-input"
+                "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                checked ? "bg-primary shadow-[0_2px_5px_rgba(0,0,0,0.2)]" : "bg-input shadow-inner"
             )}
         >
             <span
                 data-state={checked ? "checked" : "unchecked"}
                 className={cn(
-                    "pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform",
-                    checked ? "translate-x-4" : "translate-x-0"
+                    "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform",
+                    checked ? "translate-x-5" : "translate-x-0"
                 )}
             />
         </button>
@@ -242,32 +244,32 @@ export function DitherPrismHeroPlayground() {
     };
 
     return (
-        <div className="w-full h-full flex flex-col rounded-xl border border-border bg-background shadow-lg overflow-hidden">
+        <div className="w-full flex flex-col">
             {/* ----------------------------------------------------------------------------- 
                TOP: PREVIEW AREA
             ----------------------------------------------------------------------------- */}
-            <div className="relative w-full aspect-video min-h-[400px] border-b border-border bg-zinc-950 group overflow-hidden">
+            <div className="w-full rounded-t-xl border border-border/40 border-b-0 bg-zinc-950 overflow-hidden relative group ring-0">
 
                 {/* Overlay Controls */}
-                <div className="absolute top-4 right-4 z-50 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute top-6 right-6 z-50 flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
                     <button
                         onClick={handleCopyCode}
-                        className="p-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white/10 transition-all cursor-pointer hover:border-white/30"
-                        title="Copy JSX"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-xs font-medium text-white/90 hover:bg-white/10 transition-all cursor-pointer hover:border-white/30 hover:shadow-lg hover:shadow-primary/10"
                     >
-                        {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-white/90" />}
+                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copied ? "Copied" : "Copy JSX"}
                     </button>
                     <button
                         onClick={handleReset}
-                        className="p-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white/10 hover:rotate-180 transition-all cursor-pointer hover:border-white/30"
+                        className="p-1.5 bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-white/90 hover:bg-white/10 hover:rotate-180 transition-all cursor-pointer hover:border-white/30"
                         title="Reload Animation"
                     >
-                        <RotateCcw className="w-4 h-4 text-white/90" />
+                        <RotateCcw className="w-3.5 h-3.5" />
                     </button>
                 </div>
 
                 {/* The Component Wrapper */}
-                <div className={cn("relative w-full h-full", instrumentSerif.variable)}>
+                <div className={cn("relative w-full aspect-video min-h-[400px]", instrumentSerif.variable)}>
                     <DitherPrismHero
                         key={key}
                         {...config}
@@ -280,107 +282,107 @@ export function DitherPrismHeroPlayground() {
             {/* ----------------------------------------------------------------------------- 
                BOTTOM: CONFIGURATION PANEL
             ----------------------------------------------------------------------------- */}
-            <div className="w-full bg-card/50 backdrop-blur-sm">
+            <div className="w-full flex flex-col rounded-b-xl rounded-t-none border border-border/40 bg-card/30 backdrop-blur-xl overflow-hidden ring-0">
 
                 {/* Header & Presets */}
-                <div className="p-6 border-b border-border bg-card/30">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Layers className="w-4 h-4 text-primary" />
-                        <h2 className="text-sm font-semibold tracking-wide text-foreground">Select a Style</h2>
+                <div className="p-5 border-b border-border/40 bg-background/20 space-y-4">
+                    <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-primary/10">
+                            <Layers className="w-4 h-4 text-primary" />
+                        </div>
+                        <h2 className="text-sm font-semibold text-foreground tracking-tight">Design System</h2>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    <div
+                        className="flex gap-3 pb-4 overflow-x-auto scrollbar-hide -mx-5 px-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] select-none"
+                        style={{
+                            maskImage: "linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent)",
+                            WebkitMaskImage: "linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent)"
+                        }}
+                    >
                         {PRESETS.map((preset) => (
                             <button
                                 key={preset.name}
                                 onClick={() => handlePresetChange(preset.name)}
                                 className={cn(
-                                    "group relative flex flex-col items-start justify-between gap-3 p-3 h-20 rounded-xl border transition-all duration-200 text-left hover:shadow-md",
+                                    "group relative flex-none w-24 snap-start flex flex-col items-center gap-2 p-2 rounded-xl border transition-all duration-300",
                                     activePreset === preset.name
-                                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
-                                        : "border-border bg-background/50 hover:border-primary/50 hover:bg-accent/50"
+                                        ? "border-primary/50 bg-primary/5 shadow-sm"
+                                        : "border-border/40 bg-background/40 hover:border-primary/30 hover:bg-background/60"
                                 )}
                             >
-                                <div className="flex items-center gap-1.5 w-full">
-                                    <div
-                                        className="w-full h-8 rounded-md shadow-sm border border-white/10"
-                                        style={{
-                                            background: `linear-gradient(135deg, ${preset.config.color1} 0%, ${preset.config.color2} 50%, ${preset.config.color3} 100%)`
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between w-full">
-                                    <span className={cn(
-                                        "text-xs font-medium transition-colors",
-                                        activePreset === preset.name ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-                                    )}>
-                                        {preset.name}
-                                    </span>
-                                    {activePreset === preset.name && <Check className="w-3 h-3 text-primary" />}
-                                </div>
+                                <div
+                                    className={cn(
+                                        "w-full aspect-[2/1] rounded-lg shadow-sm border border-white/10 transition-transform duration-500",
+                                        activePreset === preset.name ? "scale-105" : "group-hover:scale-105"
+                                    )}
+                                    style={{
+                                        background: `linear-gradient(135deg, ${preset.config.color1} 0%, ${preset.config.color2} 50%, ${preset.config.color3} 100%)`
+                                    }}
+                                />
+                                <span className={cn(
+                                    "text-[10px] font-medium transition-colors whitespace-nowrap",
+                                    activePreset === preset.name ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                )}>
+                                    {preset.name}
+                                </span>
                             </button>
                         ))}
                     </div>
                 </div>
 
-                {/* Main Controls Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:divide-x divide-border">
+                {/* Controls Grid */}
+                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
 
-                    {/* COL 1: CONTENT */}
-                    <div className="p-6 space-y-5">
-                        <Label icon={Type} className="pb-2 border-b border-border/40 w-full text-primary">Content</Label>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <span className="text-xs text-muted-foreground">Headlines</span>
-                                <Input
-                                    value={config.title1}
-                                    onChange={(e) => handleChange("title1", e.target.value)}
-                                    placeholder="Headline Line 1"
-                                />
-                                <Input
-                                    value={config.title2}
-                                    onChange={(e) => handleChange("title2", e.target.value)}
-                                    placeholder="Headline Line 2"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <span className="text-xs text-muted-foreground">Description</span>
-                                <TextArea
-                                    value={config.description}
-                                    onChange={(e) => handleChange("description", e.target.value)}
-                                    placeholder="Description text..."
-                                    className="h-[100px]"
-                                />
-                            </div>
+                    {/* SECTION: CONTENT */}
+                    <div className="space-y-4">
+                        <Label icon={Type}>Typography & Content</Label>
+                        <div className="space-y-3 pl-1">
+                            <Input
+                                value={config.title1}
+                                onChange={(e) => handleChange("title1", e.target.value)}
+                                placeholder="Headline Line 1"
+                            />
+                            <Input
+                                value={config.title2}
+                                onChange={(e) => handleChange("title2", e.target.value)}
+                                placeholder="Headline Line 2"
+                            />
+                            <TextArea
+                                value={config.description}
+                                onChange={(e) => handleChange("description", e.target.value)}
+                                placeholder="Description text..."
+                                className="h-[70px]"
+                            />
                         </div>
                     </div>
 
-                    {/* COL 2: THEME */}
-                    <div className="p-6 space-y-5">
-                        <Label icon={Palette} className="pb-2 border-b border-border/40 w-full text-primary">Theme Colors</Label>
-                        <div className="space-y-4">
+                    {/* SECTION: THEME */}
+                    <div className="space-y-4">
+                        <Label icon={Palette}>Color Palette</Label>
+                        <div className="space-y-2 pl-1">
                             <ColorPicker
-                                label="Primary (Deep Background)"
+                                label="Primary Base"
                                 value={config.color1}
                                 onChange={(v) => handleChange("color1", v)}
                             />
                             <ColorPicker
-                                label="Secondary (Mid Gradient)"
+                                label="Secondary Flow"
                                 value={config.color2}
                                 onChange={(v) => handleChange("color2", v)}
                             />
                             <ColorPicker
-                                label="Accent (Highlights)"
+                                label="Accent Highlight"
                                 value={config.color3}
                                 onChange={(v) => handleChange("color3", v)}
                             />
                         </div>
                     </div>
 
-                    {/* COL 3: EFFECTS */}
-                    <div className="p-6 space-y-5">
-                        <Label icon={Sparkles} className="pb-2 border-b border-border/40 w-full text-primary">Effects & Motion</Label>
-                        <div className="space-y-6">
+                    {/* SECTION: VISUALS */}
+                    <div className="space-y-5">
+                        <Label icon={Sparkles}>Visual Effects</Label>
+                        <div className="space-y-5 pl-1">
                             <Slider
                                 label="Dither Grain"
                                 min={0}
@@ -398,36 +400,35 @@ export function DitherPrismHeroPlayground() {
                                 onChange={(v) => handleChange("prismIntensity", v)}
                             />
                             <Slider
-                                label="Mouse Reaction"
+                                label="Mouse Interaction"
                                 min={0}
                                 max={2}
                                 step={0.1}
                                 value={config.mouseIntensity}
                                 onChange={(v) => handleChange("mouseIntensity", v)}
                             />
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <Slider
-                                    label="Speed"
-                                    min={0}
-                                    max={3}
-                                    step={0.1}
-                                    value={config.speed}
-                                    onChange={(v) => handleChange("speed", v)}
-                                />
-                                {config.showParticles && (
+                            <div className="pt-2 border-t border-border/30">
+                                <div className="grid grid-cols-2 gap-4 mb-4">
                                     <Slider
-                                        label="Count"
+                                        label="Speed"
                                         min={0}
-                                        max={200}
-                                        step={10}
-                                        value={config.particleCount}
-                                        onChange={(v) => handleChange("particleCount", v)}
+                                        max={3}
+                                        step={0.1}
+                                        value={config.speed}
+                                        onChange={(v) => handleChange("speed", v)}
+                                        unit="x"
                                     />
-                                )}
-                            </div>
-
-                            <div className="pt-2">
+                                    {config.showParticles && (
+                                        <Slider
+                                            label="Particles"
+                                            min={0}
+                                            max={200}
+                                            step={10}
+                                            value={config.particleCount}
+                                            onChange={(v) => handleChange("particleCount", v)}
+                                        />
+                                    )}
+                                </div>
                                 <Switch
                                     label="Floating Particles"
                                     checked={config.showParticles}
@@ -436,6 +437,7 @@ export function DitherPrismHeroPlayground() {
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
