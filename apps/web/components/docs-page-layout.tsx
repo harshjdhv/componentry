@@ -1,89 +1,57 @@
-import type React from "react";
-import { Suspense } from "react";
-import { InstallCommand } from "@/components/install-command";
-import { CodeBlock } from "@/components/code-block";
-import { Section, ComponentLayout } from "@/components/component-layout";
-import { InstallationTabs } from "@/components/installation-tabs";
-import { PageContextMenu } from "@/components/page-context-menu";
-import { ComponentPreview } from "@/components/component-preview";
+// apps/web/components/docs-page-layout.tsx
+import type React from "react"
+import Link from "next/link"
+import { Suspense } from "react"
+import { Search, ChevronRight, Copy, Terminal } from "lucide-react"
+import { InstallCommand } from "@/components/install-command"
+import { CodeBlock } from "@/components/code-block"
+import { Section } from "@/components/component-layout"
+import { InstallationTabs } from "@/components/installation-tabs"
+import { PageContextMenu } from "@/components/page-context-menu"
+import { ComponentPreview } from "@/components/component-preview"
+import { CommandMenu } from "@/components/command-menu"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { cn } from "@/lib/utils"
 
 export interface PropItem {
-  name: string;
-  type: string;
-  default?: string;
-  description: string;
+  name: string
+  type: string
+  default?: string
+  description: string
 }
 
 export interface ExampleItem {
-  title: string;
-  preview: React.ReactNode;
-  code: string;
-  /** If true, renders the preview without the ComponentPreview wrapper (for full-width components) */
-  fullWidth?: boolean;
+  title: string
+  preview: React.ReactNode
+  code: string
+  fullWidth?: boolean
 }
 
 export interface DocsPageLayoutProps {
-  title: string;
-  description: string;
-
-  /** The main component preview to be shown at the top */
-  preview: React.ReactNode;
-  /** The code for the main preview */
-  previewCode: string;
-
-  /** The name of the component for the CLI install command (e.g. "hyper-text") */
-  installPackageName: string;
-  /**
-   * Manual installation: Dependencies to install
-   * (e.g. "clsx tailwind-merge")
-   */
-  installDependencies?: string;
-  /**
-   * Manual installation: Source code to copy
-   */
-  installSourceCode?: string;
-  /**
-   * Manual installation: Filename for the source code
-   * (e.g. "components/ui/hyper-text.tsx")
-   */
-  installSourceFilename?: string;
-
-  /** Usage import code */
-  usageCode: string | React.ReactNode;
-
-  /** Additional examples */
-  examples?: ExampleItem[];
-
-  /** Props table data */
-  props?: PropItem[];
-
-  /** Action element (e.g. PageContextMenu) to be rendered in the header */
-  action?: React.ReactNode;
-
-  /** If true, renders the main preview without the ComponentPreview wrapper (for full-width components like CollectionSurfer) */
-  fullWidthPreview?: boolean;
-
-  /** If true, renders the preview component directly without any wrapper/borders. Useful for custom playgrounds that handle their own layout. */
-  unstyledPreview?: boolean;
+  title: string
+  description: string
+  preview: React.ReactNode
+  previewCode: string
+  installPackageName: string
+  installDependencies?: string
+  installSourceCode?: string
+  installSourceFilename?: string
+  usageCode: string | React.ReactNode
+  examples?: ExampleItem[]
+  props?: PropItem[]
+  action?: React.ReactNode
+  fullWidthPreview?: boolean
+  unstyledPreview?: boolean
 }
 
-// Loading skeleton for code blocks
 function CodeBlockSkeleton({ className }: { className?: string }) {
   return (
     <div
       className={`h-48 w-full bg-muted/20 rounded-xl border border-border animate-pulse ${className || ""}`}
     />
-  );
+  )
 }
 
-/**
- * Server Component version of DocsPageLayout.
- * 
- * PERFORMANCE: This is a Server Component that:
- * - Renders CodeBlock async with streaming via Suspense
- * - Only client components (InstallCommand, InstallationTabs) are interactive
- * - Reduces initial JS bundle by keeping static content server-rendered
- */
 export async function DocsPageLayout({
   title,
   description,
@@ -103,229 +71,199 @@ export async function DocsPageLayout({
   // Generate the page context markdown automatically
   const pageContext = `
 # ${title}
-
 ${description}
-
 ## Installation
-
 ### CLI
 \`\`\`bash
 npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
 \`\`\`
-
-### Manual
-${installDependencies
-      ? `1. Install dependencies
-\`\`\`bash
-npm install ${installDependencies}
-\`\`\`
+...
 `
-      : ""
-    }
-
-${installSourceCode
-      ? `${installDependencies ? "2" : "1"}. Copy source code
-\`\`\`tsx
-${installSourceCode}
-\`\`\`
-`
-      : ""
-    }
-
-## Usage
-\`\`\`tsx
-${usageCode}
-\`\`\`
-
-## Examples
-${examples
-      .map(
-        (ex) => `
-### ${ex.title}
-\`\`\`tsx
-${ex.code}
-\`\`\`
-`,
-      )
-      .join("\n")}
-`;
 
   return (
-    <ComponentLayout
-      title={title}
-      description={description}
-      action={
-        <div className="flex items-center gap-2">
-          <PageContextMenu content={pageContext} />
-          {action}
-        </div>
-      }
-    >
-      {/* Main Preview + Code Block */}
-      <div className="space-y-0">
-        {unstyledPreview ? (
-          preview
-        ) : fullWidthPreview ? (
-          <div className="relative rounded-t-xl border border-border overflow-hidden">
-            {preview}
-          </div>
-        ) : (
-          <ComponentPreview>{preview}</ComponentPreview>
-        )}
+    <div className="flex flex-col lg:flex-row w-full h-full min-h-screen lg:h-screen bg-background text-foreground">
+      
+      {/* Left Column: Scrollable Content */}
+      <div className="w-full lg:w-[45%] lg:min-w-[500px] h-full flex flex-col relative z-20">
+        <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="p-8 lg:p-12 space-y-12 pb-24">
+            
+            {/* Minimal Nav Header / Breadcrumbs */}
+             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
+                <Link href="/docs" className="hover:text-foreground transition-colors">Components</Link>
+                <ChevronRight className="w-3 h-3" />
+                <span className="text-foreground font-medium">{title}</span>
+             </div>
 
-        {previewCode && (
-          <Suspense fallback={<CodeBlockSkeleton className="rounded-t-none" />}>
-            <CodeBlock code={previewCode} lang="tsx" className="rounded-t-none" />
-          </Suspense>
-        )}
+            {/* Content Header */}
+            <header className="space-y-8">
+               <div className="space-y-4">
+                  {/* Uppercase Label */}
+                  <h1 className="text-sm font-mono uppercase tracking-widest text-muted-foreground/80">
+                    {title}
+                  </h1>
+                  
+                  {/* Big Description */}
+                  <p className="text-3xl lg:text-4xl font-medium tracking-tight leading-tight text-foreground">
+                    {description}
+                  </p>
+               </div>
+               
+               {/* Metadata / Dependencies */}
+               <div className="space-y-6">
+                  {installDependencies && (
+                    <div className="space-y-3">
+                       <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground/60 flex items-center gap-2">
+                          Dependencies <Copy className="w-3 h-3" />
+                       </h3>
+                       <div className="flex flex-wrap gap-2">
+                          {installDependencies.split(' ').map(dep => (
+                            <div key={dep} className="px-2.5 py-1 rounded-full bg-muted/50 border border-border/50 text-xs font-mono text-foreground/80">
+                               {dep}
+                            </div>
+                          ))}
+                          {/* Always add framer-motion if implied */}
+                          {!installDependencies.includes('framer-motion') && (
+                              <div className="px-2.5 py-1 rounded-full bg-muted/50 border border-border/50 text-xs font-mono text-foreground/80">
+                                  framer-motion
+                              </div>
+                          )}
+                       </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                     <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground/60">
+                        Interaction Type
+                     </h3>
+                     <p className="text-sm">
+                        Scroll-driven animation
+                     </p>
+                  </div>
+               </div>
+            </header>
+
+            {/* Installation */}
+            <Section title="Installation">
+              <InstallationTabs
+                cliContent={<InstallCommand component={installPackageName} />}
+                manualContent={
+                  <div className="space-y-6">
+                    {installSourceCode && (
+                      <div className="space-y-3">
+                        <p className="font-semibold text-sm">Copy source code</p>
+                        <Suspense fallback={<CodeBlockSkeleton />}>
+                          <CodeBlock
+                            code={installSourceCode}
+                            lang="tsx"
+                            filename={installSourceFilename || `components/ui/${installPackageName}.tsx`}
+                          />
+                        </Suspense>
+                      </div>
+                    )}
+                  </div>
+                }
+              />
+            </Section>
+
+            {/* Usage */}
+             <Section title="Usage">
+              <div className="space-y-4">
+                 <Suspense fallback={<CodeBlockSkeleton />}>
+                  {typeof usageCode === "string" ? (
+                    <CodeBlock code={usageCode} lang="tsx" />
+                  ) : (
+                    usageCode
+                  )}
+                </Suspense>
+              </div>
+            </Section>
+
+            {/* Props */}
+            {props.length > 0 && (
+              <Section title="Props">
+                <div className="rounded-lg border overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 border-b">
+                      <tr>
+                        <th className="h-10 px-4 text-left font-medium text-muted-foreground w-1/4">Prop</th>
+                        <th className="h-10 px-4 text-left font-medium text-muted-foreground w-1/4">Type</th>
+                        <th className="h-10 px-4 text-left font-medium text-muted-foreground w-1/4">Default</th>
+                        <th className="h-10 px-4 text-left font-medium text-muted-foreground">Description</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {props.map((prop, i) => (
+                        <tr key={i} className="hover:bg-muted/50 transition-colors">
+                          <td className="p-4 font-mono font-semibold">{prop.name}</td>
+                          <td className="p-4 font-mono text-muted-foreground break-all">{prop.type}</td>
+                          <td className="p-4 font-mono text-muted-foreground">{prop.default || "-"}</td>
+                          <td className="p-4 text-muted-foreground">{prop.description}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Section>
+            )}
+
+             {/* Examples */}
+             {examples.length > 0 && (
+                <Section title="Examples">
+                  <div className="space-y-12">
+                     {examples.map((ex, i) => (
+                        <div key={i} className="space-y-4">
+                           <h3 className="text-lg font-semibold">{ex.title}</h3>
+                           <div className="border rounded-xl overflow-hidden bg-background">
+                              <div className="p-8 flex justify-center bg-muted/20 min-h-[200px]">
+                                {ex.preview}
+                              </div>
+                              <CodeBlock code={ex.code} lang="tsx" className="border-t rounded-t-none" />
+                           </div>
+                        </div>
+                     ))}
+                  </div>
+                </Section>
+             )}
+
+            <div className="h-10" />
+          </div>
+        </div>
       </div>
 
-      {/* Installation Section */}
-      <Section title="Installation">
-        <InstallationTabs
-          cliContent={<InstallCommand component={installPackageName} />}
-          manualContent={
-            <div className="space-y-6">
-              {installDependencies && (
-                <div className="space-y-3">
-                  <p className="text-base font-semibold">
-                    1. Install dependencies
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Ensure you have the utility function{" "}
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono text-foreground">
-                      cn
-                    </code>{" "}
-                    in{" "}
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono text-foreground">
-                      lib/utils.ts
-                    </code>
-                  </p>
-                  <Suspense fallback={<CodeBlockSkeleton />}>
-                    <CodeBlock
-                      code={`npm install ${installDependencies}`}
-                      lang="bash"
-                    />
-                  </Suspense>
-                </div>
-              )}
-              {installSourceCode && (
-                <div className="space-y-3">
-                  <p className="text-base font-semibold">
-                    {installDependencies ? "2" : "1"}. Copy the source code
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Copy the following code to{" "}
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono text-foreground">
-                      {installSourceFilename ||
-                        `components/ui/${installPackageName}.tsx`}
-                    </code>
-                  </p>
-                  <Suspense fallback={<CodeBlockSkeleton />}>
-                    <CodeBlock
-                      code={installSourceCode}
-                      lang="tsx"
-                      filename={
-                        installSourceFilename ||
-                        `components/ui/${installPackageName}.tsx`
-                      }
-                    />
-                  </Suspense>
-                </div>
-              )}
-            </div>
-          }
-        />
-      </Section>
-
-      {/* Usage Section */}
-      <Section title="Usage">
-        <Suspense fallback={<CodeBlockSkeleton />}>
-          {typeof usageCode === 'string' ? (
-            <CodeBlock code={usageCode} lang="tsx" />
-          ) : (
-            usageCode
-          )}
-        </Suspense>
-      </Section>
-
-      {/* Examples Section */}
-      {examples.length > 0 && (
-        <Section title="Examples">
-          <div className="space-y-10">
-            {examples.map((example, index) => (
-              <div key={index} className="space-y-4">
-                <h3 className="font-heading text-xl font-semibold tracking-tight">
-                  {example.title}
-                </h3>
-                <div className="space-y-0">
-                  {example.fullWidth ? (
-                    <div className="relative rounded-t-xl border border-border overflow-hidden">
-                      {example.preview}
-                    </div>
-                  ) : (
-                    <ComponentPreview>{example.preview}</ComponentPreview>
-                  )}
-                  <Suspense fallback={<CodeBlockSkeleton className="rounded-t-none" />}>
-                    <CodeBlock
-                      code={example.code}
-                      lang="tsx"
-                      className="rounded-t-none"
-                    />
-                  </Suspense>
-                </div>
-              </div>
-            ))}
+      {/* Right Column: Sticky Preview */}
+      <div className="flex-1 lg:h-full lg:sticky lg:top-0 order-first lg:order-last bg-background flex flex-col z-10">
+        {/* We use a large padding to offset the card from the left side, mimicking the image */}
+        <div className="relative w-full h-[400px] lg:h-full p-4 lg:p-2 lg:pl-0 overflow-hidden">
+           
+          {/* Floating Card Container */}
+          <div className={cn(
+             "relative w-full h-full rounded-2xl lg:rounded-[2rem] border border-border/50 shadow-2xl overflow-hidden bg-background flex flex-col",
+             // "lg:ml-auto", // Push to right if needed, though w-full handles it
+          )}>
+               {/* Toolbar / Header of the preview card */}
+               <div className="absolute top-6 right-6 z-20 flex gap-2">
+                 <div className="bg-background/80 backdrop-blur-md border rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
+                    <ThemeToggle />
+                 </div>
+               </div>
+               
+               {/* Content Area */}
+               <div className={cn(
+                 "w-full h-full overflow-auto flex bg-secondary/20", // Light contrasting bg
+                 !fullWidthPreview && "items-center justify-center"
+               )}>
+                 <div className={cn(
+                   "w-full",
+                   fullWidthPreview ? "h-full" : "p-10 flex items-center justify-center"
+                 )}>
+                    {preview}
+                 </div>
+               </div>
           </div>
-        </Section>
-      )}
 
-      {/* Props Table */}
-      {props.length > 0 && (
-        <Section title="Props">
-          <div className="my-6 w-full overflow-y-auto rounded-lg border">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-muted/50">
-                <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 w-[150px]">
-                    Prop
-                  </th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 w-[150px]">
-                    Type
-                  </th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 w-[150px]">
-                    Default
-                  </th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
-                    Description
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="[&_tr:last-child]:border-0">
-                {props.map((prop, index) => (
-                  <tr
-                    key={index}
-                    className="border-b transition-colors data-[state=selected]:bg-muted"
-                  >
-                    <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono font-semibold text-foreground">
-                      {prop.name}
-                    </td>
-                    <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
-                      {prop.type}
-                    </td>
-                    <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-mono text-muted-foreground">
-                      {prop.default || "-"}
-                    </td>
-                    <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">
-                      {prop.description}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Section>
-      )}
-    </ComponentLayout>
-  );
+        </div>
+      </div>
+    </div>
+  )
 }
