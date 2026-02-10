@@ -9,8 +9,7 @@ import { Section } from "@/components/component-layout"
 import { InstallationTabs } from "@/components/installation-tabs"
 import { PageContextMenu } from "@/components/page-context-menu"
 import { ComponentPreview } from "@/components/component-preview"
-import { CommandMenu } from "@/components/command-menu"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { DocsPreviewWrapper } from "@/components/docs-preview-wrapper"
 import { cn } from "@/lib/utils"
 
 export interface PropItem {
@@ -84,74 +83,68 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
     <div className="flex flex-col lg:flex-row w-full h-full min-h-screen lg:h-screen bg-background text-foreground">
       
       {/* Left Column: Scrollable Content */}
-      <div className="w-full lg:w-[45%] lg:min-w-[500px] h-full flex flex-col relative z-20">
+      <div className="w-full lg:w-1/2 h-full flex flex-col relative z-20 border-r border-border/40 bg-background">
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="p-8 lg:p-12 space-y-12 pb-24">
+          <div className="p-8 lg:p-16 space-y-16 pb-32 max-w-3xl mx-auto">
             
-            {/* Minimal Nav Header / Breadcrumbs */}
-             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-                <Link href="/docs" className="hover:text-foreground transition-colors">Components</Link>
-                <ChevronRight className="w-3 h-3" />
-                <span className="text-foreground font-medium">{title}</span>
-             </div>
+            {/* Header Section */}
+            <header className="space-y-10">
+               {/* Nav / Breadcrumb - Minimal */}
+               <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                  <Link href="/docs" className="hover:text-foreground transition-colors border-b border-transparent hover:border-foreground/50">Docs</Link>
+                  <span>/</span>
+                  <span className="text-foreground">{title}</span>
+               </div>
 
-            {/* Content Header */}
-            <header className="space-y-8">
-               <div className="space-y-4">
-                  {/* Uppercase Label */}
-                  <h1 className="text-sm font-mono uppercase tracking-widest text-muted-foreground/80">
-                    {title}
+               <div className="space-y-6">
+                  {/* Huge Title/Description */}
+                  <h1 className="text-4xl lg:text-5xl font-semibold tracking-tighter leading-[1.1] text-foreground">
+                    {description}
                   </h1>
                   
-                  {/* Big Description */}
-                  <p className="text-3xl lg:text-4xl font-medium tracking-tight leading-tight text-foreground">
-                    {description}
-                  </p>
-               </div>
-               
-               {/* Metadata / Dependencies */}
-               <div className="space-y-6">
-                  {installDependencies && (
-                    <div className="space-y-3">
-                       <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground/60 flex items-center gap-2">
-                          Dependencies <Copy className="w-3 h-3" />
-                       </h3>
-                       <div className="flex flex-wrap gap-2">
-                          {installDependencies.split(' ').map(dep => (
-                            <div key={dep} className="px-2.5 py-1 rounded-full bg-muted/50 border border-border/50 text-xs font-mono text-foreground/80">
-                               {dep}
-                            </div>
-                          ))}
-                          {/* Always add framer-motion if implied */}
-                          {!installDependencies.includes('framer-motion') && (
-                              <div className="px-2.5 py-1 rounded-full bg-muted/50 border border-border/50 text-xs font-mono text-foreground/80">
-                                  framer-motion
-                              </div>
-                          )}
-                       </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-3">
-                     <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground/60">
-                        Interaction Type
-                     </h3>
-                     <p className="text-sm">
-                        Scroll-driven animation
-                     </p>
+                  {/* Technical Meta Grid */}
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-4 pt-6 border-t border-border/40">
+                      <div className="space-y-1">
+                          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Component</h3>
+                          <p className="font-medium text-sm">{title}</p>
+                      </div>
+                      <div className="space-y-1">
+                          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Type</h3>
+                          <p className="font-medium text-sm">Scroll & Interaction</p>
+                      </div>
+                      {installDependencies && (
+                         <div className="space-y-1 col-span-2">
+                             <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1.5">Dependencies</h3>
+                             <div className="flex flex-wrap gap-1.5">
+                                {installDependencies.split(' ').map(dep => (
+                                  <div key={dep} className="px-1.5 py-0.5 rounded-md bg-secondary/50 text-[10px] font-mono text-secondary-foreground border border-border/50">
+                                     {dep}
+                                  </div>
+                                ))}
+                                {!installDependencies.includes('framer-motion') && (
+                                    <div className="px-1.5 py-0.5 rounded-md bg-secondary/50 text-[10px] font-mono text-secondary-foreground border border-border/50">
+                                        framer-motion
+                                    </div>
+                                )}
+                             </div>
+                         </div>
+                      )}
                   </div>
                </div>
             </header>
 
             {/* Installation */}
-            <Section title="Installation">
+            <Section title="Installation" className="border-t border-border/40 pt-12">
               <InstallationTabs
                 cliContent={<InstallCommand component={installPackageName} />}
                 manualContent={
                   <div className="space-y-6">
                     {installSourceCode && (
-                      <div className="space-y-3">
-                        <p className="font-semibold text-sm">Copy source code</p>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium">Source code</p>
+                            <span className="text-xs text-muted-foreground font-mono">{installSourceFilename || `${installPackageName}.tsx`}</span>
+                        </div>
                         <Suspense fallback={<CodeBlockSkeleton />}>
                           <CodeBlock
                             code={installSourceCode}
@@ -167,7 +160,7 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
             </Section>
 
             {/* Usage */}
-             <Section title="Usage">
+             <Section title="Usage" className="border-t border-border/40 pt-12">
               <div className="space-y-4">
                  <Suspense fallback={<CodeBlockSkeleton />}>
                   {typeof usageCode === "string" ? (
@@ -181,24 +174,27 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
 
             {/* Props */}
             {props.length > 0 && (
-              <Section title="Props">
-                <div className="rounded-lg border overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/50 border-b">
+              <Section title="API Reference" className="border-t border-border/40 pt-12">
+                <div className="rounded-md border border-border/50 overflow-hidden text-sm">
+                  <table className="w-full">
+                    <thead className="bg-secondary/20">
                       <tr>
-                        <th className="h-10 px-4 text-left font-medium text-muted-foreground w-1/4">Prop</th>
-                        <th className="h-10 px-4 text-left font-medium text-muted-foreground w-1/4">Type</th>
-                        <th className="h-10 px-4 text-left font-medium text-muted-foreground w-1/4">Default</th>
-                        <th className="h-10 px-4 text-left font-medium text-muted-foreground">Description</th>
+                        <th className="h-9 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-1/3 border-b border-border/50">Prop</th>
+                        <th className="h-9 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-1/3 border-b border-border/50">Type</th>
+                        <th className="h-9 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider border-b border-border/50">Default</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-border/40">
                       {props.map((prop, i) => (
-                        <tr key={i} className="hover:bg-muted/50 transition-colors">
-                          <td className="p-4 font-mono font-semibold">{prop.name}</td>
-                          <td className="p-4 font-mono text-muted-foreground break-all">{prop.type}</td>
-                          <td className="p-4 font-mono text-muted-foreground">{prop.default || "-"}</td>
-                          <td className="p-4 text-muted-foreground">{prop.description}</td>
+                        <tr key={i} className="hover:bg-secondary/10 transition-colors">
+                          <td className="p-4 align-top">
+                             <div className="font-mono text-xs font-semibold text-primary">{prop.name}</div>
+                             {prop.description && (
+                                <p className="mt-1 text-muted-foreground text-xs leading-relaxed">{prop.description}</p>
+                             )}
+                          </td>
+                          <td className="p-4 align-top font-mono text-xs text-muted-foreground break-all">{prop.type}</td>
+                          <td className="p-4 align-top font-mono text-xs text-muted-foreground">{prop.default || "-"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -209,16 +205,21 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
 
              {/* Examples */}
              {examples.length > 0 && (
-                <Section title="Examples">
-                  <div className="space-y-12">
+                <Section title="Examples" className="border-t border-border/40 pt-12">
+                  <div className="space-y-16">
                      {examples.map((ex, i) => (
-                        <div key={i} className="space-y-4">
-                           <h3 className="text-lg font-semibold">{ex.title}</h3>
-                           <div className="border rounded-xl overflow-hidden bg-background">
-                              <div className="p-8 flex justify-center bg-muted/20 min-h-[200px]">
+                        <div key={i} className="space-y-6">
+                           <div className="flex items-center gap-4">
+                               <span className="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold ring-4 ring-background">
+                                 {i + 1}
+                               </span>
+                               <h3 className="text-lg font-medium tracking-tight">{ex.title}</h3>
+                           </div>
+                           <div className="border border-border/50 rounded-lg overflow-hidden bg-background shadow-sm">
+                              <div className="p-8 flex justify-center bg-secondary/10 min-h-[200px]">
                                 {ex.preview}
                               </div>
-                              <CodeBlock code={ex.code} lang="tsx" className="border-t rounded-t-none" />
+                              <CodeBlock code={ex.code} lang="tsx" className="border-t border-border/50 rounded-t-none" />
                            </div>
                         </div>
                      ))}
@@ -226,7 +227,7 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
                 </Section>
              )}
 
-            <div className="h-10" />
+            <div className="h-12" />
           </div>
         </div>
       </div>
@@ -237,30 +238,9 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
         <div className="relative w-full h-[400px] lg:h-full p-4 lg:p-2 lg:pl-0 overflow-hidden">
            
           {/* Floating Card Container */}
-          <div className={cn(
-             "relative w-full h-full rounded-2xl lg:rounded-[2rem] border border-border/50 shadow-2xl overflow-hidden bg-background flex flex-col",
-             // "lg:ml-auto", // Push to right if needed, though w-full handles it
-          )}>
-               {/* Toolbar / Header of the preview card */}
-               <div className="absolute top-6 right-6 z-20 flex gap-2">
-                 <div className="bg-background/80 backdrop-blur-md border rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
-                    <ThemeToggle />
-                 </div>
-               </div>
-               
-               {/* Content Area */}
-               <div className={cn(
-                 "w-full h-full overflow-auto flex bg-secondary/20", // Light contrasting bg
-                 !fullWidthPreview && "items-center justify-center"
-               )}>
-                 <div className={cn(
-                   "w-full",
-                   fullWidthPreview ? "h-full" : "p-10 flex items-center justify-center"
-                 )}>
-                    {preview}
-                 </div>
-               </div>
-          </div>
+          <DocsPreviewWrapper fullWidthPreview={fullWidthPreview}>
+             {preview}
+          </DocsPreviewWrapper>
 
         </div>
       </div>

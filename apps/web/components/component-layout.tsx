@@ -66,14 +66,15 @@ interface SectionProps {
   children: React.ReactNode
   id?: string
   step?: number
+  className?: string
 }
 
-export function Section({ title, children, id, step }: SectionProps) {
+export function Section({ title, children, id, step, className }: SectionProps) {
   const sectionId = id || title.toLowerCase().replace(/\s+/g, "-")
 
   return (
     <div
-      className="scroll-mt-20"
+      className={cn("scroll-mt-20", className)}
       id={sectionId}
       data-section-title={title}
     >
