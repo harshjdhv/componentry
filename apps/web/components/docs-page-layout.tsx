@@ -5,7 +5,6 @@ import { Suspense } from "react"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
 import { Section } from "@/components/component-layout"
-import { InstallationTabs } from "@/components/installation-tabs"
 import { DocsPreviewWrapper } from "@/components/docs-preview-wrapper"
 
 export interface PropItem {
@@ -111,30 +110,11 @@ export async function DocsPageLayout({
               </div>
             </header>
 
+
+
             {/* Installation */}
             <Section title="Installation" className="border-t border-border/40 pt-14">
-              <InstallationTabs
-                cliContent={<InstallCommand component={installPackageName} />}
-                manualContent={
-                  <div className="space-y-6">
-                    {installSourceCode && (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium">Source code</p>
-                          <span className="text-xs text-muted-foreground font-mono">{installSourceFilename || `${installPackageName}.tsx`}</span>
-                        </div>
-                        <Suspense fallback={<CodeBlockSkeleton />}>
-                          <CodeBlock
-                            code={installSourceCode}
-                            lang="tsx"
-                            filename={installSourceFilename || `components/ui/${installPackageName}.tsx`}
-                          />
-                        </Suspense>
-                      </div>
-                    )}
-                  </div>
-                }
-              />
+              <InstallCommand component={installPackageName} />
             </Section>
 
             {/* Usage */}
@@ -222,7 +202,21 @@ export async function DocsPageLayout({
         >
 
           {/* Floating Card Container */}
-          <DocsPreviewWrapper fullWidthPreview={fullWidthPreview}>
+          <DocsPreviewWrapper
+            fullWidthPreview={fullWidthPreview}
+            sourceCodeContent={
+              installSourceCode ? (
+                <Suspense fallback={<CodeBlockSkeleton />}>
+                  <CodeBlock
+                    code={installSourceCode}
+                    lang="tsx"
+                    filename={installSourceFilename || `${installPackageName}.tsx`}
+                    className="border-none rounded-none bg-transparent"
+                  />
+                </Suspense>
+              ) : null
+            }
+          >
             {preview}
           </DocsPreviewWrapper>
 

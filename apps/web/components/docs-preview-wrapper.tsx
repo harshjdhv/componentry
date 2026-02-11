@@ -3,19 +3,29 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { cn } from "@/lib/utils"
-import { RotateCcw, Search, Settings2, X, Check, Maximize, Minimize } from "lucide-react"
+import { RotateCcw, Search, Settings2, X, Check, Maximize, Minimize, Code } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { CommandMenu } from "@/components/command-menu"
 import { motion, AnimatePresence } from "framer-motion"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerClose,
+} from "@/components/ui/drawer"
 
 interface DocsPreviewWrapperProps {
   children: React.ReactNode
   fullWidthPreview?: boolean
+  sourceCodeContent?: React.ReactNode
 }
 
-export function DocsPreviewWrapper({ children, fullWidthPreview }: DocsPreviewWrapperProps) {
+export function DocsPreviewWrapper({ children, fullWidthPreview, sourceCodeContent }: DocsPreviewWrapperProps) {
   const [key, setKey] = React.useState(0)
   const [showSettings, setShowSettings] = React.useState(false)
+  const [showSource, setShowSource] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
   const [isExpanded, setIsExpanded] = React.useState(false)
   const previewRef = React.useRef<HTMLDivElement>(null)
@@ -98,6 +108,20 @@ export function DocsPreviewWrapper({ children, fullWidthPreview }: DocsPreviewWr
               </button>
             }
           />
+
+          {/* View Source */}
+          {sourceCodeContent && (
+            <button
+              onClick={() => setShowSource(true)}
+              className={cn(
+                iconButtonClass,
+                showSource && "border-primary/30 bg-primary/90 text-primary-foreground"
+              )}
+              aria-label="View Source"
+            >
+              <Code className="w-4 h-4" />
+            </button>
+          )}
 
           {/* Settings */}
           <button
@@ -217,6 +241,27 @@ export function DocsPreviewWrapper({ children, fullWidthPreview }: DocsPreviewWr
         </AnimatePresence>,
         document.body
       )}
+
+      <Drawer direction="bottom" open={showSource} onOpenChange={setShowSource}>
+        <DrawerContent className="rounded-t-[10px] lg:w-1/2 lg:left-0 lg:right-auto">
+          <DrawerHeader className="border-b border-border bg-zinc-50/50 dark:bg-zinc-900/20 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <DrawerTitle className="font-semibold text-sm">Source Code</DrawerTitle>
+              <DrawerClose asChild>
+                <button className="p-2 hover:bg-accent rounded-md transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </DrawerClose>
+            </div>
+            <DrawerDescription className="sr-only">
+              View the source code for this component.
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="flex-1 overflow-auto p-0">
+            {sourceCodeContent}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   )
 }
