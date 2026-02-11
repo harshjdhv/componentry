@@ -2,8 +2,13 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
+import { cn } from "@/lib/utils"
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string
+}
+
+export function ThemeToggle({ className }: ThemeToggleProps) {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
@@ -12,13 +17,16 @@ export function ThemeToggle() {
   }, [])
 
   if (!mounted) {
-    return <div className="w-8 h-8" />
+    return <div className={cn("h-8 w-8", className)} />
   }
 
   return (
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 hover:bg-accent rounded-md transition-colors"
+      className={cn(
+        "inline-flex h-8 w-8 items-center justify-center rounded-md p-0 leading-none transition-colors hover:bg-accent",
+        className
+      )}
       aria-label="Toggle theme"
     >
       {theme === "dark" ? (
