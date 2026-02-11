@@ -1,15 +1,20 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter, Instrument_Serif, Syne } from "next/font/google"
+import { Plus_Jakarta_Sans, JetBrains_Mono, Instrument_Serif, Syne } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "@workspace/ui/globals.css"
 import { Providers } from "@/components/providers"
 import { JsonLd } from "@/components/seo/json-ld"
 
-const fontSans = Inter({
+const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
+})
+
+const fontMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
 })
 
 const fontSerif = Instrument_Serif({
@@ -159,7 +164,7 @@ export default function RootLayout({
         <JsonLd />
       </head>
       <body
-        className={`${fontSans.variable} ${fontSerif.variable} ${fontDisplay.variable} font-sans antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} ${fontDisplay.variable} font-sans antialiased`}
       >
         <Providers>{children}</Providers>
         <SpeedInsights />

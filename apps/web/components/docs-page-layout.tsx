@@ -2,15 +2,11 @@
 import type React from "react"
 import Link from "next/link"
 import { Suspense } from "react"
-import { Search, Copy, Terminal } from "lucide-react"
 import { InstallCommand } from "@/components/install-command"
 import { CodeBlock } from "@/components/code-block"
 import { Section } from "@/components/component-layout"
 import { InstallationTabs } from "@/components/installation-tabs"
-import { PageContextMenu } from "@/components/page-context-menu"
-import { ComponentPreview } from "@/components/component-preview"
 import { DocsPreviewWrapper } from "@/components/docs-preview-wrapper"
-import { cn } from "@/lib/utils"
 
 export interface PropItem {
   name: string
@@ -41,6 +37,8 @@ export interface DocsPageLayoutProps {
   action?: React.ReactNode
   fullWidthPreview?: boolean
   unstyledPreview?: boolean
+  type?: string
+  dependencies?: string[]
 }
 
 function CodeBlockSkeleton({ className }: { className?: string }) {
@@ -51,33 +49,24 @@ function CodeBlockSkeleton({ className }: { className?: string }) {
   )
 }
 
+
+
 export async function DocsPageLayout({
   title,
   description,
   preview,
-  previewCode,
   installPackageName,
-  installDependencies,
   installSourceCode,
   installSourceFilename,
   usageCode,
   examples = [],
   props = [],
-  action,
   fullWidthPreview = false,
-  unstyledPreview = false,
+
 }: DocsPageLayoutProps) {
+
   // Generate the page context markdown automatically
-  const pageContext = `
-# ${title}
-${description}
-## Installation
-### CLI
-\`\`\`bash
-npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
-\`\`\`
-...
-`
+
 
   return (
     <div
@@ -90,62 +79,35 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
         data-docs-left-column
         className="w-full lg:basis-1/2 lg:max-w-1/2 h-full flex flex-col relative z-20 bg-[#f3f4f6] dark:bg-[#080808]"
       >
+        {/* Premium Overlay & Navigation */}
+        <div className="absolute top-0 left-0 right-0 z-30 h-32 bg-gradient-to-b from-[#f3f4f6] via-[#f3f4f6]/95 to-transparent dark:from-[#080808] dark:via-[#080808]/95 pointer-events-none backdrop-blur-[1px]" />
+        <div className="absolute bottom-0 left-0 right-0 z-30 h-32 bg-gradient-to-t from-[#f3f4f6] via-[#f3f4f6]/95 to-transparent dark:from-[#080808] dark:via-[#080808]/95 pointer-events-none backdrop-blur-[1px]" />
+
+        <div className="absolute top-8 left-8 lg:left-16 z-40">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border/40 bg-white/50 dark:bg-white/[0.03] px-3 py-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground backdrop-blur-md shadow-sm">
+            <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
+            <span aria-hidden="true" className="text-border">/</span>
+            <span className="text-foreground font-medium">{title}</span>
+          </div>
+        </div>
+
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <div className="px-8 lg:px-16 pt-8 lg:pt-9 pb-40 space-y-20 max-w-3xl mx-auto">
+          <div className="px-8 lg:px-16 pt-32 lg:pt-48 pb-40 space-y-20 max-w-3xl mx-auto">
 
             {/* Header Section */}
             <header className="space-y-10">
-              {/* Nav / Breadcrumb */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-white/80 dark:bg-white/[0.03] px-3 py-1.5 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
-                <span aria-hidden="true">/</span>
-                <span className="text-foreground font-medium">{title}</span>
-              </div>
+              {/* Nav / Breadcrumb moved to absolute position above */}
 
               <div className="space-y-6">
                 {/* Title */}
-                <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-[1.05]">
+                <h1 className="text-4xl lg:text-6xl font-bold tracking-tighter bg-gradient-to-br from-zinc-900 via-zinc-500 to-zinc-900 dark:from-white dark:via-zinc-400 dark:to-white bg-clip-text text-transparent leading-[1.1] mb-2 pb-2">
                   {title}
                 </h1>
 
                 {/* Description */}
-                <p className="text-[17px] text-muted-foreground leading-8 max-w-2xl">
+                <p className="text-lg text-muted-foreground/90 leading-relaxed max-w-2xl font-normal">
                   {description}
                 </p>
-
-                {/* Technical Meta Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 rounded-xl border border-border/60 bg-white/65 dark:bg-white/[0.02] p-5">
-                  <div className="space-y-1">
-                    <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Type</h3>
-                    <p className="font-medium text-sm">Scroll & Interaction</p>
-                  </div>
-                  {installDependencies ? (
-                    <div className="space-y-1 col-span-2 sm:col-span-3">
-                      <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1.5">Dependencies</h3>
-                      <div className="flex flex-wrap gap-1.5">
-                        {installDependencies.split(' ').map(dep => (
-                          <div key={dep} className="px-1.5 py-0.5 rounded-md bg-secondary/50 text-[10px] font-mono text-secondary-foreground border border-border/50">
-                            {dep}
-                          </div>
-                        ))}
-                        {!installDependencies.includes('framer-motion') && (
-                          <div className="px-1.5 py-0.5 rounded-md bg-secondary/50 text-[10px] font-mono text-secondary-foreground border border-border/50">
-                            framer-motion
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-1 col-span-2 sm:col-span-3">
-                      <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1.5">Dependencies</h3>
-                      <div className="flex flex-wrap gap-1.5">
-                        <div className="px-1.5 py-0.5 rounded-md bg-secondary/50 text-[10px] font-mono text-secondary-foreground border border-border/50">
-                          framer-motion
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
             </header>
 
@@ -195,9 +157,9 @@ npx shadcn@latest add "http://localhost:3000/r/${installPackageName}.json"
                   <table className="w-full">
                     <thead className="bg-secondary/30">
                       <tr>
-                        <th className="h-9 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-1/3 border-b border-border/50">Prop</th>
-                        <th className="h-9 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-1/3 border-b border-border/50">Type</th>
-                        <th className="h-9 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider border-b border-border/50">Default</th>
+                        <th className="h-10 px-4 text-left text-[10px] font-mono font-medium text-muted-foreground/70 uppercase tracking-widest w-1/3 border-b border-border/50">Prop</th>
+                        <th className="h-10 px-4 text-left text-[10px] font-mono font-medium text-muted-foreground/70 uppercase tracking-widest w-1/3 border-b border-border/50">Type</th>
+                        <th className="h-10 px-4 text-left text-[10px] font-mono font-medium text-muted-foreground/70 uppercase tracking-widest border-b border-border/50">Default</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/40">
