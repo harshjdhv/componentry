@@ -112,7 +112,10 @@ export function DocsPreviewWrapper({ children, fullWidthPreview, sourceCodeConte
           {/* View Source */}
           {sourceCodeContent && (
             <button
-              onClick={() => setShowSource(true)}
+              onClick={() => {
+                setShowSource(true)
+                setShowSettings(false)
+              }}
               className={cn(
                 iconButtonClass,
                 showSource && "border-primary/30 bg-primary/90 text-primary-foreground"
@@ -125,7 +128,10 @@ export function DocsPreviewWrapper({ children, fullWidthPreview, sourceCodeConte
 
           {/* Settings */}
           <button
-            onClick={() => setShowSettings(true)}
+            onClick={() => {
+              setShowSettings(true)
+              setShowSource(false)
+            }}
             className={cn(
               iconButtonClass,
               showSettings && "border-primary/30 bg-primary/90 text-primary-foreground"
