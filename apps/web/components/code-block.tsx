@@ -25,7 +25,9 @@ export async function CodeBlock({
   const html = await highlightCode(code.trim(), lang as BundledLanguage);
 
   return (
-    <>
+    <div
+      className={`relative text-sm w-full border border-border overflow-hidden bg-zinc-100 dark:bg-zinc-900/50 ${className?.includes('h-full') ? 'flex flex-col ' : ''}${className || "rounded-xl"}`}
+    >
       <style>{`
         .shiki {
           counter-reset: line;
@@ -57,28 +59,24 @@ export async function CodeBlock({
           background-color: transparent !important;
         }
       `}</style>
-      <div
-        className={`relative rounded-xl text-sm w-full border border-border overflow-hidden bg-zinc-100 dark:bg-zinc-900/50 ${className || ""}`}
-      >
-        {/* Optional filename header */}
-        {filename && (
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-zinc-200/50 dark:bg-zinc-900/80">
-            <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
-            <span className="text-xs font-mono text-muted-foreground">{filename}</span>
-          </div>
-        )}
-
-        <div className="relative group">
-          <CopyButton code={code.trim()} />
-          <div
-            className="[&_pre]:p-4 [&_pre]:overflow-x-auto max-h-[500px] overflow-auto"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+      {/* Optional filename header */}
+      {filename && (
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-zinc-200/50 dark:bg-zinc-900/80">
+          <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span className="text-xs font-mono text-muted-foreground">{filename}</span>
         </div>
+      )}
+
+      <div className={`relative group ${className?.includes('h-full') ? 'flex-1 min-h-0 flex flex-col' : 'h-full'}`}>
+        <CopyButton code={code.trim()} />
+        <div
+          className={`[&_pre]:p-4 [&_pre]:overflow-x-auto overflow-auto ${className?.includes('max-h-none') ? (className?.includes('h-full') ? 'flex-1 min-h-0' : 'h-full') : 'max-h-[500px]'}`}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       </div>
-    </>
+    </div>
   );
 }
