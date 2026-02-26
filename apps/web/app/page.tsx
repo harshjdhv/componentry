@@ -7,6 +7,7 @@ import { Github, ArrowUpRight, ArrowRight } from "lucide-react"
 import { FloatingNavbar } from "@/components/floating-navbar"
 import { HeroButtons } from "@/components/landing/hero-buttons"
 import { ComponentryLogomark } from "@/components/logos/componentry-logomark"
+import { LayoutToggle } from "@/components/layout-toggle"
 
 import { WebGLLiquid } from "@/components/landing/webgl-liquid"
 import dynamic from "next/dynamic"
@@ -189,8 +190,12 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
+            className="flex flex-col items-center gap-4"
           >
             <HeroButtons />
+            <div className="mt-4">
+              <LayoutToggle />
+            </div>
           </motion.div>
         </div>
       </main>

@@ -1,10 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
-import Link from "next/link"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { CommandMenu } from "@/components/command-menu"
-import { Logomark } from "@/components/logos/logomark"
-import { GitHubStarButton } from "@/components/github-star-button"
+import { cookies } from "next/headers"
+import { LegacyDocsWrapper } from "@/components/legacy-docs-wrapper"
 
 export const metadata: Metadata = {
   title: "Components Documentation",
@@ -18,13 +15,18 @@ export const metadata: Metadata = {
   },
 }
 
-import { MobileNav } from "@/components/mobile-nav"
-
-export default function DocsLayout({
+export default async function DocsLayout({
   children,
 }: {
   children: React.ReactNode
-}): React.JSX.Element {
+}): Promise<React.JSX.Element> {
+  const cookieStore = await cookies()
+  const isLegacy = cookieStore.get("docs_layout")?.value === "legacy"
+
+  if (isLegacy) {
+    return <LegacyDocsWrapper>{children}</LegacyDocsWrapper>
+  }
+
   return (
     <div className="min-h-svh flex flex-col bg-background">
       <div className="flex-1 flex overflow-hidden">

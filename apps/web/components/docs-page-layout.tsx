@@ -56,21 +56,31 @@ function CodeBlockSkeleton({ className }: { className?: string }) {
 
 
 import { FloatingDocsSidebar } from "@/components/floating-docs-sidebar"
+import { cookies } from "next/headers"
+import { DocsPageLayout as LegacyDocsPageLayout } from "./legacy-docs-page-layout"
 
-export async function DocsPageLayout({
-  title,
-  description,
-  preview,
-  installPackageName,
-  installSourceCode,
-  installSourceFilename,
-  usageCode,
-  examples = [],
-  props = [],
-  fullWidthPreview = false,
-  personalizeContent,
+export async function DocsPageLayout(props: DocsPageLayoutProps) {
+  const {
+    title,
+    description,
+    preview,
+    installPackageName,
+    installSourceCode,
+    installSourceFilename,
+    usageCode,
+    examples = [],
+    props: componentProps = [],
+    fullWidthPreview = false,
+    personalizeContent,
+  } = props
 
-}: DocsPageLayoutProps) {
+  const cookieStore = await cookies()
+  const isLegacy = cookieStore.get("docs_layout")?.value === "legacy"
+
+  if (isLegacy) {
+    return <LegacyDocsPageLayout {...props} />
+  }
+
 
   // Generate the page context markdown automatically
 
@@ -184,7 +194,7 @@ export async function DocsPageLayout({
             </Section>
 
             {/* Props */}
-            {props.length > 0 && (
+            {componentProps.length > 0 && (
               <Section title="API Reference" className="pt-10">
                 <div className="relative overflow-hidden rounded-lg border border-border/40 shadow-sm">
                   <div className="w-full overflow-x-auto">
@@ -197,7 +207,7 @@ export async function DocsPageLayout({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/40 bg-white dark:bg-transparent">
-                        {props.map((prop, i) => (
+                        {componentProps.map((prop, i) => (
                           <tr key={i} className="group transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20 divide-x divide-border/40">
                             <td className="px-4 py-3 align-top">
                               <div className="flex flex-col gap-1">
