@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getComponent } from "@/registry";
 import { getDocsImporter, getDocsSlugs } from "@/components/docs/lazy-registry";
 import { DocsPageLayout } from "@/components/docs-page-layout";
+import { DocsPageSkeleton } from "@/components/docs-page-skeleton";
 
 // -----------------------------------------------------------------------------
 // PERFORMANCE OPTIMIZATIONS:
@@ -42,52 +43,6 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
             canonical: `https://componentry.fun/docs/components/${component.slug}`,
         },
     };
-}
-
-// Loading skeleton for docs page
-function DocsPageSkeleton() {
-    return (
-        <div className="flex flex-col lg:flex-row w-full h-full min-h-screen lg:h-screen bg-[#f3f4f6] dark:bg-[#080808] overflow-hidden">
-            {/* Left Column: Scrollable Content Skeleton */}
-            <div className="w-full lg:basis-1/2 lg:max-w-1/2 h-full flex flex-col relative z-20 bg-[#f3f4f6] dark:bg-[#080808]">
-                {/* Gradients */}
-                <div className="absolute top-0 left-0 right-0 z-30 h-32 bg-gradient-to-b from-[#f3f4f6] via-[#f3f4f6]/95 to-transparent dark:from-[#080808] dark:via-[#080808]/95 pointer-events-none backdrop-blur-[1px]" />
-
-                <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    <div className="px-8 lg:px-16 pt-32 lg:pt-48 pb-40 space-y-20 max-w-3xl mx-auto w-full animate-pulse">
-
-                        {/* Header Section */}
-                        <div className="space-y-10">
-                            <div className="space-y-6">
-                                <div className="h-12 w-3/4 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-                                <div className="h-6 w-full bg-zinc-200 dark:bg-zinc-800/50 rounded-lg" />
-                                <div className="h-6 w-2/3 bg-zinc-200 dark:bg-zinc-800/50 rounded-lg" />
-                            </div>
-                        </div>
-
-                        {/* Installation Section */}
-                        <div className="space-y-6">
-                            <div className="h-8 w-32 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-                            <div className="h-16 w-full bg-zinc-200 dark:bg-zinc-800/30 rounded-xl" />
-                        </div>
-
-                        {/* Usage Section */}
-                        <div className="space-y-6">
-                            <div className="h-8 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-                            <div className="h-48 w-full bg-zinc-200 dark:bg-zinc-800/30 rounded-xl border border-zinc-200 dark:border-zinc-800" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Right Column: Sticky Preview Skeleton */}
-            <div className="flex-1 lg:basis-1/2 lg:max-w-1/2 lg:h-full lg:sticky lg:top-0 order-first lg:order-last bg-[#f3f4f6] dark:bg-[#080808] flex flex-col z-10">
-                <div className="relative w-full h-[400px] lg:h-full p-4 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5 overflow-hidden">
-                    <div className="w-full h-full bg-zinc-200 dark:bg-zinc-800/20 rounded-xl border border-zinc-200 dark:border-zinc-800 animate-pulse" />
-                </div>
-            </div>
-        </div>
-    );
 }
 
 // Async component that loads the docs component

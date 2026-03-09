@@ -24,40 +24,28 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className={cn(
-        "inline-flex h-8 w-8 items-center justify-center rounded-md p-0 leading-none transition-colors hover:bg-accent",
+        "inline-flex h-8 w-8 items-center justify-center rounded-lg border border-transparent transition-shadow hover:bg-accent relative [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className
       )}
       aria-label="Toggle theme"
+      title="Toggle theme"
     >
-      {theme === "dark" ? (
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-          />
-        </svg>
-      ) : (
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-          />
-        </svg>
-      )}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        color="currentColor"
+        className="-rotate-45 size-4"
+        strokeWidth="2"
+        stroke="currentColor"
+      >
+        <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="2" />
+        <path d="M5 20L19 5" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
+        <path d="M16 9L22 13.8528M12.4128 12.4059L19.3601 18.3634M8 15.6672L15 21.5" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
+      </svg>
+      <span className="sr-only">Toggle theme</span>
     </button>
   )
 }

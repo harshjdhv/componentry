@@ -9,6 +9,11 @@ import { DocsSidebar } from "@/components/docs-sidebar"
 import { LayoutToggle } from "@/components/layout-toggle"
 import { motion, AnimatePresence } from "framer-motion"
 import { TableOfContents } from "@/components/table-of-contents"
+import { CommandMenu } from "@/components/command-menu"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { ComponentryLogomark } from "@/components/logos/componentry-logomark"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons"
 
 interface DocsClientLayoutProps {
     title: string
@@ -43,32 +48,39 @@ export function DocsClientLayout({
                 {/* Top Navbar */}
                 <header className="sticky top-0 z-40 w-full backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#111]/60 border-b border-border/40">
                     <div className="flex items-center h-14 px-4 sm:px-6 lg:px-8 max-w-[95rem] mx-auto w-full">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             <div className="md:hidden">
                                 <FloatingDocsSidebar />
                             </div>
-                            <nav className="flex items-center space-x-2 text-sm text-muted-foreground font-medium">
-                                <Link href="/docs" className="transition-colors hover:text-foreground">Docs</Link>
-                                <svg
-                                    width="15"
-                                    height="15"
-                                    viewBox="0 0 15 15"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="text-border"
-                                >
-                                    <path
-                                        d="M6.1584 3.13508C6.35985 2.95692 6.66473 2.9753 6.84289 3.17675L10.8429 7.67675C11.006 7.86107 11.006 8.13893 10.8429 8.32325L6.84289 12.8233C6.66473 13.0247 6.35985 13.0431 6.1584 12.8649C5.95695 12.6868 5.93857 12.3819 6.11673 12.1805L9.75488 8L6.11673 3.81951C5.93857 3.61806 5.95695 3.31317 6.1584 3.13508Z"
-                                        fill="currentColor"
-                                        fillRule="evenodd"
-                                        clipRule="evenodd"
-                                    ></path>
-                                </svg>
-                                <span className="text-foreground max-w-[200px] truncate">{title}</span>
-                            </nav>
-                        </div>
-                        <div className="ml-auto flex items-center gap-4">
+                            <Link href="/" className="flex items-center gap-2 group">
+                                <ComponentryLogomark className="size-6 text-zinc-900 dark:text-white transition-opacity group-hover:opacity-80" />
+                                <span className="text-sm font-bold tracking-wide text-zinc-900 dark:text-white">COMPONENTRY</span>
+                            </Link>
                             <LayoutToggle />
+                        </div>
+                        <div className="ml-auto flex items-center gap-2 sm:gap-4">
+                            <CommandMenu />
+                            <div className="flex items-center gap-1 sm:gap-2 border-l border-border/40 pl-2 sm:pl-4">
+                                <Link
+                                    href="https://github.com/harshjdhv/componentry"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-accent group"
+                                >
+                                    <FontAwesomeIcon icon={faGithub} className="h-4 w-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                                    <span className="sr-only">GitHub</span>
+                                </Link>
+                                <Link
+                                    href="https://x.com/harshjdhv"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-accent group"
+                                >
+                                    <FontAwesomeIcon icon={faXTwitter} className="h-4 w-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                                    <span className="sr-only">X (Twitter)</span>
+                                </Link>
+                                <ThemeToggle />
+                            </div>
                         </div>
                     </div>
                 </header>
