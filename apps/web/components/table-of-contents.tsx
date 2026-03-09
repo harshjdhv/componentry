@@ -264,11 +264,10 @@ export function TableOfContents(): React.JSX.Element | null {
       <div className="sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto pl-6 pr-4 py-10 flex flex-col">
         <div className="flex-1">
           {/* Header */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="h-1 w-1 rounded-full bg-foreground" />
-            <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">
+          <div className="mb-4">
+            <h4 className="font-semibold text-sm text-foreground">
               On This Page
-            </p>
+            </h4>
           </div>
 
           {/* Navigation */}

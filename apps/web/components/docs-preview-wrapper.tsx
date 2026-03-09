@@ -242,7 +242,6 @@ export function DocsPreviewWrapper({
         </div>
       </div>
 
-      {/* Content Area */}
       <div className={cn(
         "w-full overflow-auto flex bg-white dark:bg-[#121212] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
         "h-full",
@@ -253,7 +252,7 @@ export function DocsPreviewWrapper({
             "w-full",
             (resolvedActiveVariant >= 0 && variants[resolvedActiveVariant]?.fullWidth) || fullWidthPreview
               ? "h-full"
-              : "p-10 flex items-center justify-center"
+              : "flex items-center justify-center"
           )}
         >
           <div key={key} className="w-full h-full flex items-center justify-center">

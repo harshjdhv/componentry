@@ -16,7 +16,7 @@ export function ComponentPreview({
     return (
         <div
             className={cn(
-                "preview flex min-h-[350px] w-full justify-center p-10 items-center rounded-t-xl border border-border bg-muted/30 dark:bg-[#0A0A0A] overflow-x-auto relative",
+                "preview flex min-h-[350px] w-full justify-center p-10 items-center rounded-t-xl border border-border bg-muted/30 dark:bg-zinc-950/50 overflow-x-auto relative",
                 {
                     "items-center": align === "center",
                     "items-start": align === "start",
@@ -26,7 +26,7 @@ export function ComponentPreview({
             )}
             {...props}
         >
-            <div className="min-w-fit">
+            <div className="w-full max-w-full flex justify-center">
                 {children}
             </div>
         </div>

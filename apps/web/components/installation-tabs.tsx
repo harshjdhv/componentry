@@ -12,15 +12,15 @@ export function InstallationTabs({ cliContent, manualContent }: InstallationTabs
     const [method, setMethod] = React.useState<"cli" | "manual">("cli")
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center gap-2 border-b border-border/50">
+        <div className="space-y-4">
+            <div className="flex items-center gap-1">
                 <button
                     onClick={() => setMethod("cli")}
                     className={cn(
-                        "px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200",
+                        "px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200",
                         method === "cli"
-                            ? "border-foreground text-foreground"
-                            : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     )}
                 >
                     CLI
@@ -28,10 +28,10 @@ export function InstallationTabs({ cliContent, manualContent }: InstallationTabs
                 <button
                     onClick={() => setMethod("manual")}
                     className={cn(
-                        "px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200",
+                        "px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200",
                         method === "manual"
-                            ? "border-foreground text-foreground"
-                            : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     )}
                 >
                     Manual
