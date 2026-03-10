@@ -21,7 +21,7 @@ export default function Home() {
       <SiteHeader />
 
       {/* Hero Content */}
-      <main className="relative z-10 flex min-h-screen flex-col items-center justify-start pt-24 pb-32 px-4 sm:px-6 overflow-hidden">
+      <main className="relative z-10 flex min-h-screen flex-col items-center justify-start pt-24 pb-32 px-4 sm:px-6 overflow-x-clip">
 
         {/* Subtle pill badge */}
         <motion.div
@@ -32,7 +32,7 @@ export default function Home() {
         >
           <div className="group inline-flex cursor-pointer items-center rounded-full border border-zinc-200/60 bg-white/40 dark:border-zinc-800/60 dark:bg-zinc-900/30 px-3 py-1.5 text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 backdrop-blur-xl shadow-sm transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50">
             <span className="flex size-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] mr-2.5 animate-pulse" />
-            Componentry v1.0 is now live
+            100% free and open source
             <svg className="ml-2 size-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
@@ -66,7 +66,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 md:mt-12 w-full"
+          className="mt-6 md:mt-8 w-full"
         >
           <HeroButtons />
         </motion.div>

@@ -170,5 +170,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-anchor: none;
   }
 }
