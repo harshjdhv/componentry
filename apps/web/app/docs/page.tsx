@@ -8,7 +8,7 @@ import { components, isNewComponent, type ComponentCategory, type ComponentMetad
 import { Logomark } from "@/components/logos/logomark"
 import { usePrefetchPreviewVideos } from "@/hooks/use-prefetch-preview-videos"
 
-import { FloatingNavbar } from "@/components/floating-navbar"
+import { SiteHeader } from "@/components/site-header"
 
 type PreviewSources = {
   mp4: string
@@ -159,12 +159,11 @@ function ComponentCard({
         onMouseLeave={stopPreview}
         onFocus={startPreview}
         onBlur={stopPreview}
-        className="group relative flex flex-col rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/50 overflow-hidden transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(255,255,255,0.02)] hover:border-zinc-300 dark:hover:border-zinc-700"
+        className="group relative flex flex-col rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-[#1a1a1a] shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md dark:hover:shadow-[0_8px_30px_rgb(255,255,255,0.03)] hover:border-zinc-300 dark:hover:border-zinc-700 p-2"
       >
         {/* ── Preview area (Floating) ── */}
-        <div className="p-1.5">
-          <div className="relative h-[220px] w-full rounded-xl bg-zinc-50 dark:bg-zinc-900/80 group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/80 transition-colors border border-dashed border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
-            {shouldRenderVideo && previewSources && (
+        <div className="relative h-[220px] w-full rounded-xl bg-zinc-50 dark:bg-[#111] transition-colors border border-dashed border-zinc-200/50 dark:border-zinc-800/80 overflow-hidden group-hover:dark:bg-[#141414]">
+          {shouldRenderVideo && previewSources && (
               <video
                 ref={videoRef}
                 src={shouldLoadVideo ? previewVideoSrc : undefined}
@@ -194,13 +193,12 @@ function ComponentCard({
                 className={`w-full h-full object-cover transition-opacity duration-200 ${isVideoReady ? "opacity-100" : "opacity-0"}`}
               />
             )}
-          </div>
         </div>
 
         {/* ── Info area ── */}
-        <div className="flex flex-col gap-1.5 px-4 pb-4 pt-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors">
+        <div className="shrink-0 pt-3 pb-1 px-3">
+          <div className="flex items-center justify-between font-medium text-zinc-700 dark:text-zinc-400">
+            <h3 className="text-sm">
               {component.title}
             </h3>
             {isNewComponent(component) && (
@@ -209,9 +207,7 @@ function ComponentCard({
               </span>
             )}
           </div>
-          <p className="text-[13px] text-zinc-500 dark:text-zinc-400 line-clamp-1">
-            {component.description}
-          </p>
+          {/* We do not show the description string anymore to match the landing page */}
         </div>
       </Link>
     </motion.div>
@@ -281,17 +277,17 @@ export default function DocsPage() {
     .filter(g => g.items.length > 0)
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#080808] text-zinc-900 dark:text-zinc-100 font-sans overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-white dark:bg-[#111] text-foreground transition-colors duration-300 selection:bg-zinc-200 dark:selection:bg-zinc-800 overflow-x-hidden font-sans">
       {/* ── Overlays ── */}
-      <div className="fixed top-0 left-0 right-0 z-40 h-24 bg-gradient-to-b from-white via-white/80 to-transparent dark:from-[#080808] dark:via-[#080808]/80 pointer-events-none backdrop-blur-[1px]" />
-      <div className="fixed bottom-0 left-0 right-0 z-40 h-24 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#080808] dark:via-[#080808]/80 pointer-events-none backdrop-blur-[1px]" />
+      <div className="fixed top-0 left-0 right-0 z-40 h-24 bg-gradient-to-b from-white via-white/80 to-transparent dark:from-[#111] dark:via-[#111]/80 pointer-events-none backdrop-blur-[1px]" />
+      <div className="fixed bottom-0 left-0 right-0 z-40 h-24 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#111] dark:via-[#111]/80 pointer-events-none backdrop-blur-[1px]" />
 
       {/* ── Top Floating Header ── */}
-      <FloatingNavbar />
+      <SiteHeader />
 
       {/* ── Floating Dock Nav ── */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-[calc(100vw-2rem)] sm:max-w-fit pointer-events-none">
-        <nav className="flex items-center gap-1 p-1.5 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white/80 dark:bg-[#121212] backdrop-blur-xl shadow-lg shadow-zinc-200/20 dark:shadow-black/20 pointer-events-auto overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <nav className="flex items-center gap-1 p-1.5 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 bg-white/80 dark:bg-[#1a1a1a]/90 backdrop-blur-xl shadow-lg shadow-zinc-200/20 dark:shadow-black/40 pointer-events-auto overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {categoryOrder.map((cat) => {
             const isActive = activeSection === cat
             return (
