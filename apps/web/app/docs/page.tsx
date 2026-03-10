@@ -328,6 +328,9 @@ export default function DocsPage() {
           </h1>
           <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed">
             A growing collection of animated primitives for React.
+            <span className="block mt-2 text-sm text-zinc-400 dark:text-zinc-500">
+              (Hover over items to preview animations)
+            </span>
           </p>
         </div>
 
