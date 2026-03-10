@@ -153,8 +153,8 @@ export function DocsClientLayout({
                 data-docs-left-column
                 className="w-full lg:basis-1/2 lg:max-w-1/2 h-full flex flex-col relative z-20 bg-[#f3f4f6] dark:bg-[#080808]"
             >
-                <div className="absolute top-0 left-0 right-0 z-30 h-32 bg-gradient-to-b from-[#f3f4f6] via-[#f3f4f6]/95 to-transparent dark:from-[#080808] dark:via-[#080808]/95 pointer-events-none backdrop-blur-[1px] hidden lg:block" />
-                <div className="absolute bottom-0 left-0 right-0 z-30 h-32 bg-gradient-to-t from-[#f3f4f6] via-[#f3f4f6]/95 to-transparent dark:from-[#080808] dark:via-[#080808]/95 pointer-events-none backdrop-blur-[1px]" />
+                <div className="absolute top-0 left-0 right-0 z-30 h-16 bg-[#f3f4f6]/80 dark:bg-[#080808]/80 pointer-events-none backdrop-blur-md hidden lg:block border-none" style={{ maskImage: 'linear-gradient(to bottom, black 20%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 20%, transparent 100%)' }} />
+                <div className="absolute bottom-0 left-0 right-0 z-30 h-16 bg-[#f3f4f6]/80 dark:bg-[#080808]/80 pointer-events-none backdrop-blur-md border-none" style={{ maskImage: 'linear-gradient(to top, black 20%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 20%, transparent 100%)' }} />
 
                 <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     <div className="px-6 lg:px-12 xl:px-16 pt-16 lg:pt-48 pb-40 space-y-16 lg:space-y-20 max-w-3xl mx-auto">

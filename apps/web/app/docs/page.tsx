@@ -279,8 +279,8 @@ export default function DocsPage() {
   return (
     <div className="relative min-h-screen w-full bg-white dark:bg-[#111] text-foreground transition-colors duration-300 selection:bg-zinc-200 dark:selection:bg-zinc-800 overflow-x-hidden font-sans">
       {/* ── Overlays ── */}
-      <div className="fixed top-0 left-0 right-0 z-40 h-24 bg-gradient-to-b from-white via-white/80 to-transparent dark:from-[#111] dark:via-[#111]/80 pointer-events-none backdrop-blur-[1px]" />
-      <div className="fixed bottom-0 left-0 right-0 z-40 h-24 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#111] dark:via-[#111]/80 pointer-events-none backdrop-blur-[1px]" />
+      <div className="fixed top-0 left-0 right-0 z-40 h-16 bg-white/80 dark:bg-[#111]/80 pointer-events-none backdrop-blur-md border-none" style={{ maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)' }} />
+      <div className="fixed bottom-0 left-0 right-0 z-40 h-16 bg-white/80 dark:bg-[#111]/80 pointer-events-none backdrop-blur-md border-none" style={{ maskImage: 'linear-gradient(to top, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)' }} />
 
       {/* ── Top Floating Header ── */}
       <SiteHeader />
