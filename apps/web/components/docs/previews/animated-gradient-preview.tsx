@@ -11,7 +11,7 @@ export function AnimatedGradientPreview({
     config = { preset: "Aurora" }
 }: AnimatedGradientPreviewProps) {
     return (
-        <div className="relative h-[55vh] lg:h-full w-full bg-[#f3f4f6] dark:bg-[#080808]">
+        <div className="relative h-[55vh] lg:h-full w-full bg-[#f3f4f6] dark:bg-[#09090b]">
             <div className="relative h-full w-full overflow-hidden rounded-none border-none">
                 <AnimatedGradient config={config} noise={{ opacity: 0.2, scale: 1 }} className="!min-h-full" style={{ minHeight: "100%" }} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4 text-center">

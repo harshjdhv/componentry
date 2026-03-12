@@ -105,27 +105,7 @@ export async function DocsPageLayout({
     <>
       {/* Installation */}
       <Section title="Installation" className="pt-10">
-        <InstallationTabs
-          cliContent={<InstallCommand component={installPackageName} />}
-          manualContent={
-            installSourceCode ? (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">Copy and paste the following code into your project.</p>
-                <div className="rounded-xl border border-border/60 overflow-hidden bg-zinc-100 dark:bg-zinc-900/50">
-                  <Suspense fallback={<CodeBlockSkeleton />}>
-                    <CodeBlock
-                      code={installSourceCode}
-                      lang="tsx"
-                      className="border-none !bg-transparent shadow-none !rounded-none [&_pre]:!overflow-x-auto [&_pre]:!overflow-y-hidden"
-                    />
-                  </Suspense>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No manual installation steps available.</p>
-            )
-          }
-        />
+        <InstallCommand component={installPackageName} />
       </Section>
 
       {/* Import */}
@@ -141,7 +121,7 @@ export async function DocsPageLayout({
                 display: none;
               }
             `}</style>
-            <div className="relative rounded-xl border border-border overflow-hidden bg-zinc-100 dark:bg-zinc-900/50">
+            <div className="relative rounded-xl border border-border overflow-hidden bg-zinc-100 dark:bg-[#191919]">
               <Suspense fallback={<CodeBlockSkeleton />}>
                 {typeof importCode === "string" ? (
                   <CodeBlock
@@ -170,7 +150,7 @@ export async function DocsPageLayout({
               display: none;
             }
           `}</style>
-          <div className="relative rounded-xl border border-border overflow-hidden bg-zinc-100 dark:bg-zinc-900/50">
+          <div className="relative rounded-xl border border-border overflow-hidden bg-zinc-100 dark:bg-[#191919]">
             <Suspense fallback={<CodeBlockSkeleton />}>
               {typeof usageCode === "string" ? (
                 <DynamicCodeBlock
@@ -242,7 +222,7 @@ export async function DocsPageLayout({
 
       <div className="mt-12 flex flex-col gap-4">
         {/* View Source Hint */}
-        <div className="flex items-start gap-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-100">
+        <div className="flex items-start gap-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-[#191919] dark:text-zinc-100">
           <div className="mt-0.5 rounded-md border border-zinc-200 bg-white p-1 text-zinc-900 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100">
             <CodeXml className="h-3.5 w-3.5" />
           </div>
@@ -252,7 +232,7 @@ export async function DocsPageLayout({
         </div>
 
         {/* Keep in Mind - Attribution */}
-        <div className="flex items-start gap-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-100">
+        <div className="flex items-start gap-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-[#191919] dark:text-zinc-100">
           <div className="mt-0.5 rounded-md border border-zinc-200 bg-white p-1 text-zinc-900 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100">
             <Info className="h-3.5 w-3.5" />
           </div>
@@ -265,7 +245,7 @@ export async function DocsPageLayout({
         </div>
 
         {/* Contact */}
-        <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50/50 p-2 pl-4 dark:border-zinc-800 dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group">
+        <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50/50 p-2 pl-4 dark:border-zinc-800 dark:bg-[#191919] hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group">
           <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
             Have any questions?
           </div>
@@ -319,7 +299,7 @@ export async function DocsPageLayout({
           <PreviewCodeTabs
             previewContent={
               <div className={cn(
-                "relative flex min-h-[350px] h-full w-full items-center justify-center rounded-xl border border-border/60 bg-white dark:bg-[#121212] overflow-hidden shadow-sm",
+                "relative flex min-h-[350px] h-full w-full items-center justify-center rounded-xl border border-border/60 bg-white dark:bg-[#191919] overflow-hidden shadow-sm",
                 !fullWidthPreview && "p-4 sm:p-10"
               )}>
                 <div className="w-full min-w-0 max-w-full flex flex-col items-center justify-center">
@@ -328,7 +308,7 @@ export async function DocsPageLayout({
               </div>
             }
             codeContent={
-              <div className="rounded-xl border border-border/60 flex flex-col h-full overflow-hidden bg-zinc-100 dark:bg-[#121212]">
+              <div className="rounded-xl border border-border/60 flex flex-col h-full overflow-hidden bg-zinc-100 dark:bg-[#191919]">
                 <Suspense fallback={<CodeBlockSkeleton />}>
                   {typeof usageCode === "string" ? (
                     <CodeBlock
@@ -363,7 +343,18 @@ export async function DocsPageLayout({
               installSourceCode ? (
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">Copy and paste the following code into your project.</p>
-                  <div className="rounded-xl border border-border/60 overflow-hidden bg-zinc-100 dark:bg-[#121212]">
+                  <div className="rounded-xl border border-border/60 overflow-hidden bg-zinc-100 dark:bg-[#191919]">
+                    <div className="flex items-center px-4 py-2.5 border-b border-border/60 bg-white/50 dark:bg-[#1e1e1e]/50">
+                      <div className="flex items-center gap-1.5">
+                        <svg className="h-3.5 w-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                          <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                        <span className="text-xs font-mono text-zinc-500">
+                          {installSourceFilename || `${installPackageName}.tsx`}
+                        </span>
+                      </div>
+                    </div>
                     <Suspense fallback={<CodeBlockSkeleton />}>
                       <CodeBlock
                         code={installSourceCode}
@@ -381,6 +372,30 @@ export async function DocsPageLayout({
         </Section>
       </div>
 
+      {/* Import Code if provided */}
+      {importCode && (
+        <Section title="Import" className="pt-8">
+          <div className="relative rounded-xl border border-border/60 overflow-hidden bg-zinc-100 dark:bg-[#191919]">
+            <Suspense fallback={<CodeBlockSkeleton />}>
+              {typeof importCode === "string" ? (
+                <CodeBlock code={importCode} lang="tsx" className="border-none !bg-transparent shadow-none !rounded-none [&_pre]:!overflow-x-auto [&_pre]:!overflow-y-hidden" />
+              ) : importCode}
+            </Suspense>
+          </div>
+        </Section>
+      )}
+
+      {/* Usage Segment if provided without repeating default install code implicitly unless it's usageCode */}
+      {usageCode && typeof usageCode === "string" && usageCode !== installSourceCode && (
+        <Section title="Usage" className="pt-8">
+          <div className="relative rounded-xl border border-border/60 overflow-hidden bg-zinc-100 dark:bg-[#191919]">
+            <Suspense fallback={<CodeBlockSkeleton />}>
+              <CodeBlock code={usageCode} lang="tsx" className="border-none !bg-transparent shadow-none !rounded-none [&_pre]:!overflow-x-auto [&_pre]:!overflow-y-hidden" />
+            </Suspense>
+          </div>
+        </Section>
+      )}
+
       {/* Variants with Preview and Code Tabs */}
       {examples.map((ex, i) => (
         <div key={i} className="space-y-4 pt-4 border-t border-border/20">
@@ -389,7 +404,7 @@ export async function DocsPageLayout({
           <PreviewCodeTabs
             previewContent={
               <div className={cn(
-                "relative flex min-h-[350px] h-full w-full items-center justify-center rounded-xl border border-border/60 bg-white dark:bg-[#121212] overflow-hidden shadow-sm",
+                "relative flex min-h-[350px] h-full w-full items-center justify-center rounded-xl border border-border/60 bg-white dark:bg-[#191919] overflow-hidden shadow-sm",
                 !ex.fullWidth && "p-4 sm:p-10"
               )}>
                 <div className="w-full min-w-0 max-w-full flex flex-col items-center justify-center">
@@ -399,7 +414,7 @@ export async function DocsPageLayout({
             }
             codeContent={
               ex.code ? (
-                <div className="rounded-xl border border-border/60 flex flex-col h-full overflow-hidden bg-zinc-100 dark:bg-[#121212]">
+                <div className="rounded-xl border border-border/60 flex flex-col h-full overflow-hidden bg-zinc-100 dark:bg-[#191919]">
                   <Suspense fallback={<CodeBlockSkeleton />}>
                     <CodeBlock
                       code={ex.code}
@@ -417,30 +432,6 @@ export async function DocsPageLayout({
           />
         </div>
       ))}
-
-      {/* Import Code if provided */}
-      {importCode && (
-        <Section title="Import" className="pt-8">
-          <div className="relative rounded-xl border border-border/60 overflow-hidden bg-zinc-100 dark:bg-zinc-900/50">
-            <Suspense fallback={<CodeBlockSkeleton />}>
-              {typeof importCode === "string" ? (
-                <CodeBlock code={importCode} lang="tsx" className="border-none !bg-transparent shadow-none !rounded-none [&_pre]:!overflow-x-auto [&_pre]:!overflow-y-hidden" />
-              ) : importCode}
-            </Suspense>
-          </div>
-        </Section>
-      )}
-
-      {/* Usage Segment if provided without repeating default install code implicitly unless it's usageCode */}
-      {usageCode && typeof usageCode === "string" && usageCode !== installSourceCode && (
-        <Section title="Usage" className="pt-8">
-          <div className="relative rounded-xl border border-border/60 overflow-hidden bg-zinc-100 dark:bg-zinc-900/50">
-            <Suspense fallback={<CodeBlockSkeleton />}>
-              <CodeBlock code={usageCode} lang="tsx" className="border-none !bg-transparent shadow-none !rounded-none [&_pre]:!overflow-x-auto [&_pre]:!overflow-y-hidden" />
-            </Suspense>
-          </div>
-        </Section>
-      )}
 
       {/* Props */}
       {props.length > 0 && (
@@ -496,7 +487,7 @@ export async function DocsPageLayout({
       {/* Footer / Contact */}
       <div className="mt-12 flex flex-col gap-4">
         {/* Contact */}
-        <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50/50 p-2 pl-4 dark:border-zinc-800 dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group">
+        <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50/50 p-2 pl-4 dark:border-zinc-800 dark:bg-[#191919] hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors group">
           <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
             Have any questions?
           </div>

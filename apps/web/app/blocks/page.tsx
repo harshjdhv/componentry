@@ -44,7 +44,7 @@ export default function BlocksPage() {
     }
 
     return (
-        <div className="relative min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white dark:bg-[#080808] dark:text-zinc-100 dark:selection:bg-white dark:selection:text-zinc-900">
+        <div className="relative min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white dark:bg-[#09090b] dark:text-zinc-100 dark:selection:bg-white dark:selection:text-zinc-900">
             <FloatingNavbar />
 
             {/* ─── Refined Hero Section ─────────────────────────── */}
@@ -93,7 +93,7 @@ export default function BlocksPage() {
             <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
 
                 {/* Sticky Utility Bar */}
-                <div className="sticky top-[80px] z-30 pb-4 pt-4 mb-8 bg-white/80 dark:bg-[#080808]/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 flex flex-col md:flex-row gap-4 justify-between items-center transition-all">
+                <div className="sticky top-[80px] z-30 pb-4 pt-4 mb-8 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 flex flex-col md:flex-row gap-4 justify-between items-center transition-all">
 
                     {/* Filters (Horizontal Scroll on Mobile) */}
                     <div className="w-full md:w-auto overflow-x-auto scrollbar-hide">
@@ -159,7 +159,7 @@ export default function BlocksPage() {
                                         </div>
 
                                         {/* Hover Overlay Actions */}
-                                        <div className="absolute inset-0 bg-white/80 dark:bg-[#080808]/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                                        <div className="absolute inset-0 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
                                             <button className="flex items-center gap-2 bg-zinc-900 text-white dark:bg-white dark:text-black px-4 py-2 rounded-full text-sm font-medium shadow-md hover:scale-105 active:scale-95 transition-transform">
                                                 <Eye className="w-4 h-4" /> Preview
                                             </button>

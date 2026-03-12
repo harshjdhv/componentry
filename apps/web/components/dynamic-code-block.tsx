@@ -34,7 +34,7 @@ export function DynamicCodeBlock({
 
   return (
     <div
-      className={`relative text-sm w-full border border-border overflow-hidden bg-zinc-100 dark:bg-[#1c1c1c] ${className?.includes('h-full') ? 'flex flex-col ' : ''}${className || "rounded-xl"}`}
+      className={`relative text-sm w-full border border-border overflow-hidden bg-zinc-100 dark:bg-[#191919] ${className?.includes('h-full') ? 'flex flex-col ' : ''}${className || "rounded-xl"}`}
     >
       <style>{`
         .shiki {

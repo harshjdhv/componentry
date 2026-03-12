@@ -92,24 +92,26 @@ export function DocsSidebar() {
   }, [pathname])
 
   return (
-    <aside className="w-64 shrink-0 border-r border-border/50 hidden md:block bg-white/50 dark:bg-[#111]/50">
-      <div className="sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto px-4 py-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        <nav className="space-y-6">
-          {navGroups.map((group) => (
-            <SidebarGroup
-              key={group.title}
-              title={group.title}
-              items={group.items}
-              activeHref={activeHrefByGroup[group.title]!}
-            />
-          ))}
-        </nav>
+    <aside className="w-64 shrink-0 border-x border-zinc-200/50 dark:border-zinc-800/50 hidden md:block relative dark:bg-[#111]">
+      <div className="relative sticky top-16 h-[calc(100svh-4rem)]">
+        <div className="w-full h-full overflow-y-auto px-4 py-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <nav className="space-y-6">
+            {navGroups.map((group) => (
+              <SidebarGroup
+                key={group.title}
+                title={group.title}
+                items={group.items}
+                activeHref={activeHrefByGroup[group.title]!}
+              />
+            ))}
+          </nav>
 
-        {/* Bottom decoration */}
-        <div className="mt-8 pt-6 border-t border-border/30">
-          <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider px-2">
-            More components coming soon
-          </p>
+          {/* Bottom decoration */}
+          <div className="mt-8 pt-6 border-t border-border/30">
+            <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider px-2">
+              More components coming soon
+            </p>
+          </div>
         </div>
       </div>
     </aside>

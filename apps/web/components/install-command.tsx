@@ -31,7 +31,7 @@ export function InstallCommand({ component }: InstallCommandProps) {
 
   return (
     <div className="w-full max-w-full">
-      <div className="relative rounded-xl border border-zinc-200 dark:border-border/60 bg-zinc-50 dark:bg-[#121212] font-mono text-sm leading-relaxed text-foreground shadow-sm">
+      <div className="relative rounded-xl border border-zinc-200 dark:border-border/60 bg-zinc-50 dark:bg-[#191919] font-mono text-sm leading-relaxed text-foreground shadow-sm">
 
         {/* Tab Header */}
         <div className="flex items-center px-4 py-3 border-b border-zinc-200 dark:border-zinc-800/80">

@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Plus_Jakarta_Sans, JetBrains_Mono, Instrument_Serif, Syne } from "next/font/google"
+import { Plus_Jakarta_Sans, JetBrains_Mono, Newsreader, Syne } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Script from "next/script"
@@ -18,9 +18,9 @@ const fontMono = JetBrains_Mono({
   variable: "--font-mono",
 })
 
-const fontSerif = Instrument_Serif({
+const fontSerif = Newsreader({
   subsets: ["latin"],
-  weight: "400",
+  style: ["normal", "italic"],
   variable: "--font-serif",
 })
 
@@ -175,7 +175,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} ${fontDisplay.variable} font-sans antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} ${fontDisplay.variable} font-sans antialiased bg-white dark:bg-[#111]`}
       >
         <Providers>{children}</Providers>
         <SpeedInsights />

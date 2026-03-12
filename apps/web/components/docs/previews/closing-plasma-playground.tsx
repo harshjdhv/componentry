@@ -233,7 +233,7 @@ export function ClosingPlasmaPlayground() {
   }, [config]);
 
   return (
-    <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-[#080808]">
+    <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-[#09090b]">
       <div className="relative h-full w-full overflow-hidden rounded-none">
         <ClosingPlasma key={renderVersion} {...config} className="h-full w-full" />
       </div>
@@ -280,7 +280,7 @@ export function ClosingPlasmaPersonalizePanel() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-[#f3f4f6] dark:bg-[#080808] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <div className="h-full overflow-auto bg-[#f3f4f6] dark:bg-[#09090b] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       <div className="space-y-6 px-4 pb-10 pt-20">
         <header className="space-y-2">
           <h2 className="text-2xl font-bold tracking-tighter text-foreground">Personalize</h2>

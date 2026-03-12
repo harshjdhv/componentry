@@ -250,55 +250,61 @@ export function TableOfContents(): React.JSX.Element | null {
 
   if (headings.length === 0) {
     return (
-      <aside className="w-64 shrink-0 hidden xl:block border-l border-border/50">
-        <div className="sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto pl-6 pr-4 py-10 flex flex-col">
-          <div className="mt-auto pt-6" />
-          <CTACard />
+      <aside className="w-64 shrink-0 hidden xl:block border-x border-zinc-200/50 dark:border-zinc-800/50 relative dark:bg-[#111]">
+        <div className="relative sticky top-16 h-[calc(100svh-4rem)]">
+          <div className="w-full h-full overflow-y-auto pl-6 pr-4 py-10 flex flex-col items-start justify-start">
+            <div className="mt-auto pt-6 w-full" />
+            <div className="w-full">
+              <CTACard />
+            </div>
+          </div>
         </div>
       </aside>
     )
   }
 
   return (
-    <aside className="w-64 shrink-0 hidden xl:block border-l border-border/50">
-      <div className="sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto pl-6 pr-4 py-10 flex flex-col">
-        <div className="flex-1">
-          {/* Header */}
-          <div className="mb-4">
-            <h4 className="font-semibold text-sm text-foreground">
-              On This Page
-            </h4>
+    <aside className="w-64 shrink-0 hidden xl:block border-x border-zinc-200/50 dark:border-zinc-800/50 relative dark:bg-[#111]">
+      <div className="relative sticky top-16 h-[calc(100svh-4rem)]">
+        <div className="w-full h-full overflow-y-auto pl-6 pr-4 py-10 flex flex-col">
+          <div className="flex-1">
+            {/* Header */}
+            <div className="mb-4">
+              <h4 className="font-semibold text-sm text-foreground">
+                On This Page
+              </h4>
+            </div>
+
+            {/* Navigation */}
+            <nav ref={navRef} className="relative flex flex-col">
+              {/* Background track line */}
+              <div className="absolute left-[1px] top-0 bottom-0 w-px bg-border/50" />
+              
+              {/* Active indicator */}
+              {indicatorPos && (
+                <motion.div
+                  className="absolute left-0 w-[2px] rounded-full bg-foreground"
+                  initial={false}
+                  animate={{ top: indicatorPos.top, height: indicatorPos.height }}
+                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                />
+              )}
+
+              {/* Links */}
+              {headings.map((heading) => (
+                <TocLink
+                  key={heading.id}
+                  heading={heading}
+                  isActive={activeId === heading.id}
+                  onClick={handleClick}
+                />
+              ))}
+            </nav>
           </div>
 
-          {/* Navigation */}
-          <nav ref={navRef} className="relative flex flex-col">
-            {/* Background track line */}
-            <div className="absolute left-[1px] top-0 bottom-0 w-px bg-border/50" />
-
-            {/* Active indicator */}
-            {indicatorPos && (
-              <motion.div
-                className="absolute left-0 w-[2px] rounded-full bg-foreground"
-                initial={false}
-                animate={{ top: indicatorPos.top, height: indicatorPos.height }}
-                transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              />
-            )}
-
-            {/* Links */}
-            {headings.map((heading) => (
-              <TocLink
-                key={heading.id}
-                heading={heading}
-                isActive={activeId === heading.id}
-                onClick={handleClick}
-              />
-            ))}
-          </nav>
+          <div className="mt-auto pt-6" />
+          <CTACard />
         </div>
-
-        <div className="mt-auto pt-6" />
-        <CTACard />
       </div>
     </aside>
   )
