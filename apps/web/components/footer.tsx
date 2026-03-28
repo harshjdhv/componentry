@@ -11,7 +11,7 @@ const links = {
   resources: [
     { label: "Documentation", href: "/docs" },
     { label: "GitHub", href: "https://github.com/harshjdhv/componentry", external: true },
-    { label: "Sponsor", href: "https://github.com/sponsors/harshjdhv", external: true },
+    { label: "Sponsors", href: "/sponsors" },
   ],
   connect: [
     { label: "Twitter / X", href: "https://x.com/harshjdhv", external: true },

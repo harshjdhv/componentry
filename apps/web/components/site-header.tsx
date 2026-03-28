@@ -48,12 +48,10 @@ export function SiteHeader({ sidebarToggle }: SiteHeaderProps) {
                             MCP
                         </Link>
                         <Link
-                            href="https://github.com/sponsors/harshjdhv"
-                            target="_blank"
-                            rel="noreferrer"
+                            href="/sponsors"
                             className="text-foreground/60 transition-colors hover:text-foreground"
                         >
-                            Sponsor
+                            Sponsors
                         </Link>
                     </nav>
                 </div>
