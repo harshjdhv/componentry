@@ -213,6 +213,13 @@ export const components: Record<string, ComponentMetadata> = {
     slug: "eye-tracking",
     addedAt: "2026-03-28",
   },
+  "scratch-card": {
+    title: "Scratch Card",
+    description: "A premium scratch-to-reveal card with realistic metallic textures, canvas-based scratching, and multiple overlay styles.",
+    category: "Components",
+    slug: "scratch-card",
+    addedAt: "2026-03-28",
+  },
   // Hero Backgrounds
   "hero-geometric": {
     title: "Hero Geometric",

@@ -166,6 +166,10 @@ const docsImportMap: Record<
     import("@/components/docs/eye-tracking").then((m) => ({
       default: m.EyeTrackingDocs,
     })),
+  "scratch-card": () =>
+    import("@/components/docs/scratch-card").then((m) => ({
+      default: m.ScratchCardDocs,
+    })),
 };
 
 /**

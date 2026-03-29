@@ -130,6 +130,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "scratch-card",
+      "type": "registry:ui"
+    },
+    {
       "name": "scroll-based-velocity",
       "type": "registry:ui"
     },
