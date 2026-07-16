@@ -38,6 +38,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "color-picker",
+      "type": "registry:ui"
+    },
+    {
       "name": "command-menu",
       "type": "registry:ui"
     },
@@ -68,6 +72,10 @@
     {
       "name": "github-calendar",
       "type": "registry:ui"
+    },
+    {
+      "name": "gradient-hero-01",
+      "type": "registry:block"
     },
     {
       "name": "hero-geometric",
@@ -220,10 +228,6 @@
     {
       "name": "webgl-liquid",
       "type": "registry:ui"
-    },
-    {
-      "name": "gradient-hero-01",
-      "type": "registry:block"
     }
   ]
 }

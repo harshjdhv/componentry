@@ -162,6 +162,10 @@ const docsImportMap: Record<
     import("@/components/docs/eye-tracking").then((m) => ({
       default: m.EyeTrackingDocs,
     })),
+  "color-picker": () =>
+    import("@/components/docs/color-picker").then((m) => ({
+      default: m.ColorPickerDocs,
+    })),
 };
 
 /**

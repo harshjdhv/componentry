@@ -380,6 +380,12 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/visual-effects/matrixrain.mov",
   },
+  "color-picker": {
+      title: "Color Picker",
+      description: "An interactive and customizable color selection tool with HEX, RGB, and HSL modes, hue and saturation controls, and automatic contrast ratio display.",
+      category: "Components",
+      slug: "color-picker",
+    },
 };
 
 export function getComponent(slug: string) {
