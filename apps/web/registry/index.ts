@@ -182,6 +182,16 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/scrollchoreography.webm",
   },
+  "scroll-tilted-grid": {
+    title: "Scroll Tilted Grid",
+    description:
+      "A cinematic image grid that tilts and resolves into focus as each frame crosses the viewport.",
+    category: "Components",
+    slug: "scroll-tilted-grid",
+    addedAt: "2026-07-17",
+    previewVideo:
+      "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/scrolltiltedgrid.webm",
+  },
   "layered-stack": {
     title: "Layered Stack",
     description: "A stack of layered cards that interact with mouse hover.",

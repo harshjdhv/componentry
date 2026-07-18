@@ -182,6 +182,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "scroll-tilted-grid",
+      "type": "registry:ui"
+    },
+    {
       "name": "scrub-input",
       "type": "registry:ui"
     },
