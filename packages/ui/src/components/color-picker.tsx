@@ -19,8 +19,6 @@ import {
 import { Check, ChevronDown, CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// --- Utility: Color Math for Contrast ---
-
 const parseToHsva = (color: string): HsvaColor => {
   const str = color.toLowerCase().trim();
 
@@ -69,25 +67,20 @@ const getContrastRatio = (lum1: number, lum2: number) => {
   return (brightest + 0.05) / (darkest + 0.05);
 };
 
-// --- Component Props ---
-
 export interface ColorPickerProps {
   value?: string;
   onValueChange?: (val: string) => void;
   isRTL?: boolean;
   showContrast?: boolean;
 
-  // NEW: channel fields & modes
   enabledModes?: Array<"hex" | "rgb" | "hsl">;
   defaultFormat?: "hex" | "rgb" | "hsl";
   
-  // Mode selector labels (full names)
   hexLabel?: string;
   rgbLabel?: string;
   hslLabel?: string;
   modeLabel?: string;
   
-  // Channel input labels (single letters)
   rLabel?: string;
   gLabel?: string;
   bLabel?: string;
@@ -98,7 +91,6 @@ export interface ColorPickerProps {
   contrastBgLuminance?: number;
   colorPreviewAreaText?: string;
 
-  // Container styling
   containerBg?: string;
   containerBorderColor?: string;
   containerBorderWidth?: number;
@@ -106,13 +98,11 @@ export interface ColorPickerProps {
   containerPadding?: string;
   containerElementGap?: string;
 
-  // Saturation area
   saturationHeight?: number;
   saturationRadius?: number;
   saturationBorderColor?: string;
   saturationBorderWidth?: number;
 
-  // Saturation THUMB (draggable circle inside the saturation area)
   saturationThumbWidth?: number | string;
   saturationThumbHeight?: number | string;
   saturationThumbRadius?: number | string;
@@ -121,18 +111,15 @@ export interface ColorPickerProps {
   saturationThumbBorderColor?: string;
   saturationThumbBgColor?: string;
 
-  // Hue TRACK (static colorful background)
   hueTrackHeight?: number | string;
   hueTrackRadius?: number | string;
   hueTrackBorderWidth?: number;
   hueTrackBorderColor?: string;
 
-  // Hue THUMB (draggable slider circle) - base
   hueThumbSize?: number | string;
   hueThumbRadius?: number | string;
   hueThumbBorderWidth?: number;
   
-  // Hue THUMB states (hover/active colors)
   hueThumbBgDefault?: string;
   hueThumbBgHover?: string;
   hueThumbBgActive?: string;
@@ -140,7 +127,6 @@ export interface ColorPickerProps {
   hueThumbBorderHover?: string;
   hueThumbBorderActive?: string;
 
-  // Contrast stuff
   contrastLabel?: string;
   contrastLabelSize?: string;
   contrastLabelColor?: string;
@@ -156,7 +142,6 @@ export interface ColorPickerProps {
   showContrastAAALabel?: boolean;
   contrastAreaTopMargin?: string;
 
-  // Input / display field (HEX only)
   inputHeight?: number;
   inputBg?: string;
   inputBorderColor?: string;
@@ -167,7 +152,6 @@ export interface ColorPickerProps {
   inputFocusRingColor?: string;
   inputErrorOutlineColor?: string;
 
-  // Floating label styling
   floatingLabelBg?: string;
   floatingLabelTextColor?: string;
   floatingLabelActiveTextColor?: string;
@@ -176,7 +160,6 @@ export interface ColorPickerProps {
   floatingLabelBorderWidth?: number;
   floatingLabelMainTextSize?: number;
 
-  // Dropdown / combobox button
   dropdownHeight?: number;
   dropdownBg?: string;
   dropdownBorderColor?: string;
@@ -187,7 +170,6 @@ export interface ColorPickerProps {
   dropdownFocusRingColor?: string;
   dropdownChevronColor?: string;
 
-  // Dropdown menu
   dropdownMenuBg?: string;
   dropdownMenuBorderColor?: string;
   dropdownMenuBorderWidth?: number;
@@ -199,7 +181,6 @@ export interface ColorPickerProps {
   modeDropdownWidth?: string;
   modeDropdownFullWidth?: boolean;
 
-  // Preview / letter area
   showLetterTop?: boolean;
   previewBgFallback?: string;
   previewBorderColor?: string;
@@ -212,7 +193,6 @@ export interface ColorPickerProps {
   previewWidth?: number | string;
   previewHeight?: number;
 
-  // Badge group customization
   badgeBorderWidth?: number | string;
   badgeBorderRadius?: number | string;
   badgeFontSize?: number | string;
@@ -227,8 +207,6 @@ export interface ColorPickerProps {
   badgeTextPass?: string;
   badgeTextFail?: string;
 }
-
-// --- Main Component ---
 
 export function ColorPicker({
   value = "#06B5EF",
@@ -251,7 +229,6 @@ export function ColorPicker({
   sLabel = "S",
   lLabel = "L",
 
-  // Container
   containerBg = "#000",
   containerBorderColor = "#242424",
   containerBorderWidth = 1,
@@ -259,13 +236,11 @@ export function ColorPicker({
   containerPadding = "16px",
   containerElementGap = "16px",
 
-  // Saturation
   saturationHeight = 140,
   saturationRadius = 8,
   saturationBorderColor = "#242424",
   saturationBorderWidth = 1,
 
-  // Saturation thumb (indicator)
   saturationThumbWidth = 14,
   saturationThumbHeight = 14,
   saturationThumbRadius = 50,
@@ -274,18 +249,15 @@ export function ColorPicker({
   saturationThumbBorderColor = "#ffffff",
   saturationThumbBgColor = "transparent",
 
-  // NEW: Hue TRACK (static colorful background)
   hueTrackHeight = 10,
   hueTrackRadius = "8px",
   hueTrackBorderWidth = 1,
   hueTrackBorderColor = "transparent",
 
-  // NEW: Hue THUMB (draggable slider circle) - base
   hueThumbSize = 16,
   hueThumbRadius = "50%",
   hueThumbBorderWidth = 3,
 
-  // NEW: Hue THUMB states (hover/active colors)
   hueThumbBgDefault = "#f0f0f0",
   hueThumbBgHover = "#e5e5e5",
   hueThumbBgActive = "#f0f0f0",
@@ -293,7 +265,6 @@ export function ColorPicker({
   hueThumbBorderHover = "#f0f0f0",
   hueThumbBorderActive = "#fff",
 
-  // NEW: Badge group (AA/AAA contrast badges)
   badgeBorderWidth = 1,
   badgeBorderRadius = "50px",
   badgeFontSize = "10px",
@@ -308,7 +279,6 @@ export function ColorPicker({
   badgeTextPass = "#41EF06",
   badgeTextFail = "#EF0641",
 
-  // Contrast
   contrastLabelSize = "12px",
   contrastLabelColor = "#737373",
   contrastLabelWeight = 700,
@@ -323,7 +293,6 @@ export function ColorPicker({
   showContrastAAALabel = true,
   contrastAreaTopMargin = "0px",
 
-  // Inputs
   inputHeight = 44,
   inputBg = "#000",
   inputBorderColor = "#242424",
@@ -333,7 +302,6 @@ export function ColorPicker({
   floatingLabelFocusBorderColor = "#06B5EF",
   inputErrorOutlineColor = "#EF0641",
 
-  // Floating labels
   floatingLabelBg,
   floatingLabelTextColor = "#777777",
   floatingLabelActiveTextColor = "#ffffff",
@@ -342,7 +310,6 @@ export function ColorPicker({
   floatingLabelBorderWidth = 0,
   floatingLabelMainTextSize = 14,
 
-  // Dropdown
   dropdownHeight = 44,
   dropdownBg,
   dropdownBorderColor,
@@ -352,7 +319,6 @@ export function ColorPicker({
   dropdownFocusBorderColor,
   dropdownChevronColor = "#6b7280",
 
-  // Dropdown menu
   dropdownMenuBg = "#111111",
   dropdownMenuBorderColor = "#242424",
   dropdownMenuBorderWidth = 1,
@@ -364,7 +330,6 @@ export function ColorPicker({
   modeDropdownWidth = "128px",
   modeDropdownFullWidth = false,
 
-  // Preview area
   previewBgFallback = "#111111",
   previewBorderColor = "rgba(255,255,255,0.14)",
   previewBorderWidth = 1,
@@ -377,14 +342,12 @@ export function ColorPicker({
   previewWidth = 44,
   previewHeight = inputHeight, 
 }: ColorPickerProps) {
-  // Normalize modes
   const normalizedModes = enabledModes.length ? enabledModes : ["hex"];
   const initialFormat = normalizedModes.includes(defaultFormat) ? defaultFormat : normalizedModes[0];
   
   const [hsva, setHsva] = useState<HsvaColor>(parseToHsva(value));
   const [format, setFormat] = useState<"hex" | "rgb" | "hsl">(initialFormat);
   
-  // ✅ FIXED: Track source of change + hex completely independent
   const [hexInput, setHexInput] = useState("");
   const [hexIsFocused, setHexIsFocused] = useState(false);
   const [hexError, setHexError] = useState(false);
@@ -400,7 +363,6 @@ export function ColorPicker({
   
   const satContainerRef = useRef<HTMLDivElement>(null);
 
-  // Computed defaults
   const resolvedDropdownBg = dropdownBg ?? inputBg;
   const resolvedDropdownBorderColor = dropdownBorderColor ?? inputBorderColor;
   const resolvedDropdownBorderWidth = dropdownBorderWidth ?? inputBorderWidth;
@@ -409,7 +371,6 @@ export function ColorPicker({
   const resolvedDropdownFocusBorderColor = dropdownFocusBorderColor ?? floatingLabelFocusBorderColor;
   const resolvedFloatingLabelBg = floatingLabelBg ?? containerBg;
 
-  // ✅ FIXED: Manual hex sync ONLY for external changes
   const updateHexFromColor = useCallback(() => {
     if (changeSource !== 'hex' && !hexIsFocused) {
       const newHex = hsvaToHex(hsva).toUpperCase();
@@ -418,7 +379,6 @@ export function ColorPicker({
     }
   }, [hsva, hexIsFocused, changeSource]);
 
-  // External prop sync
   useEffect(() => {
     const next = parseToHsva(value);
     setHsva(next);
@@ -426,7 +386,6 @@ export function ColorPicker({
     updateHexFromColor();
   }, [value]);
 
-  // RGB/HSL sync ONLY
   useEffect(() => {
     if (!rgbIsFocused) {
       const { r, g, b } = hsvaToRgba(hsva);
@@ -474,10 +433,9 @@ export function ColorPicker({
     onValueChange?.(out);
   }, [format, onValueChange]);
 
-  // ✅ FIXED HEX - TRACKS SOURCE + NEVER AUTO-CORRECTS
   const handleHexChange = (val: string) => {
     if (val.length > 7) return;
-    setHexInput(val); // ALWAYS free - NO corrections ever
+    setHexInput(val);
     
     const trimmed = val.trim();
     if (!trimmed) {
@@ -489,13 +447,12 @@ export function ColorPicker({
     const isFallbackZero = parsed.h === 0 && parsed.s === 0 && parsed.v === 0;
     setHexError(!!trimmed && isFallbackZero && trimmed !== "#000");
     
-    triggerChange(parsed, 'hex'); // Mark as hex source - NO input correction
+    triggerChange(parsed, 'hex');
   };
 
   const handleHexFocus = () => setHexIsFocused(true);
   const handleHexBlur = () => setHexIsFocused(false);
 
-  // RGB handlers (mark source)
   const handleRgbChannelChange = (channel: "r"|"g"|"b", raw: string) => {
     if (raw.length > 3) return;
     const newInputs = { ...rgbInputs, [channel]: raw };
@@ -518,7 +475,6 @@ export function ColorPicker({
   const handleRgbFocus = (channel: "r"|"g"|"b") => setRgbIsFocused(channel);
   const handleRgbBlur = () => setRgbIsFocused(null);
 
-  // HSL handlers (mark source)
   const handleHslChannelChange = (channel: "h"|"s"|"l", raw: string) => {
     if (raw.length > 3) return;
     const newInputs = { ...hslInputs, [channel]: raw };
@@ -541,7 +497,6 @@ export function ColorPicker({
   const handleHslFocus = (channel: "h"|"s"|"l") => setHslIsFocused(channel);
   const handleHslBlur = () => setHslIsFocused(null);
 
-  // ✅ FIXED Saturation - external source
   const handleSatMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     const handleMove = (moveEvent: MouseEvent) => {
@@ -579,7 +534,6 @@ export function ColorPicker({
   const autoPreviewTextColor = hsva.v > 60 && hsva.s < 30 ? "#000000" : "#ffffff";
   const showModeDropdown = normalizedModes.length > 1;
 
-  // ✅ FIXED: Add autocomplete="off" to prevent browser interference
   return (
     <div className={cn("flex flex-col select-none", isRTL && "rtl")} style={{
       backgroundColor: containerBg, borderStyle: "solid", borderColor: containerBorderColor,
@@ -625,7 +579,6 @@ export function ColorPicker({
         thumbHeight={typeof hueThumbSize === 'number' ? `${hueThumbSize}px` : hueThumbSize}
         thumbBorderWidth={`${hueThumbBorderWidth}px`}
         thumbBorderRadius={typeof hueThumbRadius === 'number' ? `${hueThumbRadius}px` : hueThumbRadius}
-        // ✅ FIXED: All 3 static track props
         trackBorderRadius={typeof hueTrackRadius === 'number' ? `${hueTrackRadius}px` : hueTrackRadius}
         trackBorderWidth={`${hueTrackBorderWidth}px`}
         trackBorderColor={hueTrackBorderColor}
@@ -881,12 +834,9 @@ export function ColorPicker({
 }
 
 
-// --- Sub-Components ---
-
 function Badge({
   pass,
   label,
-  // All props now support string | number for sizes
   badgeBorderWidth = 1,
   badgeBorderRadius = "999px",
   badgeFontSize = "10px",
@@ -946,9 +896,6 @@ function Badge({
   );
 }
 
-// --- FIXED Floating Label Input ---
-// IMMEDIATE parent prop sync + perfect color erasing respect
-
 type FloatingLabelInputProps = {
   value: string;
   onChange: (v: string) => void;
@@ -957,13 +904,13 @@ type FloatingLabelInputProps = {
   maxLength?: number;
   height: number;
   bg: string;
-  borderColor: string;      // ← IMMEDIATELY responsive
+  borderColor: string;
   borderWidth: number;
   radius: number;
   fontSize: number;
   textColor: string;
   focusBorderColor: string;
-  floatingLabelBg: string;  // ← IMMEDIATELY responsive
+  floatingLabelBg: string;
   floatingLabelTextColor: string;
   floatingLabelActiveTextColor: string;
   floatingLabelRadius: number;
@@ -988,7 +935,6 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
     onChange(newVal);
   };
 
-  // ✅ FIXED: IMMEDIATE parent prop reactivity
   const labelTextColor = hasError 
     ? errorOutlineColor 
     : isFocused ? floatingLabelActiveTextColor : floatingLabelTextColor;
@@ -998,7 +944,6 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  // ✅ FIXED: useEffect for immediate parent prop changes
   React.useEffect(() => {
     if (inputRef.current) {
       inputRef.current.style.borderColor = isFocused 
@@ -1007,7 +952,6 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
     }
   }, [borderColor, focusBorderColor, hasError, errorOutlineColor, isFocused]);
 
-  // ✅ FIXED: Manual style updates respect parent changes instantly
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
     e.currentTarget.style.borderColor = currentFocusBorderColor;
@@ -1039,7 +983,7 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
         "--foreground": textColor,
         "--muted-foreground": floatingLabelTextColor,
         "--accent-color": floatingLabelActiveTextColor,
-        "--parent-background": floatingLabelBg,  // ← IMMEDIATELY updates
+        "--parent-background": floatingLabelBg,
         "--general-rounding": `${radius}px`,
       }}
     >
@@ -1050,9 +994,9 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
         onChange={handleChange}
         className="floating-input"
         maxLength={maxLength}
-        autoComplete="off"  // ✅ Browser autofill prevention
-        inputMode="text"    // ✅ Better mobile
-        spellCheck="false"  // ✅ No autocorrect
+        autoComplete="off"
+        inputMode="text"
+        spellCheck="false"
         style={{
           backgroundColor: bg,
           borderRadius: radius,
@@ -1068,12 +1012,12 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
       <label 
         className="floating-label"
         style={{
-          color: labelTextColor,  // ← IMMEDIATELY responsive
+          color: labelTextColor,
           borderRadius: floatingLabelRadius,
           borderStyle: floatingLabelBorderColor ? "solid" : "none",
           borderColor: floatingLabelBorderColor,
           borderWidth: floatingLabelBorderWidth,
-          backgroundColor: floatingLabelBg,  // ← EXPLICIT background
+          backgroundColor: floatingLabelBg,
         }}
       >
         {label}
@@ -1101,7 +1045,7 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
           box-sizing: border-box;
           text-transform: uppercase;
           box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-          transition: border-color 0.15s ease;  // ✅ Faster transition
+          transition: border-color 0.15s ease;
           line-height: 1.4;
         }
 
@@ -1161,7 +1105,6 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   );
 };
 
-// --- Floating Label Select ---
 type FloatingLabelSelectProps = {
   value: string;
   onChange: (v: string) => void;
@@ -1228,7 +1171,7 @@ export const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
 }) => {
   const [open, setOpen] = React.useState(false);
   const [isFocused, setIsFocused] = React.useState(false);
-  const hasValue = value !== null && value !== undefined && value !== ""; // Tracks if select has selection
+  const hasValue = value !== null && value !== undefined && value !== "";
 
   const buttonRef = React.useRef<HTMLButtonElement | null>(null);
   const listRef = React.useRef<HTMLDivElement | null>(null);
@@ -1557,9 +1500,9 @@ export function CustomSlider({
   thumbWidth = '20px',
   thumbHeight = '20px',
   width = '100%',
-  trackBorderRadius = '8px',       // ✅ NEW DEFAULT
-  trackBorderWidth = '0px',        // ✅ NEW DEFAULT (0px = no border)
-  trackBorderColor = 'transparent', // ✅ NEW DEFAULT
+  trackBorderRadius = '8px',
+  trackBorderWidth = '0px',
+  trackBorderColor = 'transparent',
   thumbBorderRadius = '50%',
   thumbBorderWidth = '2px',
   colorTrackBackground = '#262626',
@@ -1702,13 +1645,13 @@ export function CustomSlider({
         }
         .${trackClass} {
           background: ${colorTrackBackground} !important;
-          border-radius: ${trackBorderRadius} !important;           // ✅ NEW: Static rounding
-          border: ${trackBorderWidth} solid ${trackBorderColor} !important;  // ✅ NEW: Static border (0px = none)
+          border-radius: ${trackBorderRadius} !important;
+          border: ${trackBorderWidth} solid ${trackBorderColor} !important;
           z-index: 1;
         }
         .${rangeClass} {
           background: ${fillColor};
-          border-radius: ${trackBorderRadius};                       // ✅ Matches track rounding
+          border-radius: ${trackBorderRadius};
           ${isRTL ? 'right: 0;' : 'left: 0;'}
           width: ${percentage}%;
           z-index: 2;

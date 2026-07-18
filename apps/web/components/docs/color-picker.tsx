@@ -14,7 +14,6 @@ export default function Page() {
         <ColorPicker 
             value={color} 
             onValueChange={setColor} 
-            showAlpha={false} 
             showContrast={true} 
         />
     )
@@ -30,7 +29,6 @@ export default function Page() {
             value={color} 
             onValueChange={setColor} 
             isRTL={true} 
-            showAlpha={false} 
             showContrast={true} 
             hexLabel="הקס" 
             rgbLabel="ארג׳יבי" 

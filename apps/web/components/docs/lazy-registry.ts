@@ -110,10 +110,6 @@ const docsImportMap: Record<
     import("@/components/docs/scroll-choreography").then((m) => ({
       default: m.ScrollChoreographyDocs,
     })),
-  "scroll-tilted-grid": () =>
-    import("@/components/docs/scroll-tilted-grid").then((m) => ({
-      default: m.ScrollTiltedGridDocs,
-    })),
   "letter-cascade": () =>
     import("@/components/docs/letter-cascade").then((m) => ({
       default: m.LetterCascadeDocs,
