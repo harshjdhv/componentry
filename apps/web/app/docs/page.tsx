@@ -13,6 +13,7 @@ import {
   landingGutterClass,
 } from "@/components/landing/landing-frame"
 import { cn } from "@/lib/utils"
+import { AsciiCatalogPreview } from "@/components/docs/previews/ascii-effects-preview"
 
 type PreviewSources = {
   mp4: string
@@ -58,9 +59,11 @@ function getPreviewPosterSrc(previewVideo?: string) {
 function ComponentCard({
   component,
   index,
+  asciiColors,
 }: {
   component: ComponentMetadata
   index: number
+  asciiColors?: string[]
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -190,6 +193,9 @@ function ComponentCard({
             }}
             className="relative w-full rounded-xl bg-zinc-50 dark:bg-zinc-900/80 group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/80 transition-colors border border-dashed border-border shadow-surface-inset overflow-hidden"
           >
+            {component.category === "ASCII Effects" && (
+              <AsciiCatalogPreview slug={component.slug} colors={asciiColors} />
+            )}
             {previewPosterSrc && (
               <img
                 src={previewPosterSrc}
@@ -260,12 +266,23 @@ const categoryOrder: ComponentCategory[] = [
   "Components",
   "Hero Backgrounds",
   "Visual Effects",
+  "ASCII Effects",
+]
+
+const asciiPalettes: Array<{ label: string; colors: string[] }> = [
+  { label: "Graphite", colors: ["#171719", "#888b91", "#f4f4f5"] },
+  { label: "Crimson", colors: ["#180407", "#821421", "#e34a55"] },
+  { label: "Matrix", colors: ["#04180b", "#18a448", "#baffca"] },
+  { label: "Cobalt", colors: ["#071426", "#2566ad", "#d1e5ff"] },
+  { label: "Amber", colors: ["#211304", "#b96b13", "#ffe0a3"] },
+  { label: "Ultraviolet", colors: ["#170923", "#7d2db3", "#e8caff"] },
 ]
 
 // ─── Main Docs Page ─────────────────────────────────────────────────────────
 export default function DocsPage() {
   const allComponents = Object.values(components)
   const [activeSection, setActiveSection] = useState<string>("")
+  const [asciiPalette, setAsciiPalette] = useState(0)
 
   useEffect(() => {
     const observers = categoryOrder.map((cat) => {
@@ -376,15 +393,52 @@ export default function DocsPage() {
           {grouped.map(({ category, items }) => {
             return (
               <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-32">
-                <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-8 tracking-tight">
-                  {category}
-                </h2>
+                <div className="mb-8 flex items-center justify-between gap-4">
+                  <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                    {category}
+                  </h2>
+                  {category === "ASCII Effects" && (
+                    <div
+                      className="flex items-center gap-0.5 rounded-full border border-zinc-200/80 bg-white/70 p-1 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-black/30"
+                      role="group"
+                      aria-label="ASCII color theme"
+                    >
+                      {asciiPalettes.map((palette, paletteIndex) => (
+                        <button
+                          key={palette.label}
+                          type="button"
+                          aria-label={palette.label}
+                          aria-pressed={asciiPalette === paletteIndex}
+                          title={palette.label}
+                          onClick={() => setAsciiPalette(paletteIndex)}
+                          className={cn(
+                            "grid size-7 place-items-center rounded-full border border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
+                            asciiPalette === paletteIndex
+                              ? "border-zinc-300 bg-zinc-100 dark:border-white/15 dark:bg-white/10"
+                              : "hover:bg-zinc-100 dark:hover:bg-white/[0.06]"
+                          )}
+                        >
+                          <span
+                            className="size-3.5 rounded-full border border-white/15"
+                            style={{
+                              backgroundColor: palette.colors[1],
+                              boxShadow: asciiPalette === paletteIndex
+                                ? `0 0 10px ${palette.colors[1]}`
+                                : `0 0 0 1px ${palette.colors[0]}`,
+                            }}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {items.map((component, i) => (
                     <ComponentCard
                       key={component.slug}
                       component={component}
                       index={i}
+                      asciiColors={category === "ASCII Effects" ? asciiPalettes[asciiPalette]?.colors : undefined}
                     />
                   ))}
                 </div>

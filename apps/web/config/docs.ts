@@ -30,6 +30,7 @@ const categoryOrder = [
   "Components",
   "Hero Backgrounds",
   "Visual Effects",
+  "ASCII Effects",
 ];
 
 const getComponentNav = (): NavGroup[] => {

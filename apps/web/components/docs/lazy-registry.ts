@@ -10,6 +10,18 @@ const docsImportMap: Record<
     | { [key: string]: React.ComponentType<Record<string, unknown>> }
   >
 > = {
+  "ascii-image": () =>
+    import("@/components/docs/ascii-effects").then((m) => ({
+      default: m.AsciiImageDocs,
+    })),
+  "ascii-flow": () =>
+    import("@/components/docs/ascii-effects").then((m) => ({
+      default: m.AsciiFlowDocs,
+    })),
+  "ascii-glitch": () =>
+    import("@/components/docs/ascii-effects").then((m) => ({
+      default: m.AsciiGlitchDocs,
+    })),
   "dithered-logo": () =>
     import("@/components/docs/dithered-logo").then((m) => ({
       default: m.DitheredLogoDocs,

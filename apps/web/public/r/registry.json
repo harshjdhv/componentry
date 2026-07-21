@@ -14,6 +14,18 @@
       "type": "registry:ui"
     },
     {
+      "name": "ascii-flow",
+      "type": "registry:ui"
+    },
+    {
+      "name": "ascii-glitch",
+      "type": "registry:ui"
+    },
+    {
+      "name": "ascii-image",
+      "type": "registry:ui"
+    },
+    {
       "name": "auth-modal",
       "type": "registry:ui"
     },
