@@ -182,6 +182,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "shader-background",
+      "type": "registry:ui"
+    },
+    {
       "name": "shimmer-button",
       "type": "registry:ui"
     },

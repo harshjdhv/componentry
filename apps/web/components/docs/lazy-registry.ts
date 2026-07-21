@@ -82,6 +82,10 @@ const docsImportMap: Record<
     import("@/components/docs/animated-gradient").then((m) => ({
       default: m.AnimatedGradientDocs,
     })),
+  "shader-background": () =>
+    import("@/components/docs/shader-background").then((m) => ({
+      default: m.ShaderBackgroundDocs,
+    })),
   "prism-gradient": () =>
     import("@/components/docs/prism-gradient").then((m) => ({
       default: m.PrismGradientDocs,

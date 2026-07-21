@@ -288,6 +288,14 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/animatedgradient.webm",
   },
+  "shader-background": {
+    title: "Shader Background",
+    description:
+      "A locally vendored Neuro Noise WebGL background with four expressive presets.",
+    category: "Hero Backgrounds",
+    slug: "shader-background",
+    addedAt: "2026-07-20",
+  },
   "prism-gradient": {
     title: "Prism Gradient",
     description:
