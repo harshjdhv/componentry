@@ -123,6 +123,7 @@ async function AsciiDocs({ kind }: { kind: keyof typeof entries }) {
       previewCode={entry.usage}
       installPackageName={`ascii-${kind}`}
       installSourceCode={source ?? "// Unable to load source code"}
+      installSourceFilename="components/ui/ascii-effect.tsx"
       usageCode={entry.usage}
       examples={[]}
       props={props}
@@ -131,14 +132,14 @@ async function AsciiDocs({ kind }: { kind: keyof typeof entries }) {
   )
 }
 
-export function AsciiImageDocs() {
+export async function AsciiImageDocs() {
   return <AsciiDocs kind="image" />
 }
 
-export function AsciiFlowDocs() {
+export async function AsciiFlowDocs() {
   return <AsciiDocs kind="flow" />
 }
 
-export function AsciiGlitchDocs() {
+export async function AsciiGlitchDocs() {
   return <AsciiDocs kind="glitch" />
 }
