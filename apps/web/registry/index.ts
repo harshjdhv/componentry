@@ -309,25 +309,11 @@ export const components: Record<string, ComponentMetadata> = {
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/liquidchrome.webm",
   },
   // ASCII Effects
-  "ascii-image": {
-    title: "ASCII Image",
-    description: "Turn any image into crisp, responsive ASCII artwork.",
+  "ascii-effect": {
+    title: "ASCII Effect",
+    description: "Render images as responsive ASCII artwork with image, flow, and glitch variations.",
     category: "ASCII Effects",
-    slug: "ascii-image",
-    addedAt: "2026-07-21",
-  },
-  "ascii-flow": {
-    title: "ASCII Flow",
-    description: "Directional ASCII motion with configurable speed and cursor ripples.",
-    category: "ASCII Effects",
-    slug: "ascii-flow",
-    addedAt: "2026-07-21",
-  },
-  "ascii-glitch": {
-    title: "ASCII Glitch",
-    description: "A radial ASCII reveal punctuated by configurable signal glitches.",
-    category: "ASCII Effects",
-    slug: "ascii-glitch",
+    slug: "ascii-effect",
     addedAt: "2026-07-21",
   },
   // Visual Effects

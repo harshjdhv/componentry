@@ -193,21 +193,6 @@ export const components: Record<string, ComponentMetadata> = {
 | `"Visual Effects"` | Decorative effects (Blobs, Particles, Noise) |
 | `"ASCII Effects"` | Image-to-ASCII renderers and animated ASCII effects |
 
-### Shared Source Files
-
-Related registry entries may share one implementation file. Pass the shared source
-name as the second argument when generating each entry:
-
-```bash
-node scripts/generate-registry.js ascii-image ascii-effect
-node scripts/generate-registry.js ascii-flow ascii-effect
-node scripts/generate-registry.js ascii-glitch ascii-effect
-```
-
-When using this pattern, set `installSourceFilename` in every docs page to the
-shared registry path (for example, `"components/ui/ascii-effect.tsx"`) so the
-manual-install filename matches the import shown in usage examples.
-
 ---
 
 ## 📝 Step 4: Create Documentation Component

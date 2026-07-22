@@ -2,27 +2,14 @@
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "componentry",
   "homepage": "https://componentry.fun",
-  "aliases": [
-    "componentry",
-    "componentryui",
-    "ui",
-    "cmp"
-  ],
+  "aliases": ["componentry", "componentryui", "ui", "cmp"],
   "items": [
     {
       "name": "animated-gradient",
       "type": "registry:ui"
     },
     {
-      "name": "ascii-flow",
-      "type": "registry:ui"
-    },
-    {
-      "name": "ascii-glitch",
-      "type": "registry:ui"
-    },
-    {
-      "name": "ascii-image",
+      "name": "ascii-effect",
       "type": "registry:ui"
     },
     {
@@ -80,6 +67,10 @@
     {
       "name": "github-calendar",
       "type": "registry:ui"
+    },
+    {
+      "name": "gradient-hero-01",
+      "type": "registry:block"
     },
     {
       "name": "hero-geometric",
@@ -236,10 +227,6 @@
     {
       "name": "webgl-liquid",
       "type": "registry:ui"
-    },
-    {
-      "name": "gradient-hero-01",
-      "type": "registry:block"
     }
   ]
 }

@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-  "name": "ascii-glitch",
+  "name": "ascii-effect",
   "type": "registry:ui",
-  "title": "Ascii Glitch",
+  "title": "ASCII Effect",
   "dependencies": [],
   "devDependencies": [],
   "registryDependencies": [],
-  "description": "Component for ascii-glitch",
+  "description": "Render images as responsive ASCII artwork with image, flow, and glitch variations.",
   "files": [
     {
       "path": "components/ui/ascii-effect.tsx",

@@ -13,13 +13,12 @@ const WEBGL_ERROR_BOUNDARY_SOURCE_PATH = path.join(COMPONENT_DIR, WEBGL_ERROR_BO
 const args = process.argv.slice(2);
 
 if (args.length === 0) {
-  console.error('Please provide a component name and optional source name (e.g., ascii-image ascii-effect)');
+  console.error('Please provide a component name (e.g., scroll-based-velocity)');
   process.exit(1);
 }
 
 const componentName = args[0];
-const sourceComponentName = args[1] || componentName;
-const componentFilename = `${sourceComponentName}.tsx`;
+const componentFilename = `${componentName}.tsx`;
 const sourcePath = path.join(COMPONENT_DIR, componentFilename);
 const registryPath = path.join(REGISTRY_DIR, `${componentName}.json`);
 
