@@ -155,7 +155,7 @@ export default function Home() {
                 hidden: {},
                 visible: { transition: { staggerChildren: 0.06 } },
               }}
-              className="mb-20 mt-10 grid w-full min-w-0 auto-rows-[min(300px,70vw)] grid-cols-1 gap-2.5 md:mt-12 md:auto-rows-[300px] md:grid-cols-4 md:grid-rows-3"
+              className="mb-20 mt-10 grid w-full min-w-0 auto-rows-[min(300px,70vw)] grid-cols-1 gap-2.5 md:mt-12 md:auto-rows-[300px] md:grid-cols-4"
             >
               {/* Card 1: 1x1 Dark */}
               <motion.div
