@@ -320,6 +320,10 @@ body:has([data-blocks-layout])::-webkit-scrollbar,
   height: 0;
 }
 
+button:not(:disabled) {
+  cursor: pointer;
+}
+
 .usage-code-scrollbar-none * {
   -ms-overflow-style: none;
   scrollbar-width: none;
