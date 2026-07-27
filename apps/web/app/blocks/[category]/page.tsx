@@ -3,8 +3,8 @@ import { Fragment } from "react";
 import { notFound } from "next/navigation";
 
 import { BlockDisplay } from "@/components/blocks/block-display";
+import { BlocksHeading } from "@/components/blocks/blocks-heading";
 import { BlocksStripeDivider } from "@/components/blocks/blocks-list-decor";
-import { BlocksNav } from "@/components/blocks/blocks-nav";
 import { getAllBlocks } from "@/lib/blocks/registry";
 import categories from "@/registry/generated/block-categories.json";
 
@@ -45,7 +45,12 @@ export default async function BlocksCategoryPage({
 
   return (
     <>
-      <BlocksNav active={category} />
+      <div className="mx-auto w-full max-w-[1360px]">
+        <BlocksHeading
+          title={`${item.title} blocks.`}
+          description={item.description}
+        />
+      </div>
 
       {blocks.map((block) => (
         <Fragment key={block.name}>

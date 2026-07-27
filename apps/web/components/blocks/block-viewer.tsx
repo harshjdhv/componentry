@@ -4,7 +4,6 @@ import * as React from "react";
 import {
   Check,
   ChevronRight,
-  Code2,
   Copy,
   FileCode2,
   FileJson,
@@ -16,9 +15,7 @@ import {
   Tablet,
   Terminal,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
-import { blockThemes, type BlockThemeName } from "@/lib/blocks/theme";
 import type {
   BlockRegistryItem,
   FileTree,
@@ -41,10 +38,8 @@ const sizeIcons = {
   desktop: Monitor,
 };
 
-const viewerToolbarRail =
-  "relative mx-auto w-full max-w-[1360px] border-x border-line px-4 md:px-0";
-const viewerBodyRail =
-  "relative mx-auto w-full max-w-[1360px] border-x border-line px-4 md:px-3";
+const viewerToolbarRail = "relative mx-auto w-full max-w-[1360px] px-4 md:px-3";
+const viewerBodyRail = "relative mx-auto w-full max-w-[1360px] px-4 md:px-3";
 
 function copyText(text: string) {
   return navigator.clipboard.writeText(text);
@@ -180,7 +175,6 @@ export function BlockViewer({
 }) {
   const [view, setView] = React.useState<View>("preview");
   const [size, setSize] = React.useState<Size>("desktop");
-  const [theme, setTheme] = React.useState<BlockThemeName>("system");
   const [iframeKey, setIframeKey] = React.useState(0);
   const [activeFile, setActiveFile] = React.useState(
     highlightedFiles[0]?.target ?? "",
@@ -192,7 +186,7 @@ export function BlockViewer({
   const activeFileName = file ? getFileName(file.target) : "";
   const activeFileFolder = file ? getFileFolder(file.target) : "";
   const installCommand = `npx shadcn@latest add ${getRegistryItemNamespace(item.name)}`;
-  const previewUrl = `/preview/${item.name}?theme=${theme}`;
+  const previewUrl = `/preview/${item.name}`;
 
   return (
     <section
@@ -200,43 +194,18 @@ export function BlockViewer({
       className="scroll-mt-20 overflow-x-clip bg-background"
     >
       <div>
-        <Rule />
         <div className={viewerToolbarRail}>
-          <div className="flex w-full flex-wrap items-center gap-2 px-3 py-2">
+          <div className="flex w-full flex-wrap items-center gap-2 rounded-t-xl border border-b-0 border-line bg-background px-3 py-2">
             <SegmentedControl
               value={view}
               items={[
-                { value: "preview", label: "Preview", icon: Monitor },
-                { value: "code", label: "Code", icon: Code2 },
+                { value: "preview", label: "Preview" },
+                { value: "code", label: "Code" },
               ]}
               onValueChange={(value) => setView(value as View)}
             />
 
-            <div className="mx-1 hidden h-4 w-px bg-line md:block" />
-
-            <a
-              href={`#${item.name}`}
-              className="line-clamp-1 min-w-0 flex-1 text-sm font-medium text-foreground hover:underline"
-            >
-              {item.description.replace(/\.$/, "")}
-            </a>
-
             <div className="ml-auto flex min-w-0 flex-wrap items-center gap-2">
-              <select
-                value={theme}
-                aria-label="Preview theme"
-                className="h-8 rounded-md border border-line bg-background px-2 text-sm outline-none transition hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
-                onChange={(event) =>
-                  setTheme(event.target.value as BlockThemeName)
-                }
-              >
-                {blockThemes.map((themeItem) => (
-                  <option key={themeItem.name} value={themeItem.name}>
-                    {themeItem.label}
-                  </option>
-                ))}
-              </select>
-
               <div className="flex h-8 items-center rounded-md border border-line bg-background p-0.5">
                 {(["mobile", "tablet", "desktop"] as const).map((value) => {
                   const Icon = sizeIcons[value];
@@ -293,107 +262,100 @@ export function BlockViewer({
           </div>
         </div>
 
-        <Rule />
-
         {view === "preview" ? (
-          <div
-            className={cn(viewerBodyRail, "overflow-hidden bg-muted/20 py-2")}
-          >
+          <div className={viewerBodyRail}>
             <div
               className={cn(
-                "relative mx-auto max-w-full overflow-hidden rounded-xl border border-line bg-background transition-[max-width] duration-300",
-                sizeClass[size],
+                "overflow-hidden rounded-b-xl border border-line bg-muted/20",
+                size !== "desktop" &&
+                  "bg-[radial-gradient(circle,var(--color-line)_1px,transparent_1px)] [background-size:16px_16px]",
               )}
             >
-              <iframe
-                key={iframeKey}
-                src={previewUrl}
-                title={`${item.title} preview`}
-                className="block w-full border-0 bg-background"
-                style={{ height: item.meta?.iframeHeight ?? 780 }}
-                loading="lazy"
-              />
+              <div
+                className={cn(
+                  "relative mx-auto max-w-full overflow-hidden bg-background transition-[max-width] duration-300",
+                  sizeClass[size],
+                  size !== "desktop" && "my-2 rounded-xl border border-line",
+                )}
+              >
+                <iframe
+                  key={iframeKey}
+                  src={previewUrl}
+                  title={`${item.title} preview`}
+                  className="block w-full border-0 bg-background"
+                  style={{ height: item.meta?.iframeHeight ?? 780 }}
+                  loading="lazy"
+                />
+              </div>
             </div>
           </div>
         ) : file ? (
-          <div
-            data-block-code-viewer
-            className={cn(
-              viewerBodyRail,
-              "grid overflow-hidden bg-[#09090b] py-2 lg:h-[720px] lg:grid-cols-[288px_minmax(0,1fr)] lg:gap-2",
-            )}
-          >
-            <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-[#18181b] p-1 shadow-[0_18px_60px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.04)] max-lg:mb-2 max-lg:max-h-64">
-              <div className="flex h-10 shrink-0 items-center gap-2 px-3 text-sm font-medium text-zinc-400">
-                <Folder className="size-4" />
-                Files
+          <div className={viewerBodyRail}>
+            <div
+              data-block-code-viewer
+              className="grid gap-2 overflow-hidden rounded-b-xl border border-line bg-zinc-100 p-2 dark:bg-[#09090b] lg:h-[720px] lg:grid-cols-[288px_minmax(0,1fr)]"
+            >
+              <div className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-black/[0.08] bg-zinc-50 p-1 dark:border-white/[0.08] dark:bg-[#18181b] max-lg:max-h-64">
+                <div className="flex h-10 shrink-0 items-center gap-2 px-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                  <Folder className="size-4" />
+                  Files
+                </div>
+
+                <div className="min-h-0 flex-1 overflow-auto rounded-md border border-black/[0.08] bg-white py-1 dark:border-white/[0.08] dark:bg-[#09090b]">
+                  {tree.map((item) => (
+                    <FileTreeNode
+                      key={item.path ?? item.name}
+                      item={item}
+                      depth={0}
+                      activeFile={file.target}
+                      onSelect={setActiveFile}
+                    />
+                  ))}
+                </div>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-auto rounded-[9px] border border-white/[0.10] bg-[#050506] py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-                {tree.map((item) => (
-                  <FileTreeNode
-                    key={item.path ?? item.name}
-                    item={item}
-                    depth={0}
-                    activeFile={file.target}
-                    onSelect={setActiveFile}
+              <figure className="my-0 flex min-w-0 flex-col overflow-hidden rounded-lg border border-black/[0.08] bg-zinc-50 p-1 text-zinc-800 dark:border-white/[0.08] dark:bg-[#18181b] dark:text-zinc-200 max-lg:h-[560px]">
+                <figcaption className="relative flex h-10 shrink-0 items-center gap-3 px-3 pr-11 font-mono text-sm text-zinc-600 dark:text-zinc-400">
+                  <FileIcon file={file.target} />
+                  <span className="min-w-0 truncate text-zinc-800 dark:text-zinc-300">
+                    {activeFileName}
+                  </span>
+                  <span className="hidden min-w-0 truncate text-xs text-zinc-400 sm:block dark:text-zinc-500">
+                    {activeFileFolder}
+                  </span>
+                  <CopyIconButton
+                    text={file.content ?? ""}
+                    label="Copy file"
+                    className="absolute right-1.5 size-7 text-zinc-500 hover:bg-black/[0.05] hover:text-zinc-900 dark:hover:bg-white/[0.08] dark:hover:text-zinc-200"
                   />
-                ))}
-              </div>
-            </div>
+                </figcaption>
 
-            <figure className="my-0 flex min-w-0 flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-[#18181b] p-1 text-zinc-200 shadow-[0_18px_60px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.04)] max-lg:h-[560px]">
-              <figcaption className="relative flex h-10 shrink-0 items-center gap-3 px-3 pr-11 font-mono text-sm text-zinc-400">
-                <FileIcon file={file.target} />
-                <span className="min-w-0 truncate text-zinc-300">
-                  {activeFileName}
-                </span>
-                <span className="hidden min-w-0 truncate text-xs text-zinc-500 sm:block">
-                  {activeFileFolder}
-                </span>
-                <CopyIconButton
-                  text={file.content ?? ""}
-                  label="Copy file"
-                  className="absolute right-1.5 size-7 text-zinc-500 hover:bg-white/[0.08] hover:text-zinc-200"
-                />
-              </figcaption>
-
-              <div
-                data-code-block
-                data-block-code-panel
-                data-line-numbers="true"
-                className="min-h-0 flex-1 overflow-hidden rounded-[9px] border border-white/[0.10] bg-[#09090b] text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] [--code-number:rgba(161,161,170,0.42)] [&_.shiki]:h-full [&_code]:min-w-full [&_pre]:h-full [&_pre]:overflow-auto [&_pre]:py-4"
-              >
                 <div
-                  key={file.target}
-                  className="h-full [&_.shiki_[data-line]]:pr-4 [&_.shiki_[data-line]]:pl-4"
-                  dangerouslySetInnerHTML={{
-                    __html: file.highlightedContent,
-                  }}
-                />
-              </div>
-            </figure>
+                  data-code-block
+                  data-block-code-panel
+                  data-line-numbers="true"
+                  className="min-h-0 flex-1 overflow-hidden rounded-md border border-black/[0.08] bg-white text-sm [--block-code-bg:#fff] [--code-number:rgba(113,113,122,0.55)] dark:border-white/[0.08] dark:bg-[#09090b] dark:[--block-code-bg:#09090b] dark:[--code-number:rgba(161,161,170,0.42)] [&_.shiki]:h-full [&_code]:min-w-full [&_pre]:h-full [&_pre]:overflow-auto [&_pre]:py-4"
+                >
+                  <div
+                    key={file.target}
+                    className="h-full [&_.shiki_[data-line]]:pr-4 [&_.shiki_[data-line]]:pl-4"
+                    dangerouslySetInnerHTML={{
+                      __html: file.highlightedContent,
+                    }}
+                  />
+                </div>
+              </figure>
+            </div>
           </div>
         ) : (
-          <div className={cn(viewerBodyRail, "bg-muted/20 py-2")}>
-            <div className="flex min-h-80 items-center justify-center rounded-xl border border-line bg-background text-sm text-muted-foreground">
+          <div className={viewerBodyRail}>
+            <div className="flex min-h-80 items-center justify-center rounded-b-xl border border-line bg-background text-sm text-muted-foreground">
               No files available.
             </div>
           </div>
         )}
       </div>
     </section>
-  );
-}
-
-function Rule() {
-  return (
-    <div
-      aria-hidden="true"
-      className="mx-auto w-full max-w-[1360px] border-x border-line px-4 md:px-0"
-    >
-      <div className="h-px bg-foreground/15 dark:bg-white/12" />
-    </div>
   );
 }
 
@@ -417,18 +379,18 @@ function FileTreeNode({
       <div>
         <button
           type="button"
-          className="flex h-9 w-full min-w-0 items-center gap-2 px-3 text-left font-mono text-sm text-zinc-300 transition hover:bg-white/[0.06] hover:text-zinc-100"
+          className="flex h-9 w-full min-w-0 items-center gap-2 px-3 text-left font-mono text-sm text-zinc-700 transition hover:bg-black/[0.05] hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100"
           style={{ paddingLeft: `${0.75 + depth * 0.85}rem` }}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
           <ChevronRight
             className={cn(
-              "size-3.5 shrink-0 text-zinc-500 transition-transform",
+              "size-3.5 shrink-0 text-zinc-400 transition-transform dark:text-zinc-500",
               open && "rotate-90",
             )}
           />
-          <FolderIcon className="size-4 shrink-0 text-zinc-500" />
+          <FolderIcon className="size-4 shrink-0 text-zinc-400 dark:text-zinc-500" />
           <span className="truncate">{item.name}</span>
         </button>
         {open &&
@@ -453,8 +415,9 @@ function FileTreeNode({
       title={item.path}
       className={cn(
         "group flex h-9 w-full min-w-0 items-center gap-2 px-3 text-left font-mono text-sm text-zinc-500 transition-[background-color,color]",
-        "hover:bg-white/[0.06] hover:text-zinc-200",
-        isActive && "bg-[#1d1d20] text-zinc-200",
+        "hover:bg-black/[0.05] hover:text-zinc-900 dark:hover:bg-white/[0.06] dark:hover:text-zinc-200",
+        isActive &&
+          "bg-zinc-100 text-zinc-900 dark:bg-[#1d1d20] dark:text-zinc-200",
       )}
       style={{ paddingLeft: `${0.75 + depth * 0.85}rem` }}
       onClick={() => item.path && onSelect(item.path)}
@@ -471,24 +434,23 @@ function SegmentedControl({
   onValueChange,
 }: {
   value: string;
-  items: Array<{ value: string; label: string; icon: LucideIcon }>;
+  items: Array<{ value: string; label: string }>;
   onValueChange: (value: string) => void;
 }) {
   return (
-    <div className="flex h-8 items-center rounded-md border border-line bg-background p-0.5">
+    <div className="flex h-8 items-center gap-0.5 rounded-md border border-line bg-muted/35 p-0.5">
       {items.map((item) => {
-        const Icon = item.icon;
         return (
           <button
             key={item.value}
             type="button"
             className={cn(
-              "inline-flex h-6 items-center gap-1.5 rounded-sm px-2 text-sm text-muted-foreground transition hover:text-foreground",
-              value === item.value && "bg-muted text-foreground",
+              "inline-flex h-6 items-center justify-center rounded-sm px-2.5 text-sm font-medium text-muted-foreground transition-[color,background-color,box-shadow] hover:text-foreground",
+              value === item.value &&
+                "bg-foreground/[0.07] text-foreground shadow-sm ring-1 ring-line",
             )}
             onClick={() => onValueChange(item.value)}
           >
-            <Icon className="size-4" />
             {item.label}
           </button>
         );

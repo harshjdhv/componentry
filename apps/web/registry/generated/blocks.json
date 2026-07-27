@@ -5,7 +5,7 @@
     "description": "A simple centered hero with a warm cinematic gradient, compact badge, short copy, and two actions.",
     "type": "registry:block",
     "categories": [
-      "marketing"
+      "hero-section"
     ],
     "files": [
       {

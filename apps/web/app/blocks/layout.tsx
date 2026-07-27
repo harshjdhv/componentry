@@ -1,7 +1,12 @@
-import type { Metadata } from "next"
+import type { Metadata } from "next";
 
-import { BlocksHeading } from "@/components/blocks/blocks-heading"
-import { SiteHeader } from "@/components/site-header"
+import { BlocksNav } from "@/components/blocks/blocks-nav";
+import {
+  LandingGuideLines,
+  landingGutterClass,
+} from "@/components/landing/landing-frame";
+import { SiteHeader } from "@/components/site-header";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Blocks",
@@ -10,34 +15,29 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-}
+};
 
 export default function BlocksLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen overflow-x-clip bg-background text-foreground">
-      <div className="pointer-events-none fixed left-[max(1rem,calc((100vw-1440px)/2))] top-0 z-[60] hidden h-14 w-px bg-line md:block" />
-      <div className="pointer-events-none fixed right-[max(1rem,calc((100vw-1440px)/2))] top-0 z-[60] hidden h-14 w-px bg-line md:block" />
-      <div className="pointer-events-none fixed left-[max(1rem,calc((100vw-1440px)/2))] top-14 z-[61] hidden size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-[2px] border border-line bg-white md:block dark:bg-background" />
-      <div className="pointer-events-none fixed right-[max(1rem,calc((100vw-1440px)/2))] top-14 z-[61] hidden size-2.5 translate-x-1/2 -translate-y-1/2 rounded-[2px] border border-line bg-white md:block dark:bg-background" />
+      <LandingGuideLines />
       <SiteHeader />
       <main className="overflow-x-clip pt-14">
         <div
           data-blocks-layout
-          className="mx-0 min-h-[calc(100vh-3.5rem)] overflow-x-clip bg-background md:mx-[max(1rem,calc((100vw-1440px)/2))] md:border-x md:border-line"
+          className={cn(
+            "min-h-[calc(100vh-3.5rem)] overflow-x-clip bg-background",
+            landingGutterClass,
+          )}
         >
-          <div className="mx-auto w-full max-w-[1360px]">
-            <BlocksHeading
-              title="Composable blocks for real product screens."
-              description="Browse polished sections, preview them across themes, inspect the source, and drop them into your app."
-            />
-          </div>
+          <BlocksNav />
           <div className="relative overflow-x-clip">{children}</div>
         </div>
       </main>
     </div>
-  )
+  );
 }

@@ -56,14 +56,17 @@
   --sidebar-accent-foreground: var(--color-neutral-800);
   --sidebar-border: --alpha(var(--color-black) / 6%);
   --sidebar-ring: oklch(0.708 0 0);
-  --surface-inset: inset 0 1px 0 --alpha(var(--color-white) / 88%),
+  --surface-inset:
+    inset 0 1px 0 --alpha(var(--color-white) / 88%),
     inset 0 -1px 0 --alpha(var(--color-black) / 5%);
-  --shadow-card: var(--surface-inset), 0 1px 1px --alpha(var(--color-black) / 3%),
+  --shadow-card:
+    var(--surface-inset), 0 1px 1px --alpha(var(--color-black) / 3%),
     0 8px 24px --alpha(var(--color-black) / 4%);
-  --shadow-card-hover: var(--surface-inset),
-    0 1px 1px --alpha(var(--color-black) / 4%),
+  --shadow-card-hover:
+    var(--surface-inset), 0 1px 1px --alpha(var(--color-black) / 4%),
     0 14px 36px --alpha(var(--color-black) / 7%);
-  --shadow-panel: var(--surface-inset), 0 1px 2px --alpha(var(--color-black) / 4%);
+  --shadow-panel:
+    var(--surface-inset), 0 1px 2px --alpha(var(--color-black) / 4%);
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -120,14 +123,17 @@
   --sidebar-accent-foreground: var(--color-neutral-100);
   --sidebar-border: --alpha(var(--color-white) / 5%);
   --sidebar-ring: oklch(0.439 0 0);
-  --surface-inset: inset 0 1px 0 --alpha(var(--color-white) / 7%),
+  --surface-inset:
+    inset 0 1px 0 --alpha(var(--color-white) / 7%),
     inset 0 -1px 0 --alpha(var(--color-black) / 44%);
-  --shadow-card: var(--surface-inset), 0 1px 1px --alpha(var(--color-black) / 28%),
+  --shadow-card:
+    var(--surface-inset), 0 1px 1px --alpha(var(--color-black) / 28%),
     0 12px 28px --alpha(var(--color-black) / 24%);
-  --shadow-card-hover: var(--surface-inset),
-    0 1px 1px --alpha(var(--color-black) / 34%),
+  --shadow-card-hover:
+    var(--surface-inset), 0 1px 1px --alpha(var(--color-black) / 34%),
     0 18px 44px --alpha(var(--color-black) / 32%);
-  --shadow-panel: var(--surface-inset), 0 1px 2px --alpha(var(--color-black) / 28%);
+  --shadow-panel:
+    var(--surface-inset), 0 1px 2px --alpha(var(--color-black) / 28%);
 }
 
 @theme inline {
@@ -202,8 +208,12 @@
   }
 
   @keyframes shimmer {
-    0% { background-position: 200% center; }
-    100% { background-position: -200% center; }
+    0% {
+      background-position: 200% center;
+    }
+    100% {
+      background-position: -200% center;
+    }
   }
 
   @keyframes shimmer-slide {
@@ -228,8 +238,6 @@
       transform: translateZ(0) rotate(360deg);
     }
   }
-
-
 
   --animate-pulse: pulse var(--duration) ease-out infinite;
 
@@ -386,8 +394,12 @@ body:has([data-blocks-layout])::-webkit-scrollbar,
 
 [data-block-code-panel] .shiki,
 [data-block-code-panel] .shiki span {
-  color: var(--shiki-dark) !important;
   background-color: transparent !important;
+}
+
+.dark [data-block-code-panel] .shiki,
+.dark [data-block-code-panel] .shiki span {
+  color: var(--shiki-dark) !important;
 }
 
 [data-block-code-panel][data-line-numbers="true"] .shiki [data-line]::before {
@@ -397,7 +409,7 @@ body:has([data-blocks-layout])::-webkit-scrollbar,
   width: 2.25rem;
   margin-right: 1rem;
   color: var(--code-number);
-  background: #09090b;
+  background: var(--block-code-bg);
 }
 
 [data-block-code-panel] pre {

@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import { Fragment } from "react";
-
-import { BlockDisplay } from "@/components/blocks/block-display";
-import { BlocksStripeDivider } from "@/components/blocks/blocks-list-decor";
-import { BlocksNav } from "@/components/blocks/blocks-nav";
-import { getAllBlocks } from "@/lib/blocks/registry";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-static";
 
@@ -15,18 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function BlocksPage() {
-  const blocks = getAllBlocks();
-
-  return (
-    <>
-      <BlocksNav />
-
-      {blocks.map((block) => (
-        <Fragment key={block.name}>
-          <BlockDisplay name={block.name} />
-          <BlocksStripeDivider />
-        </Fragment>
-      ))}
-    </>
-  );
+  redirect("/blocks/hero-section");
 }

@@ -2,7 +2,12 @@
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "componentry",
   "homepage": "https://componentry.fun",
-  "aliases": ["componentry", "componentryui", "ui", "cmp"],
+  "aliases": [
+    "componentry",
+    "componentryui",
+    "ui",
+    "cmp"
+  ],
   "items": [
     {
       "name": "animated-gradient",
@@ -63,10 +68,6 @@
     {
       "name": "github-calendar",
       "type": "registry:ui"
-    },
-    {
-      "name": "gradient-hero-01",
-      "type": "registry:block"
     },
     {
       "name": "hero-geometric",
@@ -227,6 +228,10 @@
     {
       "name": "webgl-liquid",
       "type": "registry:ui"
+    },
+    {
+      "name": "gradient-hero-01",
+      "type": "registry:block"
     }
   ]
 }
