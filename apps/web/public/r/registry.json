@@ -129,6 +129,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "morphing-icon",
+      "type": "registry:ui"
+    },
+    {
       "name": "music-player",
       "type": "registry:ui"
     },

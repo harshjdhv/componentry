@@ -166,6 +166,10 @@ const docsImportMap: Record<
     import("@/components/docs/eye-tracking").then((m) => ({
       default: m.EyeTrackingDocs,
     })),
+  "morphing-icon": () =>
+    import("@/components/docs/morphing-icon").then((m) => ({
+      default: m.MorphingIconDocs,
+    })),
 };
 
 /**

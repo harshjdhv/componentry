@@ -223,6 +223,14 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/eyetracking.webm",
   },
+  "morphing-icon": {
+    title: "Morphing Icon",
+    description:
+      "Three-stroke interface icons that transition smoothly between controlled states.",
+    category: "Components",
+    slug: "morphing-icon",
+    addedAt: "2026-07-27",
+  },
   // Hero Backgrounds
   "hero-geometric": {
     title: "Hero Geometric",
