@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Mail } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
 import { LandingContent } from "@/components/landing/landing-frame";
+import posthog from "posthog-js";
 
 const emailAddress = "harshjadhavconnect@gmail.com";
 
@@ -59,6 +60,7 @@ export function CustomWorkCta() {
               <div className="mt-auto flex items-center gap-2 pt-6">
                 <a
                   href={`mailto:${emailAddress}?subject=Custom%20design%20work`}
+                  onClick={() => posthog.capture("custom_work_contact_started")}
                   className="group inline-flex h-9 items-center justify-center gap-2 rounded-full bg-foreground px-3.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
                 >
                   Send an email

@@ -47,6 +47,7 @@ export function PackageManagerCommand({
     <DocsCodePanel
       icon={Terminal}
       copyCode={command}
+      copyEventName="component_install_command_copied"
       tabs={tabs}
       activeTab={selected}
       onTabChange={(id) => setSelected(id as PackageManager)}

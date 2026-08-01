@@ -13,6 +13,7 @@ export interface DocsCodePanelTab {
 interface DocsCodePanelProps {
   icon: LucideIcon
   copyCode: string
+  copyEventName?: "content_copied" | "component_install_command_copied"
   tabs?: DocsCodePanelTab[]
   activeTab?: string
   onTabChange?: (id: string) => void
@@ -24,6 +25,7 @@ interface DocsCodePanelProps {
 export function DocsCodePanel({
   icon: Icon,
   copyCode,
+  copyEventName,
   tabs,
   activeTab,
   onTabChange,
@@ -77,7 +79,12 @@ export function DocsCodePanel({
           )}
         </div>
 
-        <CopyButton code={copyCode} absolute={false} className="shrink-0 p-1.5" />
+        <CopyButton
+          code={copyCode}
+          eventName={copyEventName}
+          absolute={false}
+          className="shrink-0 p-1.5"
+        />
       </div>
 
       <div className="relative">{children}</div>

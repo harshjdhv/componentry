@@ -2,18 +2,26 @@
 
 import { useState } from "react"
 import { Check, Copy } from "lucide-react"
+import posthog from "posthog-js"
 
 interface CopyButtonProps {
   code: string
   className?: string
   absolute?: boolean
+  eventName?: "content_copied" | "component_install_command_copied"
 }
 
-export function CopyButton({ code, className, absolute = true }: CopyButtonProps) {
+export function CopyButton({
+  code,
+  className,
+  absolute = true,
+  eventName = "content_copied",
+}: CopyButtonProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code)
+    posthog.capture(eventName)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

@@ -12,6 +12,7 @@ import {
 } from "@/components/landing/landing-frame"
 import { SiteHeader } from "@/components/site-header"
 import { cn } from "@/lib/utils"
+import posthog from "posthog-js"
 
 const sponsorHref =
   "https://github.com/sponsors/harshjdhv?utm_source=componentry&utm_medium=sponsor&utm_campaign=sponsors_page"
@@ -92,6 +93,7 @@ function SponsorCta({
       href={sponsorHref}
       target="_blank"
       rel="noreferrer"
+      onClick={() => posthog.capture("sponsor_checkout_started")}
       className={cn(
         "group inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-950 px-3.5 text-sm font-normal text-white [transform:translate3d(0,0,0)] transition-[background-color,transform] duration-300 ease-out-strong will-change-transform hover:[transform:translate3d(0,-1px,0)] hover:bg-zinc-800 active:[transform:translate3d(0,0,0)] motion-reduce:transform-none motion-reduce:transition-colors motion-reduce:will-change-auto dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200",
         className
@@ -283,6 +285,11 @@ export default function SponsorsPage() {
                     href={sponsorHref}
                     target="_blank"
                     rel="noreferrer"
+                    onClick={() =>
+                      posthog.capture("sponsor_checkout_started", {
+                        sponsorship_tier: tier.name.toLowerCase(),
+                      })
+                    }
                     className="group relative block min-h-full pt-10"
                   >
                     <div className="pointer-events-none absolute inset-x-0 top-0 bottom-2 z-0 rounded-[1.35rem] bg-white/45 opacity-0 shadow-[0_0_0_1px_rgba(0,0,0,0.05),inset_0_18px_40px_-30px_rgba(0,0,0,0.28),inset_0_-18px_40px_-32px_rgba(0,0,0,0.24)] backdrop-blur-xl [transform:translate3d(0,14px,0)] transition-[opacity,transform] duration-150 ease-in will-change-[opacity,transform] group-hover:opacity-100 group-hover:[transform:translate3d(0,0,0)] group-hover:duration-500 group-hover:ease-out-strong motion-reduce:transform-none motion-reduce:transition-opacity motion-reduce:will-change-auto dark:bg-white/[0.055] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.07),inset_0_18px_40px_-30px_rgba(255,255,255,0.2),inset_0_-18px_40px_-32px_rgba(255,255,255,0.16)]">
