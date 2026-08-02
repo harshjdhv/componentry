@@ -218,6 +218,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "text-morph",
+      "type": "registry:ui"
+    },
+    {
       "name": "text-repel",
       "type": "registry:ui"
     },

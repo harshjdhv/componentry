@@ -101,6 +101,14 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/text-animations/textrepel.webm",
   },
+  "text-morph": {
+    title: "Text Morph",
+    description:
+      "Fluid word transitions that blend blurred silhouettes through a crisp SVG alpha threshold.",
+    category: "Text Animations",
+    slug: "text-morph",
+    addedAt: "2026-08-02",
+  },
   "kinetic-text-reveal": {
     title: "Kinetic Text Reveal",
     description:

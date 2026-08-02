@@ -122,6 +122,10 @@ const docsImportMap: Record<
     import("@/components/docs/text-repel").then((m) => ({
       default: m.TextRepelDocs,
     })),
+  "text-morph": () =>
+    import("@/components/docs/text-morph").then((m) => ({
+      default: m.TextMorphDocs,
+    })),
   "kinetic-text-reveal": () =>
     import("@/components/docs/kinetic-text-reveal").then((m) => ({
       default: m.KineticTextRevealDocs,

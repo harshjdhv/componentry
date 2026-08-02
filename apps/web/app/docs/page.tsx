@@ -14,6 +14,7 @@ import {
 } from "@/components/landing/landing-frame"
 import { cn } from "@/lib/utils"
 import { AsciiCatalogPreview } from "@/components/docs/previews/ascii-effect-preview"
+import { TextMorphCardPreview } from "@/components/docs/previews/text-morph-card-preview"
 
 type PreviewSources = {
   mp4: string
@@ -194,6 +195,7 @@ function ComponentCard({
             {component.category === "ASCII Effects" && (
               <AsciiCatalogPreview />
             )}
+            {component.slug === "text-morph" && <TextMorphCardPreview />}
             {previewPosterSrc && (
               <img
                 src={previewPosterSrc}
