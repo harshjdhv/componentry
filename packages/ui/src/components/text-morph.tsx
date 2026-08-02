@@ -9,7 +9,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
 } from "react";
 
 export interface TextMorphProps {
@@ -19,39 +18,13 @@ export interface TextMorphProps {
   interval?: number;
   /** Duration of the fluid morph itself, in milliseconds. */
   morphDuration?: number;
-  /** Maximum blur used to blend the outgoing and incoming silhouettes. */
-  blur?: number;
-  /** Alpha contrast applied by the SVG threshold filter. */
-  threshold?: number;
-  /** Optional supporting copy rendered beneath the morphing text. */
-  subtext?: string;
-  /** CSS font-size value for the morphing text. */
-  fontSize?: string;
-  /** CSS font-family value. Inherits from the surrounding page by default. */
-  fontFamily?: string;
-  /** CSS font-weight value for the morphing text. */
-  fontWeight?: CSSProperties["fontWeight"];
-  /** Horizontal alignment of the text and subtext. */
-  align?: "left" | "center" | "right";
-  /** Smoothly interpolate the stage width between differently sized words. */
-  animateWidth?: boolean;
-  /** Automatically continue cycling through the supplied words. */
-  loop?: boolean;
-  /** Pause the next cycle while the component is hovered or focused. */
-  pauseOnHover?: boolean;
-  /** Additional classes applied to the root wrapper. */
+  /** Additional classes applied to the component. */
   className?: string;
-  /** Additional classes applied to the morphing text stage. */
-  textClassName?: string;
-  /** Additional classes applied to the supporting text. */
-  subtextClassName?: string;
-  /** Called immediately before a morph begins. */
-  onMorphStart?: (nextWord: string, nextIndex: number) => void;
-  /** Called after a morph resolves into a crisp resting word. */
-  onMorphComplete?: (word: string, index: number) => void;
 }
 
 const DEFAULT_WORDS = ["IMAGINE", "REFINE", "RELEASE"];
+const MORPH_BLUR = 12;
+const MORPH_THRESHOLD = 18;
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -84,35 +57,20 @@ function setLayerStyles(
 ) {
   element.style.opacity = opacity.toFixed(4);
   element.style.filter = blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : "none";
-  element.style.transform = `scale(${scale.toFixed(4)})`;
+  element.style.transform = `translateX(-50%) scale(${scale.toFixed(4)})`;
 }
 
 export function TextMorph({
   words = DEFAULT_WORDS,
   interval = 2600,
   morphDuration = 680,
-  blur = 12,
-  threshold = 18,
-  subtext,
-  fontSize = "clamp(3rem, 14vw, 9rem)",
-  fontFamily = "inherit",
-  fontWeight = 700,
-  align = "center",
-  animateWidth = true,
-  loop = true,
-  pauseOnHover = true,
   className,
-  textClassName,
-  subtextClassName,
-  onMorphStart,
-  onMorphComplete,
 }: TextMorphProps) {
   const values = useMemo(() => {
     const filtered = words.filter((word) => word.trim().length > 0);
     return filtered.length > 0 ? filtered : DEFAULT_WORDS;
   }, [words]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
   const currentLayerRef = useRef<HTMLSpanElement>(null);
   const nextLayerRef = useRef<HTMLSpanElement>(null);
   const stageRef = useRef<HTMLSpanElement>(null);
@@ -127,7 +85,7 @@ export function TextMorph({
   const nextIndex = (safeIndex + 1) % values.length;
   const currentWord = values[safeIndex]!;
   const nextWord = values[nextIndex]!;
-  const thresholdOffset = -Math.max(1, threshold) * 0.46;
+  const thresholdOffset = -MORPH_THRESHOLD * 0.46;
 
   const measureStage = useCallback(
     (target: "current" | "next", immediate = false) => {
@@ -136,24 +94,24 @@ export function TextMorph({
         target === "current" ? currentLayerRef.current : nextLayerRef.current;
       if (!stage || !layer) return;
 
-      // Read the untransformed glyph width. The incoming layer rests at a
-      // fractional scale, which must not leak into the layout target.
-      const previousTransform = layer.style.transform;
-      layer.style.transform = "none";
-      const width = layer.getBoundingClientRect().width;
-      layer.style.transform = previousTransform;
-      if (immediate || !animateWidth || reducedMotion) {
+      // offsetWidth/offsetHeight exclude transforms, so both layers are
+      // measured from their crisp resting geometry around the same center.
+      const width = layer.offsetWidth;
+      const height = layer.offsetHeight;
+      if (immediate || reducedMotion) {
         const previousTransition = stage.style.transition;
         stage.style.transition = "none";
         stage.style.width = `${width}px`;
+        stage.style.height = `${height}px`;
         void stage.offsetWidth;
         stage.style.transition = previousTransition;
         return;
       }
 
       stage.style.width = `${width}px`;
+      stage.style.height = `${height}px`;
     },
-    [animateWidth, reducedMotion],
+    [reducedMotion],
   );
 
   useLayoutEffect(() => {
@@ -163,23 +121,15 @@ export function TextMorph({
     if (!currentLayer || !nextLayer || !stage) return;
 
     setLayerStyles(currentLayer, 1, 0, 1);
-    setLayerStyles(nextLayer, 0, reducedMotion ? 0 : blur, 0.992);
+    setLayerStyles(nextLayer, 0, reducedMotion ? 0 : MORPH_BLUR, 0.992);
     currentLayer.style.willChange = "auto";
     nextLayer.style.willChange = "auto";
     stage.style.filter = "none";
-    stage.style.transition = animateWidth
-      ? `width ${Math.max(160, morphDuration)}ms cubic-bezier(0.22, 1, 0.36, 1)`
-      : "none";
+    stage.style.transition = reducedMotion
+      ? "none"
+      : `width ${Math.max(160, morphDuration)}ms cubic-bezier(0.22, 1, 0.36, 1), height ${Math.max(160, morphDuration)}ms cubic-bezier(0.22, 1, 0.36, 1)`;
     measureStage("current", true);
-  }, [
-    animateWidth,
-    blur,
-    currentIndex,
-    measureStage,
-    morphDuration,
-    reducedMotion,
-    values,
-  ]);
+  }, [currentIndex, measureStage, morphDuration, reducedMotion, values]);
 
   useEffect(() => {
     const currentLayer = currentLayerRef.current;
@@ -213,7 +163,6 @@ export function TextMorph({
     nextLayer.style.willChange = "opacity, filter, transform";
     stage.style.filter = reducedMotion ? "none" : `url(#${filterId})`;
     measureStage("next");
-    onMorphStart?.(nextWord, nextIndex);
 
     const startedAt = performance.now();
     const resolvedDuration = reducedMotion ? 140 : Math.max(240, morphDuration);
@@ -234,13 +183,13 @@ export function TextMorph({
         setLayerStyles(
           currentLayer,
           Math.pow(1 - outgoing, 0.55),
-          blur * outgoing,
+          MORPH_BLUR * outgoing,
           1 - outgoing * 0.012,
         );
         setLayerStyles(
           nextLayer,
           Math.pow(incoming, 0.55),
-          blur * (1 - incoming),
+          MORPH_BLUR * (1 - incoming),
           0.988 + incoming * 0.012,
         );
       }
@@ -255,25 +204,20 @@ export function TextMorph({
       nextLayer.style.willChange = "auto";
       morphingRef.current = false;
       setCurrentIndex(nextIndex);
-      onMorphComplete?.(nextWord, nextIndex);
     };
 
     frameRef.current = window.requestAnimationFrame(renderFrame);
   }, [
-    blur,
     filterId,
     measureStage,
     morphDuration,
     nextIndex,
-    nextWord,
-    onMorphComplete,
-    onMorphStart,
     reducedMotion,
     values.length,
   ]);
 
   useEffect(() => {
-    if (!loop || paused || values.length < 2) return;
+    if (values.length < 2) return;
 
     holdTimerRef.current = window.setTimeout(
       beginMorph,
@@ -285,7 +229,7 @@ export function TextMorph({
         window.clearTimeout(holdTimerRef.current);
       }
     };
-  }, [beginMorph, currentIndex, interval, loop, paused, values.length]);
+  }, [beginMorph, currentIndex, interval, values.length]);
 
   useEffect(
     () => () => {
@@ -304,41 +248,13 @@ export function TextMorph({
     setCurrentIndex(0);
   }, [currentIndex, values.length]);
 
-  const alignmentClasses = {
-    left: "items-start text-left",
-    center: "items-center text-center",
-    right: "items-end text-right",
-  } as const;
-  const layerPositionClasses = {
-    left: "left-0",
-    center: "inset-x-0 mx-auto",
-    right: "right-0",
-  } as const;
-  const layerTransformOrigins = {
-    left: "left center",
-    center: "center center",
-    right: "right center",
-  } as const;
-
   return (
     <span
       className={cn(
-        "relative inline-flex max-w-full flex-col",
-        alignmentClasses[align],
+        "relative inline-block max-w-full align-baseline",
         className,
       )}
-      onMouseEnter={() => pauseOnHover && setPaused(true)}
-      onMouseLeave={() => pauseOnHover && setPaused(false)}
-      onFocusCapture={() => pauseOnHover && setPaused(true)}
-      onBlurCapture={(event) => {
-        if (
-          pauseOnHover &&
-          !event.currentTarget.contains(event.relatedTarget)
-        ) {
-          setPaused(false);
-        }
-      }}
-      aria-label={[currentWord, subtext].filter(Boolean).join(" — ")}
+      aria-label={currentWord}
       aria-live="off"
     >
       <svg
@@ -358,7 +274,7 @@ export function TextMorph({
             <feColorMatrix
               in="SourceGraphic"
               type="matrix"
-              values={`1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${Math.max(1, threshold)} ${thresholdOffset}`}
+              values={`1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${MORPH_THRESHOLD} ${thresholdOffset}`}
               result="thresholded"
             />
             <feComposite in="SourceGraphic" in2="thresholded" operator="atop" />
@@ -369,52 +285,27 @@ export function TextMorph({
       <span
         ref={stageRef}
         aria-hidden="true"
-        className={cn(
-          "relative inline-block min-w-0 max-w-full shrink-0 select-none leading-[0.88] tracking-[-0.065em]",
-          textClassName,
-        )}
-        style={{
-          fontSize,
-          fontFamily,
-          fontWeight,
-          height: "0.88em",
-          textRendering: "geometricPrecision",
-        }}
+        className="relative block min-w-0 max-w-full select-none"
       >
         <span
           ref={currentLayerRef}
-          className={cn(
-            "absolute top-0 block w-max whitespace-pre",
-            layerPositionClasses[align],
-          )}
-          style={{ transformOrigin: layerTransformOrigins[align] }}
+          className="absolute left-1/2 top-0 block w-max whitespace-pre"
+          style={{ transform: "translateX(-50%)", transformOrigin: "center" }}
         >
           {currentWord}
         </span>
         <span
           ref={nextLayerRef}
-          className={cn(
-            "absolute top-0 block w-max whitespace-pre",
-            layerPositionClasses[align],
-          )}
-          style={{ transformOrigin: layerTransformOrigins[align] }}
+          className="absolute left-1/2 top-0 block w-max whitespace-pre opacity-0"
+          style={{
+            filter: `blur(${MORPH_BLUR}px)`,
+            transform: "translateX(-50%) scale(0.992)",
+            transformOrigin: "center",
+          }}
         >
           {nextWord}
         </span>
       </span>
-
-      {subtext && (
-        <span
-          aria-hidden="true"
-          className={cn(
-            "mt-6 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-current/45",
-            subtextClassName,
-          )}
-          style={{ fontFamily }}
-        >
-          {subtext}
-        </span>
-      )}
     </span>
   );
 }

@@ -104,7 +104,7 @@ export const components: Record<string, ComponentMetadata> = {
   "text-morph": {
     title: "Text Morph",
     description:
-      "Fluid word transitions that blend blurred silhouettes through a crisp SVG alpha threshold.",
+      "Centered fluid text transitions that inherit the surrounding typography and theme.",
     category: "Text Animations",
     slug: "text-morph",
     addedAt: "2026-08-02",
