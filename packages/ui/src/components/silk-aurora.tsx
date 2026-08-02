@@ -2,10 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@workspace/ui/lib/utils";
-import {
-  WebGLErrorBoundary,
-  WebGLFallback,
-} from "@workspace/ui/components/webgl-error-boundary";
+import { WebGLErrorBoundary } from "@workspace/ui/components/webgl-error-boundary";
 
 const VERTEX_SHADER = `
 attribute vec2 position;
@@ -19,23 +16,43 @@ const FRAGMENT_SHADER = `
 precision highp float;
 
 uniform vec2 u_res;
-uniform vec2 u_mouse;
+uniform vec2 u_pointer;
+uniform vec2 u_flowDirection;
 uniform float u_time;
 uniform float u_speed;
+uniform float u_animationSpeed;
 uniform float u_intensity;
-uniform float u_grain;
+uniform float u_opacity;
+uniform float u_blur;
+uniform float u_contrast;
+uniform float u_brightness;
+uniform float u_layers;
+uniform float u_flowScale;
+uniform float u_flowStrength;
+uniform float u_pointerStrength;
+uniform float u_scroll;
+uniform float u_parallaxStrength;
+uniform float u_grainOpacity;
+uniform float u_noiseOpacity;
+uniform float u_noiseScale;
+uniform float u_lighting;
+uniform float u_lightingIntensity;
+uniform float u_lightingRadius;
+uniform float u_lightingSpeed;
+uniform float u_ambientGlow;
+uniform float u_ambientOpacity;
 uniform float u_vignette;
-uniform float u_mouseInfluence;
-uniform vec3 u_base;
-uniform vec3 u_mid;
-uniform vec3 u_sheen;
-uniform vec3 u_accent;
+uniform vec3 u_color0;
+uniform vec3 u_color1;
+uniform vec3 u_color2;
+uniform vec3 u_color3;
+uniform vec3 u_color4;
 
 float hash(vec2 p) {
-  return fract(sin(dot(p, vec2(41.93, 289.17))) * 43758.5453123);
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
 }
 
-float noise(vec2 p) {
+float valueNoise(vec2 p) {
   vec2 i = floor(p);
   vec2 f = fract(p);
   vec2 u = f * f * (3.0 - 2.0 * f);
@@ -48,24 +65,30 @@ float noise(vec2 p) {
   return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
+mat2 rotate2d(float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+  return mat2(c, -s, s, c);
+}
+
 float fbm(vec2 p) {
   float value = 0.0;
-  float amp = 0.5;
-  mat2 rot = mat2(0.82, 0.57, -0.57, 0.82);
+  float amplitude = 0.52;
+  mat2 turn = mat2(0.84, 0.54, -0.54, 0.84);
 
-  for (int i = 0; i < 5; i++) {
-    value += amp * noise(p);
-    p = rot * p * 2.03;
-    amp *= 0.5;
+  for (int i = 0; i < 7; i++) {
+    float enabled = step(float(i) + 0.5, u_layers);
+    value += amplitude * valueNoise(p) * enabled;
+    p = turn * p * 2.03 + 0.17;
+    amplitude *= 0.5;
   }
 
   return value;
 }
 
-float ribbon(vec2 p, float offset, float width, float softness) {
-  float y = p.y + sin(p.x * 1.8 + offset) * 0.18;
-  y += sin(p.x * 4.2 - offset * 0.7) * 0.045;
-  return smoothstep(width + softness, width, abs(y));
+vec3 grade(vec3 color, float contrast, float brightness) {
+  color = (color - 0.5) * contrast + 0.5;
+  return color * brightness;
 }
 
 void main() {
@@ -73,420 +96,602 @@ void main() {
   float aspect = u_res.x / max(u_res.y, 1.0);
   vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
 
-  vec2 mouse = (u_mouse - 0.5) * vec2(aspect, 1.0);
-  float t = u_time * 0.12 * u_speed;
-  float pointerFalloff = smoothstep(0.72, 0.0, length(p - mouse));
-  p += (mouse - p) * pointerFalloff * 0.05 * u_mouseInfluence;
+  float t = u_time * 0.075 * u_speed * u_animationSpeed;
+  vec2 direction = normalize(u_flowDirection + vec2(0.0001));
+  vec2 crossDirection = vec2(-direction.y, direction.x);
 
-  vec2 silk = p;
-  silk.x += fbm(p * 1.6 + vec2(t * 0.8, -t * 0.35)) * 0.16;
-  silk.y += fbm(p * 2.2 + vec2(-t * 0.25, t * 0.7)) * 0.10;
+  vec2 pointer = (u_pointer - 0.5) * vec2(aspect, 1.0);
+  vec2 pointerDelta = pointer - p;
+  float pointerFalloff = smoothstep(0.68, 0.0, length(pointerDelta));
+  p += crossDirection * pointerDelta.x * pointerFalloff * 0.035 * u_pointerStrength;
+  p += direction * pointerDelta.y * pointerFalloff * 0.022 * u_pointerStrength;
 
-  float veilA = ribbon(silk + vec2(-0.18, 0.08), t * 2.1, 0.055, 0.22);
-  float veilB = ribbon(silk * vec2(0.86, 1.18) + vec2(0.2, -0.14), -t * 2.8 + 1.7, 0.038, 0.18);
-  float veilC = ribbon(silk * vec2(1.18, 0.9) + vec2(-0.08, 0.24), t * 1.4 - 2.1, 0.03, 0.16);
+  p.y += u_scroll * 0.045 * u_parallaxStrength;
+  p.x -= u_scroll * 0.018 * u_parallaxStrength;
 
-  float atmosphere = fbm(p * 1.35 + vec2(t * 0.22, -t * 0.1));
-  float pearlescent = pow(max(0.0, sin((p.x - p.y) * 7.5 + atmosphere * 4.0 - t * 2.5)), 5.0);
-  float glint = pow(max(0.0, noise(gl_FragCoord.xy * 0.065 + t * 18.0) - 0.72), 5.0);
+  float scale = max(0.2, u_flowScale);
+  vec2 broadP = p * scale;
+  float warpA = fbm(broadP * 0.82 + direction * t * 0.71 + vec2(2.7, -1.3));
+  float warpB = fbm(rotate2d(0.73) * broadP * 1.08 - crossDirection * t * 0.53 + vec2(-4.1, 3.6));
+  float warpC = fbm(rotate2d(-0.46) * broadP * 1.42 + vec2(-t * 0.31, t * 0.43) + 8.2);
 
-  vec3 col = u_base;
-  col = mix(col, u_mid, smoothstep(-0.45, 0.75, p.y + atmosphere * 0.75));
-  col += u_accent * veilA * 0.72 * u_intensity;
-  col += u_sheen * veilB * 0.64 * u_intensity;
-  col += mix(u_sheen, u_accent, 0.35) * veilC * 0.42 * u_intensity;
-  col += u_sheen * pearlescent * 0.075 * u_intensity;
-  col += vec3(1.0, 0.93, 0.82) * glint * 0.22 * u_intensity;
-  col += u_sheen * pointerFalloff * 0.08 * u_mouseInfluence;
+  vec2 silk = broadP;
+  silk += vec2(warpA - 0.5, warpB - 0.5) * 0.72 * u_flowStrength;
+  silk += direction * (warpC - 0.5) * 0.28 * u_flowStrength;
 
-  float vignette = smoothstep(1.25, 0.22, length(p));
-  col *= mix(1.0 - u_vignette * 0.42, 1.06, vignette);
+  float fieldA = fbm(rotate2d(0.28) * silk * 0.74 + direction * t * 0.83 + 1.9);
+  float fieldB = fbm(rotate2d(-0.81) * silk * 0.91 - crossDirection * t * 0.61 + 5.4);
+  float fieldC = fbm(rotate2d(1.17) * silk * 1.16 + vec2(t * 0.37, -t * 0.29) + 9.7);
 
-  float grain = (hash(gl_FragCoord.xy + t * 90.0) - 0.5) * 0.08 * u_grain;
-  col += grain;
+  float softness = clamp(u_blur * 0.08, 0.025, 0.2);
+  float veilA = smoothstep(0.28 - softness, 0.76 + softness, fieldA + (warpB - 0.5) * 0.28);
+  float veilB = smoothstep(0.34 - softness, 0.82 + softness, fieldB + (warpC - 0.5) * 0.24);
+  float veilC = smoothstep(0.42 - softness, 0.86 + softness, fieldC + (fieldA - 0.5) * 0.18);
 
-  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+  float folded = 0.5 + 0.5 * sin(
+    silk.y * 2.7 + silk.x * 0.72 + warpA * 3.1 - warpB * 1.9 + t * 0.47
+  );
+  float silkFold = smoothstep(0.18, 0.92, folded) * smoothstep(0.12, 0.94, fieldB);
+
+  vec3 color = mix(u_color0, u_color1, clamp(0.22 + veilA * 0.62, 0.0, 1.0));
+  color = mix(color, u_color2, veilB * 0.58 * u_intensity);
+  color = mix(color, u_color3, veilC * 0.42 * u_intensity);
+  color += u_color4 * silkFold * 0.13 * u_intensity;
+
+  vec2 lightCenter = vec2(
+    0.5 + sin(t * 0.37 * u_lightingSpeed + 1.4) * 0.24,
+    0.48 + cos(t * 0.29 * u_lightingSpeed - 0.8) * 0.18
+  );
+  vec2 lightDelta = uv - lightCenter;
+  lightDelta = rotate2d(0.42 + warpA * 0.22) * lightDelta;
+  lightDelta *= vec2(0.74, 1.32);
+  float lightRadius = max(0.08, u_lightingRadius * 0.34);
+  float bloom = exp(-dot(lightDelta, lightDelta) / (lightRadius * lightRadius));
+  bloom *= 0.76 + fieldC * 0.24;
+  color += mix(u_color3, u_color4, 0.58) * bloom * 0.22 * u_lightingIntensity * u_lighting;
+
+  vec2 ambientDelta = uv - vec2(0.52, 0.47);
+  ambientDelta *= vec2(0.72, 1.0);
+  float ambient = exp(-dot(ambientDelta, ambientDelta) / 0.34);
+  color += mix(u_color2, u_color4, 0.5) * ambient * 0.12 * u_ambientOpacity * u_ambientGlow;
+
+  float haze = fbm(p * max(0.5, u_noiseScale) * 2.6 + vec2(-t * 0.18, t * 0.14));
+  color += (haze - 0.5) * u_noiseOpacity * 0.16;
+
+  float vignetteMask = smoothstep(0.18, 1.08, length((uv - 0.5) * vec2(1.0, 0.86)));
+  color *= 1.0 - vignetteMask * 0.52 * u_vignette;
+
+  float grain = hash(gl_FragCoord.xy + floor(u_time * 12.0) * 17.0) - 0.5;
+  color += grain * u_grainOpacity * 0.16;
+  color = grade(color, u_contrast, u_brightness);
+
+  gl_FragColor = vec4(clamp(color, 0.0, 1.0), clamp(u_opacity, 0.0, 1.0));
 }
 `;
 
 const HEX_COLOR_REGEX = /^#?[0-9a-fA-F]{6}$/;
 
-const DEFAULT_BASE = "#050507";
-const DEFAULT_MID = "#14151d";
-const DEFAULT_SHEEN = "#f4dfb8";
-const DEFAULT_ACCENT = "#6ed6c9";
+export const SILK_AURORA_PRESETS = {
+  ocean: ["#020817", "#062a55", "#0b62b4", "#39bfe6", "#d9f6ff"],
+  aurora: ["#07051a", "#25105e", "#4d43c7", "#20a7a0", "#c3f5eb"],
+  sky: ["#071425", "#16456e", "#4d9acb", "#9edbf0", "#eefaff"],
+  cloud: ["#20242c", "#4b5360", "#8c98a7", "#ced5dc", "#f7f8fa"],
+  sunset: ["#1d0812", "#6d1e3e", "#d95b48", "#f2a35b", "#ffe2a6"],
+  midnight: ["#010206", "#080d1c", "#17264d", "#304d7f", "#a8c6ef"],
+  ice: ["#07141b", "#123b49", "#3e8796", "#a6e4e7", "#f1ffff"],
+  dream: ["#10091c", "#3b1d58", "#8d4ca0", "#df91bd", "#ffe7f1"],
+  nebula: ["#090512", "#32104a", "#813b8f", "#315fa8", "#e2b7ff"],
+  emerald: ["#03120e", "#073c2c", "#0e7358", "#53c89f", "#d9fff0"],
+  lavender: ["#100b20", "#30205d", "#6252a6", "#b58bc6", "#f4dff4"],
+  mono: ["#020202", "#171717", "#414141", "#8a8a8a", "#f2f2f2"],
+} as const;
 
-function sanitizeHexColor(value: string, fallback: string) {
-  const trimmed = value.trim();
-  if (!HEX_COLOR_REGEX.test(trimmed)) {
-    return fallback;
-  }
-
-  return trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
-}
-
-function hexToRgb01(hex: string, fallback: string): [number, number, number] {
-  const normalized = sanitizeHexColor(hex, fallback).replace("#", "");
-  const r = parseInt(normalized.slice(0, 2), 16) / 255;
-  const g = parseInt(normalized.slice(2, 4), 16) / 255;
-  const b = parseInt(normalized.slice(4, 6), 16) / 255;
-
-  return [r, g, b];
-}
+export type SilkAuroraPreset = keyof typeof SILK_AURORA_PRESETS;
 
 export interface SilkAuroraProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: string;
-  subtitle?: string;
-  description?: string;
-  baseColor?: string;
-  midColor?: string;
-  sheenColor?: string;
-  accentColor?: string;
+  colors?: readonly string[];
+  preset?: SilkAuroraPreset;
   speed?: number;
   intensity?: number;
-  grain?: number;
-  vignette?: number;
-  mouseInfluence?: number;
-  interactive?: boolean;
+  opacity?: number;
+  blur?: number;
+  contrast?: number;
+  brightness?: number;
+  grain?: boolean;
+  grainOpacity?: number;
+  layers?: number;
+  flowScale?: number;
+  flowStrength?: number;
+  flowDirection?: number;
+  animationSpeed?: number;
+  pointerInteraction?: boolean;
+  pointerStrength?: number;
+  scrollInteraction?: boolean;
+  parallaxStrength?: number;
+  lighting?: boolean;
+  lightingIntensity?: number;
+  lightingRadius?: number;
+  lightingSpeed?: number;
+  ambientGlow?: boolean;
+  ambientOpacity?: number;
+  noise?: boolean;
+  noiseOpacity?: number;
+  noiseScale?: number;
+  vignette?: boolean;
+  vignetteStrength?: number;
+  borderRadius?: React.CSSProperties["borderRadius"];
   children?: React.ReactNode;
 }
 
-const HEADLINE_CLASS =
-  "max-w-[820px] text-[13cqi] font-semibold leading-[0.86] tracking-normal text-white md:text-[8cqi] lg:text-[6.4cqi]";
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+function sanitizeHexColor(value: string | undefined, fallback: string) {
+  const trimmed = value?.trim() ?? "";
+  if (!HEX_COLOR_REGEX.test(trimmed)) return fallback;
+  return trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+}
+
+function hexToRgb01(hex: string): [number, number, number] {
+  const normalized = hex.slice(1);
+  return [
+    parseInt(normalized.slice(0, 2), 16) / 255,
+    parseInt(normalized.slice(2, 4), 16) / 255,
+    parseInt(normalized.slice(4, 6), 16) / 255,
+  ];
+}
+
+function useReducedMotion() {
+  const [reduced, setReduced] = React.useState(false);
+
+  React.useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  return reduced;
+}
 
 export function SilkAurora({
-  title,
-  subtitle,
-  description,
-  baseColor = DEFAULT_BASE,
-  midColor = DEFAULT_MID,
-  sheenColor = DEFAULT_SHEEN,
-  accentColor = DEFAULT_ACCENT,
+  colors,
+  preset = "ocean",
   speed = 1,
   intensity = 1,
-  grain = 0.85,
-  vignette = 1,
-  mouseInfluence = 1,
-  interactive = true,
+  opacity = 1,
+  blur = 1,
+  contrast = 1.04,
+  brightness = 1,
+  grain = true,
+  grainOpacity = 0.22,
+  layers = 6,
+  flowScale = 1,
+  flowStrength = 1,
+  flowDirection = -18,
+  animationSpeed = 1,
+  pointerInteraction = true,
+  pointerStrength = 0.7,
+  scrollInteraction = false,
+  parallaxStrength = 0.5,
+  lighting = true,
+  lightingIntensity = 0.8,
+  lightingRadius = 1,
+  lightingSpeed = 0.8,
+  ambientGlow = true,
+  ambientOpacity = 0.7,
+  noise = true,
+  noiseOpacity = 0.16,
+  noiseScale = 1,
+  vignette = true,
+  vignetteStrength = 0.55,
+  borderRadius = 0,
   className,
-  children,
   style,
+  children,
   ...props
 }: SilkAuroraProps) {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const mouseRef = React.useRef({ x: 0.5, y: 0.5 });
-  const targetMouseRef = React.useRef({ x: 0.5, y: 0.5 });
+  const drawStaticRef = React.useRef<(() => void) | null>(null);
+  const pointerRef = React.useRef({ x: 0.5, y: 0.5 });
+  const targetPointerRef = React.useRef({ x: 0.5, y: 0.5 });
+  const scrollRef = React.useRef(0);
+  const targetScrollRef = React.useRef(0);
   const [hasWebGLError, setHasWebGLError] = React.useState(false);
+  const reducedMotion = useReducedMotion();
+
+  const palette = React.useMemo(() => {
+    const fallback = SILK_AURORA_PRESETS[preset];
+    return fallback.map((color, index) =>
+      sanitizeHexColor(colors?.[index], color),
+    ) as [string, string, string, string, string];
+  }, [colors, preset]);
 
   const settings = React.useMemo(
     () => ({
-      baseColor,
-      midColor,
-      sheenColor,
-      accentColor,
-      speed,
-      intensity,
-      grain,
-      vignette,
-      mouseInfluence,
-      interactive,
+      palette: palette.map(hexToRgb01),
+      speed: clamp(speed, 0, 3),
+      intensity: clamp(intensity, 0, 2),
+      opacity: clamp(opacity, 0, 1),
+      blur: clamp(blur, 0.25, 2),
+      contrast: clamp(contrast, 0.6, 1.6),
+      brightness: clamp(brightness, 0.5, 1.5),
+      grainOpacity: grain ? clamp(grainOpacity, 0, 1) : 0,
+      layers: clamp(Math.round(layers), 3, 7),
+      flowScale: clamp(flowScale, 0.35, 2.5),
+      flowStrength: clamp(flowStrength, 0, 2),
+      flowDirection,
+      animationSpeed: clamp(animationSpeed, 0, 3),
+      pointerStrength: pointerInteraction ? clamp(pointerStrength, 0, 1.5) : 0,
+      scrollInteraction,
+      parallaxStrength: clamp(parallaxStrength, 0, 1.5),
+      lighting: lighting ? 1 : 0,
+      lightingIntensity: clamp(lightingIntensity, 0, 2),
+      lightingRadius: clamp(lightingRadius, 0.3, 2),
+      lightingSpeed: clamp(lightingSpeed, 0, 2),
+      ambientGlow: ambientGlow ? 1 : 0,
+      ambientOpacity: clamp(ambientOpacity, 0, 1.5),
+      noiseOpacity: noise ? clamp(noiseOpacity, 0, 1) : 0,
+      noiseScale: clamp(noiseScale, 0.4, 3),
+      vignette: vignette ? clamp(vignetteStrength, 0, 1.5) : 0,
+      pointerInteraction,
     }),
     [
-      baseColor,
-      midColor,
-      sheenColor,
-      accentColor,
-      speed,
-      intensity,
+      ambientGlow,
+      ambientOpacity,
+      animationSpeed,
+      blur,
+      brightness,
+      contrast,
+      flowDirection,
+      flowScale,
+      flowStrength,
       grain,
+      grainOpacity,
+      intensity,
+      layers,
+      lighting,
+      lightingIntensity,
+      lightingRadius,
+      lightingSpeed,
+      noise,
+      noiseOpacity,
+      noiseScale,
+      opacity,
+      palette,
+      parallaxStrength,
+      pointerInteraction,
+      pointerStrength,
+      scrollInteraction,
+      speed,
       vignette,
-      mouseInfluence,
-      interactive,
+      vignetteStrength,
     ],
   );
+  const settingsRef = React.useRef(settings);
+  settingsRef.current = settings;
 
   React.useEffect(() => {
-    if (hasWebGLError) {
-      return;
-    }
+    if (hasWebGLError) return;
 
     const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!container || !canvas) {
+    if (!container || !canvas) return;
+
+    const gl = canvas.getContext("webgl", {
+      antialias: false,
+      alpha: true,
+      premultipliedAlpha: true,
+      powerPreference: "high-performance",
+    });
+    if (!gl) {
+      setHasWebGLError(true);
       return;
     }
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const compileShader = (type: number, source: string) => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    };
+
+    const vertexShader = compileShader(gl.VERTEX_SHADER, VERTEX_SHADER);
+    const fragmentShader = compileShader(gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
+    if (!vertexShader || !fragmentShader) {
+      setHasWebGLError(true);
+      return;
+    }
+
+    const program = gl.createProgram();
+    if (!program) {
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+      setHasWebGLError(true);
+      return;
+    }
+
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+      setHasWebGLError(true);
+      return;
+    }
+
+    gl.useProgram(program);
+    const position = gl.getAttribLocation(program, "position");
+    const buffer = gl.createBuffer();
+    if (position < 0 || !buffer) {
+      setHasWebGLError(true);
+      return;
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+      gl.STATIC_DRAW,
+    );
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+    const uniformNames = [
+      "u_res",
+      "u_pointer",
+      "u_flowDirection",
+      "u_time",
+      "u_speed",
+      "u_animationSpeed",
+      "u_intensity",
+      "u_opacity",
+      "u_blur",
+      "u_contrast",
+      "u_brightness",
+      "u_layers",
+      "u_flowScale",
+      "u_flowStrength",
+      "u_pointerStrength",
+      "u_scroll",
+      "u_parallaxStrength",
+      "u_grainOpacity",
+      "u_noiseOpacity",
+      "u_noiseScale",
+      "u_lighting",
+      "u_lightingIntensity",
+      "u_lightingRadius",
+      "u_lightingSpeed",
+      "u_ambientGlow",
+      "u_ambientOpacity",
+      "u_vignette",
+      "u_color0",
+      "u_color1",
+      "u_color2",
+      "u_color3",
+      "u_color4",
+    ] as const;
+    const uniforms = Object.fromEntries(
+      uniformNames.map((name) => [name, gl.getUniformLocation(program, name)]),
+    ) as Record<(typeof uniformNames)[number], WebGLUniformLocation | null>;
+
+    if (uniformNames.some((name) => uniforms[name] === null)) {
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+      setHasWebGLError(true);
+      return;
+    }
 
     const handlePointerMove = (event: PointerEvent) => {
-      if (!settings.interactive) {
-        return;
-      }
-
+      if (!settingsRef.current.pointerInteraction || reducedMotion) return;
       const rect = container.getBoundingClientRect();
-      targetMouseRef.current = {
-        x: (event.clientX - rect.left) / rect.width,
-        y: 1 - (event.clientY - rect.top) / rect.height,
+      targetPointerRef.current = {
+        x: clamp((event.clientX - rect.left) / rect.width, 0, 1),
+        y: clamp(1 - (event.clientY - rect.top) / rect.height, 0, 1),
       };
     };
-
     const handlePointerLeave = () => {
-      targetMouseRef.current = { x: 0.5, y: 0.5 };
+      targetPointerRef.current = { x: 0.5, y: 0.5 };
+    };
+    const handleScroll = () => {
+      if (!settingsRef.current.scrollInteraction || reducedMotion) return;
+      targetScrollRef.current =
+        window.scrollY / Math.max(window.innerHeight, 1);
     };
 
-    container.addEventListener("pointermove", handlePointerMove);
+    container.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
     container.addEventListener("pointerleave", handlePointerLeave);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
-    try {
-      const gl = canvas.getContext("webgl", { antialias: false, alpha: false });
-      if (!gl) {
-        setHasWebGLError(true);
-        return () => {
-          container.removeEventListener("pointermove", handlePointerMove);
-          container.removeEventListener("pointerleave", handlePointerLeave);
-        };
+    let elapsed = reducedMotion ? 7.25 : 0;
+    let lastNow = performance.now();
+    let rafId = 0;
+    let running = false;
+
+    const draw = (now: number, scheduleNext = true) => {
+      const current = settingsRef.current;
+      if (!reducedMotion) {
+        elapsed += Math.min((now - lastNow) / 1000, 0.05);
       }
+      lastNow = now;
 
-      const compileShader = (type: number, source: string) => {
-        const shader = gl.createShader(type);
-        if (!shader) {
-          return null;
-        }
+      pointerRef.current.x +=
+        (targetPointerRef.current.x - pointerRef.current.x) * 0.035;
+      pointerRef.current.y +=
+        (targetPointerRef.current.y - pointerRef.current.y) * 0.035;
+      scrollRef.current +=
+        (targetScrollRef.current - scrollRef.current) * 0.025;
 
-        gl.shaderSource(shader, source);
-        gl.compileShader(shader);
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-          gl.deleteShader(shader);
-          return null;
-        }
-
-        return shader;
-      };
-
-      const vertexShader = compileShader(gl.VERTEX_SHADER, VERTEX_SHADER);
-      const fragmentShader = compileShader(gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
-      if (!vertexShader || !fragmentShader) {
-        setHasWebGLError(true);
-        return;
-      }
-
-      const program = gl.createProgram();
-      if (!program) {
-        gl.deleteShader(vertexShader);
-        gl.deleteShader(fragmentShader);
-        setHasWebGLError(true);
-        return;
-      }
-
-      gl.attachShader(program, vertexShader);
-      gl.attachShader(program, fragmentShader);
-      gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        gl.deleteProgram(program);
-        gl.deleteShader(vertexShader);
-        gl.deleteShader(fragmentShader);
-        setHasWebGLError(true);
-        return;
-      }
-
-      gl.useProgram(program);
-
-      const position = gl.getAttribLocation(program, "position");
-      const buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
-        gl.STATIC_DRAW,
+      const radians = (current.flowDirection * Math.PI) / 180;
+      gl.uniform2f(
+        uniforms.u_pointer!,
+        pointerRef.current.x,
+        pointerRef.current.y,
       );
-      gl.enableVertexAttribArray(position);
-      gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-
-      const uRes = gl.getUniformLocation(program, "u_res");
-      const uMouse = gl.getUniformLocation(program, "u_mouse");
-      const uTime = gl.getUniformLocation(program, "u_time");
-      const uSpeed = gl.getUniformLocation(program, "u_speed");
-      const uIntensity = gl.getUniformLocation(program, "u_intensity");
-      const uGrain = gl.getUniformLocation(program, "u_grain");
-      const uVignette = gl.getUniformLocation(program, "u_vignette");
-      const uMouseInfluence = gl.getUniformLocation(
-        program,
-        "u_mouseInfluence",
+      gl.uniform2f(
+        uniforms.u_flowDirection!,
+        Math.cos(radians),
+        Math.sin(radians),
       );
-      const uBase = gl.getUniformLocation(program, "u_base");
-      const uMid = gl.getUniformLocation(program, "u_mid");
-      const uSheen = gl.getUniformLocation(program, "u_sheen");
-      const uAccent = gl.getUniformLocation(program, "u_accent");
+      gl.uniform1f(uniforms.u_time!, elapsed);
+      gl.uniform1f(uniforms.u_speed!, current.speed);
+      gl.uniform1f(uniforms.u_animationSpeed!, current.animationSpeed);
+      gl.uniform1f(uniforms.u_intensity!, current.intensity);
+      gl.uniform1f(uniforms.u_opacity!, current.opacity);
+      gl.uniform1f(uniforms.u_blur!, current.blur);
+      gl.uniform1f(uniforms.u_contrast!, current.contrast);
+      gl.uniform1f(uniforms.u_brightness!, current.brightness);
+      gl.uniform1f(uniforms.u_layers!, current.layers);
+      gl.uniform1f(uniforms.u_flowScale!, current.flowScale);
+      gl.uniform1f(uniforms.u_flowStrength!, current.flowStrength);
+      gl.uniform1f(
+        uniforms.u_pointerStrength!,
+        reducedMotion ? 0 : current.pointerStrength,
+      );
+      gl.uniform1f(
+        uniforms.u_scroll!,
+        reducedMotion || !current.scrollInteraction ? 0 : scrollRef.current,
+      );
+      gl.uniform1f(uniforms.u_parallaxStrength!, current.parallaxStrength);
+      gl.uniform1f(uniforms.u_grainOpacity!, current.grainOpacity);
+      gl.uniform1f(uniforms.u_noiseOpacity!, current.noiseOpacity);
+      gl.uniform1f(uniforms.u_noiseScale!, current.noiseScale);
+      gl.uniform1f(uniforms.u_lighting!, current.lighting);
+      gl.uniform1f(uniforms.u_lightingIntensity!, current.lightingIntensity);
+      gl.uniform1f(uniforms.u_lightingRadius!, current.lightingRadius);
+      gl.uniform1f(uniforms.u_lightingSpeed!, current.lightingSpeed);
+      gl.uniform1f(uniforms.u_ambientGlow!, current.ambientGlow);
+      gl.uniform1f(uniforms.u_ambientOpacity!, current.ambientOpacity);
+      gl.uniform1f(uniforms.u_vignette!, current.vignette);
+      current.palette.forEach((color, index) => {
+        const location = uniforms[`u_color${index}` as "u_color0"]!;
+        gl.uniform3f(location, color[0], color[1], color[2]);
+      });
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-      if (
-        !uRes ||
-        !uMouse ||
-        !uTime ||
-        !uSpeed ||
-        !uIntensity ||
-        !uGrain ||
-        !uVignette ||
-        !uMouseInfluence ||
-        !uBase ||
-        !uMid ||
-        !uSheen ||
-        !uAccent
-      ) {
-        gl.deleteBuffer(buffer);
-        gl.deleteProgram(program);
-        gl.deleteShader(vertexShader);
-        gl.deleteShader(fragmentShader);
-        setHasWebGLError(true);
-        return;
-      }
+      if (running && scheduleNext) rafId = window.requestAnimationFrame(draw);
+    };
 
-      const resize = () => {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const { width, height } = container.getBoundingClientRect();
-        canvas.width = Math.max(1, Math.floor(width * dpr));
-        canvas.height = Math.max(1, Math.floor(height * dpr));
-        gl.viewport(0, 0, canvas.width, canvas.height);
-        gl.uniform2f(uRes, canvas.width, canvas.height);
-      };
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      const rect = container.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(uniforms.u_res!, canvas.width, canvas.height);
+      draw(performance.now(), false);
+    };
 
-      resize();
-      const resizeObserver = new ResizeObserver(resize);
-      resizeObserver.observe(container);
+    const start = () => {
+      if (running || reducedMotion || document.hidden) return;
+      running = true;
+      lastNow = performance.now();
+      rafId = window.requestAnimationFrame(draw);
+    };
+    const stop = () => {
+      running = false;
+      window.cancelAnimationFrame(rafId);
+    };
 
-      const base = hexToRgb01(settings.baseColor, DEFAULT_BASE);
-      const mid = hexToRgb01(settings.midColor, DEFAULT_MID);
-      const sheen = hexToRgb01(settings.sheenColor, DEFAULT_SHEEN);
-      const accent = hexToRgb01(settings.accentColor, DEFAULT_ACCENT);
+    resize();
+    drawStaticRef.current = () => draw(performance.now(), false);
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+    const intersectionObserver = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) start();
+      else stop();
+    });
+    intersectionObserver.observe(container);
+    const handleVisibility = () => {
+      if (document.hidden) stop();
+      else start();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
-      gl.uniform3f(uBase, base[0], base[1], base[2]);
-      gl.uniform3f(uMid, mid[0], mid[1], mid[2]);
-      gl.uniform3f(uSheen, sheen[0], sheen[1], sheen[2]);
-      gl.uniform3f(uAccent, accent[0], accent[1], accent[2]);
+    if (reducedMotion) draw(performance.now(), false);
 
-      let rafId = 0;
-      const start = performance.now();
+    return () => {
+      stop();
+      drawStaticRef.current = null;
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
+      container.removeEventListener("pointermove", handlePointerMove);
+      container.removeEventListener("pointerleave", handlePointerLeave);
+      window.removeEventListener("scroll", handleScroll);
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+    };
+  }, [hasWebGLError, reducedMotion]);
 
-      const render = (now: number) => {
-        mouseRef.current.x +=
-          (targetMouseRef.current.x - mouseRef.current.x) * 0.045;
-        mouseRef.current.y +=
-          (targetMouseRef.current.y - mouseRef.current.y) * 0.045;
+  React.useEffect(() => {
+    if (reducedMotion) drawStaticRef.current?.();
+  }, [reducedMotion, settings]);
 
-        const elapsed = reducedMotion ? 8 : (now - start) / 1000;
+  const staticBackground = {
+    background: [
+      `radial-gradient(ellipse at 18% 28%, ${palette[2]}99, transparent 52%)`,
+      `radial-gradient(ellipse at 78% 34%, ${palette[3]}66, transparent 48%)`,
+      `radial-gradient(ellipse at 52% 82%, ${palette[1]}aa, transparent 58%)`,
+      palette[0],
+    ].join(", "),
+  } satisfies React.CSSProperties;
 
-        gl.uniform2f(uMouse, mouseRef.current.x, mouseRef.current.y);
-        gl.uniform1f(uTime, elapsed);
-        gl.uniform1f(uSpeed, reducedMotion ? 0 : settings.speed);
-        gl.uniform1f(uIntensity, settings.intensity);
-        gl.uniform1f(uGrain, settings.grain);
-        gl.uniform1f(uVignette, settings.vignette);
-        gl.uniform1f(
-          uMouseInfluence,
-          settings.interactive && !reducedMotion ? settings.mouseInfluence : 0,
-        );
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-        rafId = requestAnimationFrame(render);
-      };
-
-      rafId = requestAnimationFrame(render);
-
-      return () => {
-        container.removeEventListener("pointermove", handlePointerMove);
-        container.removeEventListener("pointerleave", handlePointerLeave);
-        cancelAnimationFrame(rafId);
-        resizeObserver.disconnect();
-        gl.deleteBuffer(buffer);
-        gl.deleteProgram(program);
-        gl.deleteShader(vertexShader);
-        gl.deleteShader(fragmentShader);
-      };
-    } catch {
-      setHasWebGLError(true);
-      return () => {
-        container.removeEventListener("pointermove", handlePointerMove);
-        container.removeEventListener("pointerleave", handlePointerLeave);
-      };
-    }
-  }, [hasWebGLError, settings]);
-
-  const fallbackContent = (
+  const fallback = (
     <div
-      className={cn(
-        "relative flex min-h-screen w-full items-center overflow-hidden bg-[#050507] text-white",
-        className,
-      )}
-      style={{ containerType: "size", ...style }}
+      className={cn("relative min-h-[420px] w-full overflow-hidden", className)}
+      style={{ ...style, borderRadius }}
       {...props}
     >
-      <WebGLFallback className="absolute inset-0 h-full w-full" />
-      {(title || subtitle || description || children) && (
-        <div className="relative z-10 mx-auto w-full max-w-[1240px] px-6 py-20 md:px-10 md:py-28">
-          <div className="max-w-[760px]">
-            {subtitle && (
-              <p className="mb-5 text-xs font-medium uppercase tracking-[0.24em] text-white/50">
-                {subtitle}
-              </p>
-            )}
-            {title && <h1 className={HEADLINE_CLASS}>{title}</h1>}
-            {description && (
-              <p className="mt-7 max-w-[620px] text-base leading-relaxed text-white/68 md:text-xl">
-                {description}
-              </p>
-            )}
-            {children && <div className="mt-10">{children}</div>}
-          </div>
-        </div>
-      )}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={staticBackground}
+      />
+      {children && <div className="relative z-10 size-full">{children}</div>}
     </div>
   );
 
-  if (hasWebGLError) {
-    return fallbackContent;
-  }
-
   return (
-    <WebGLErrorBoundary fallback={fallbackContent}>
+    <WebGLErrorBoundary fallback={fallback}>
       <div
         ref={containerRef}
         className={cn(
-          "relative flex min-h-screen w-full items-center overflow-hidden bg-[#050507] text-white",
+          "relative min-h-[420px] w-full overflow-hidden",
           className,
         )}
-        style={{ containerType: "size", ...style }}
+        style={{ ...style, borderRadius }}
         {...props}
       >
-        <canvas
-          ref={canvasRef}
+        <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          style={{ width: "100%", height: "100%", display: "block" }}
+          className="absolute inset-0"
+          style={staticBackground}
         />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_72%_34%,rgba(255,255,255,0.16),transparent_24%),radial-gradient(circle_at_18%_74%,rgba(110,214,201,0.13),transparent_30%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.46),rgba(0,0,0,0.14)_42%,rgba(0,0,0,0.42))]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
-
-        {(title || subtitle || description || children) && (
-          <div className="relative z-10 mx-auto w-full max-w-[1240px] px-6 py-20 md:px-10 md:py-28">
-            <div className="max-w-[760px]">
-              {subtitle && (
-                <p className="mb-5 text-xs font-medium uppercase tracking-[0.24em] text-white/50">
-                  {subtitle}
-                </p>
-              )}
-              {title && <h1 className={HEADLINE_CLASS}>{title}</h1>}
-              {description && (
-                <p className="mt-7 max-w-[620px] text-base leading-relaxed text-white/68 md:text-xl">
-                  {description}
-                </p>
-              )}
-              {children && <div className="mt-10">{children}</div>}
-            </div>
-          </div>
+        {!hasWebGLError && (
+          <canvas
+            ref={canvasRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 size-full"
+          />
         )}
+        {children && <div className="relative z-10 size-full">{children}</div>}
       </div>
     </WebGLErrorBoundary>
   );

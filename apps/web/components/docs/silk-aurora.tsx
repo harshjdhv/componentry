@@ -1,42 +1,16 @@
-import React from "react";
-import { SilkAurora } from "@workspace/ui/components/silk-aurora";
 import { DocsPageLayout } from "@/components/docs-page-layout";
+import { LiveCodeBlock } from "@/components/live-code-block";
+import {
+  SilkAuroraPersonalizePanel,
+  SilkAuroraPlayground,
+} from "@/components/docs/previews/silk-aurora-playground";
 import { readComponentSource } from "@/lib/source-code";
 
 const basicUsageCode = `import { SilkAurora } from "@/components/ui/silk-aurora"
 
 <SilkAurora
-  title="Silk Aurora"
-  subtitle="Premium Atmosphere"
-  description="A satin-dark WebGL background with aurora ribbons, pearlescent highlights, fine grain, and cursor-driven depth."
-/>`;
-
-const champagneCode = `import { SilkAurora } from "@/components/ui/silk-aurora"
-
-<SilkAurora
-  title="Maison Lumiere"
-  subtitle="Private Preview"
-  description="Quiet motion, warm sheen, and a velvet base for refined product launches."
-  baseColor="#060505"
-  midColor="#19130f"
-  sheenColor="#ffe2a9"
-  accentColor="#c58d5d"
-  intensity={0.9}
-  speed={0.75}
-/>`;
-
-const editorialCode = `import { SilkAurora } from "@/components/ui/silk-aurora"
-
-<SilkAurora
-  title="Nocturne Index"
-  subtitle="Editorial Systems"
-  description="A cooler metallic palette for dashboards, media covers, and cinematic editorial moments."
-  baseColor="#030407"
-  midColor="#101827"
-  sheenColor="#d6e8ff"
-  accentColor="#86f0dc"
-  intensity={1.15}
-  grain={0.7}
+  preset="ocean"
+  className="min-h-[600px]"
 />`;
 
 export async function SilkAuroraDocs() {
@@ -47,154 +21,227 @@ export async function SilkAuroraDocs() {
   return (
     <DocsPageLayout
       title="Silk Aurora"
-      description="A premium WebGL hero background with satin-dark aurora ribbons, pearlescent highlights, subtle grain, and optional cursor depth."
-      preview={
-        <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-background">
-          <SilkAurora
-            title="Silk Aurora"
-            subtitle="Premium Atmosphere"
-            description="Polished motion for luxury product heroes, editorial launches, and high-end SaaS moments."
-            className="h-full w-full min-h-0"
-          />
-        </div>
-      }
+      description="A procedural atmospheric hero background with layered silk flow, diffused aurora light, subtle interaction, and production-ready presets."
+      preview={<SilkAuroraPlayground />}
+      personalizeContent={<SilkAuroraPersonalizePanel />}
       previewCode={basicUsageCode}
       installPackageName="silk-aurora"
+      installDependencies="clsx tailwind-merge"
       installSourceCode={sourceCode}
-      usageCode={basicUsageCode}
+      installSourceFilename="components/ui/silk-aurora.tsx"
+      usageCode={<LiveCodeBlock defaultCode={basicUsageCode} />}
+      usageNote={
+        <p className="text-sm leading-6 text-muted-foreground">
+          Silk Aurora renders one WebGL quad, caps pixel density, pauses outside
+          the viewport, and draws only a static frame when reduced motion is
+          requested.
+        </p>
+      }
       fullWidthPreview
       unstyledPreview
-      examples={[
-        {
-          title: "Champagne",
-          preview: (
-            <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-background">
-              <SilkAurora
-                title="Maison Lumiere"
-                subtitle="Private Preview"
-                description="Quiet motion, warm sheen, and a velvet base for refined product launches."
-                baseColor="#060505"
-                midColor="#19130f"
-                sheenColor="#ffe2a9"
-                accentColor="#c58d5d"
-                intensity={0.9}
-                speed={0.75}
-                className="h-full w-full min-h-0"
-              />
-            </div>
-          ),
-          code: champagneCode,
-          fullWidth: true,
-        },
-        {
-          title: "Editorial",
-          preview: (
-            <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-background">
-              <SilkAurora
-                title="Nocturne Index"
-                subtitle="Editorial Systems"
-                description="A cooler metallic palette for dashboards, media covers, and cinematic editorial moments."
-                baseColor="#030407"
-                midColor="#101827"
-                sheenColor="#d6e8ff"
-                accentColor="#86f0dc"
-                intensity={1.15}
-                grain={0.7}
-                className="h-full w-full min-h-0"
-              />
-            </div>
-          ),
-          code: editorialCode,
-          fullWidth: true,
-        },
-      ]}
       props={[
         {
-          name: "title",
-          type: "string",
-          default: '"Silk Aurora"',
-          description: "Primary hero headline rendered above the background.",
+          name: "colors",
+          type: "readonly string[]",
+          description:
+            "Up to five custom hex colors overriding the selected preset.",
         },
         {
-          name: "subtitle",
-          type: "string",
-          default: '"Premium Atmosphere"',
-          description: "Small uppercase label rendered above the title.",
-        },
-        {
-          name: "description",
-          type: "string",
-          description: "Supporting copy rendered below the title.",
-        },
-        {
-          name: "baseColor",
-          type: "string",
-          default: '"#050507"',
-          description: "Deepest background color.",
-        },
-        {
-          name: "midColor",
-          type: "string",
-          default: '"#14151d"',
-          description: "Secondary base color for atmospheric depth.",
-        },
-        {
-          name: "sheenColor",
-          type: "string",
-          default: '"#f4dfb8"',
-          description: "Pearlescent highlight color.",
-        },
-        {
-          name: "accentColor",
-          type: "string",
-          default: '"#6ed6c9"',
-          description: "Aurora ribbon accent color.",
+          name: "preset",
+          type: "SilkAuroraPreset",
+          default: '"ocean"',
+          description:
+            "Production palette: ocean, aurora, sky, cloud, sunset, midnight, ice, dream, nebula, emerald, lavender, or mono.",
         },
         {
           name: "speed",
           type: "number",
           default: "1",
-          description: "Global animation speed multiplier.",
+          description: "Global motion speed multiplier.",
         },
         {
           name: "intensity",
           type: "number",
           default: "1",
-          description: "Strength of aurora ribbons, glints, and sheen.",
+          description: "Strength of flowing color and silk highlights.",
+        },
+        {
+          name: "opacity",
+          type: "number",
+          default: "1",
+          description: "Final canvas opacity.",
+        },
+        {
+          name: "blur",
+          type: "number",
+          default: "1",
+          description: "Diffusion softness applied to atmospheric fields.",
+        },
+        {
+          name: "contrast",
+          type: "number",
+          default: "1.04",
+          description: "Final color contrast.",
+        },
+        {
+          name: "brightness",
+          type: "number",
+          default: "1",
+          description: "Final scene brightness.",
         },
         {
           name: "grain",
+          type: "boolean",
+          default: "true",
+          description: "Enables fine film-inspired grain.",
+        },
+        {
+          name: "grainOpacity",
           type: "number",
-          default: "0.85",
-          description: "Amount of fine shader grain.",
+          default: "0.22",
+          description: "Strength of fine grain.",
+        },
+        {
+          name: "layers",
+          type: "number",
+          default: "6",
+          description: "Procedural FBM depth, clamped from 3 to 7.",
+        },
+        {
+          name: "flowScale",
+          type: "number",
+          default: "1",
+          description: "Scale of the broad atmospheric structures.",
+        },
+        {
+          name: "flowStrength",
+          type: "number",
+          default: "1",
+          description: "Strength of domain warping and silk folds.",
+        },
+        {
+          name: "flowDirection",
+          type: "number",
+          default: "-18",
+          description: "Primary flow direction in degrees.",
+        },
+        {
+          name: "animationSpeed",
+          type: "number",
+          default: "1",
+          description: "Fine multiplier for procedural evolution.",
+        },
+        {
+          name: "pointerInteraction",
+          type: "boolean",
+          default: "true",
+          description: "Enables restrained pointer-driven flow bending.",
+        },
+        {
+          name: "pointerStrength",
+          type: "number",
+          default: "0.7",
+          description: "Maximum pointer influence.",
+        },
+        {
+          name: "scrollInteraction",
+          type: "boolean",
+          default: "false",
+          description: "Enables subtle scroll-driven depth movement.",
+        },
+        {
+          name: "parallaxStrength",
+          type: "number",
+          default: "0.5",
+          description: "Strength of scroll parallax.",
+        },
+        {
+          name: "lighting",
+          type: "boolean",
+          default: "true",
+          description: "Enables the broad traveling bloom.",
+        },
+        {
+          name: "lightingIntensity",
+          type: "number",
+          default: "0.8",
+          description: "Brightness of traveling light.",
+        },
+        {
+          name: "lightingRadius",
+          type: "number",
+          default: "1",
+          description: "Diffusion radius of traveling light.",
+        },
+        {
+          name: "lightingSpeed",
+          type: "number",
+          default: "0.8",
+          description: "Independent light movement speed.",
+        },
+        {
+          name: "ambientGlow",
+          type: "boolean",
+          default: "true",
+          description: "Enables the broad central ambient lift.",
+        },
+        {
+          name: "ambientOpacity",
+          type: "number",
+          default: "0.7",
+          description: "Strength of ambient illumination.",
+        },
+        {
+          name: "noise",
+          type: "boolean",
+          default: "true",
+          description: "Enables low-frequency atmospheric haze.",
+        },
+        {
+          name: "noiseOpacity",
+          type: "number",
+          default: "0.16",
+          description: "Strength of atmospheric haze.",
+        },
+        {
+          name: "noiseScale",
+          type: "number",
+          default: "1",
+          description: "Scale of the haze field.",
         },
         {
           name: "vignette",
-          type: "number",
-          default: "1",
-          description: "Edge darkening strength.",
-        },
-        {
-          name: "mouseInfluence",
-          type: "number",
-          default: "1",
-          description: "Cursor-driven distortion strength.",
-        },
-        {
-          name: "interactive",
           type: "boolean",
           default: "true",
-          description: "Enables pointer movement response.",
+          description: "Enables soft edge falloff.",
         },
         {
-          name: "children",
-          type: "ReactNode",
-          description: "Custom content rendered above the background.",
+          name: "vignetteStrength",
+          type: "number",
+          default: "0.55",
+          description: "Strength of edge falloff.",
+        },
+        {
+          name: "borderRadius",
+          type: "CSSProperties['borderRadius']",
+          default: "0",
+          description: "Radius applied to the background container.",
         },
         {
           name: "className",
           type: "string",
-          description: "Additional CSS classes for the root container.",
+          description: "Additional classes for sizing and placement.",
+        },
+        {
+          name: "style",
+          type: "CSSProperties",
+          description: "Additional inline styles for the root container.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          description:
+            "Optional content rendered above the atmospheric canvas.",
         },
       ]}
     />
