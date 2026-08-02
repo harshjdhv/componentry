@@ -18,6 +18,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "aurora-flow",
+      "type": "registry:ui"
+    },
+    {
       "name": "auth-modal",
       "type": "registry:ui"
     },

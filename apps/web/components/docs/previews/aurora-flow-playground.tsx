@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import {
-  SilkAurora,
-  SILK_AURORA_PRESETS,
-  type SilkAuroraPreset,
-} from "@workspace/ui/components/silk-aurora";
+  AuroraFlow,
+  AURORA_FLOW_PRESETS,
+  type AuroraFlowPreset,
+} from "@workspace/ui/components/aurora-flow";
 import { cn } from "@/lib/utils";
 import { usePlaygroundStore } from "@/hooks/use-playground-store";
 import {
@@ -16,8 +16,8 @@ import {
   PlaygroundSwitch,
 } from "@/components/playground-primitives";
 
-interface SilkAuroraConfig {
-  preset: SilkAuroraPreset;
+interface AuroraFlowConfig {
+  preset: AuroraFlowPreset;
   colors: string[];
   speed: number;
   intensity: number;
@@ -50,9 +50,9 @@ interface SilkAuroraConfig {
   borderRadius: number;
 }
 
-const DEFAULT_CONFIG: SilkAuroraConfig = {
+const DEFAULT_CONFIG: AuroraFlowConfig = {
   preset: "ocean",
-  colors: [...SILK_AURORA_PRESETS.ocean],
+  colors: [...AURORA_FLOW_PRESETS.ocean],
   speed: 1,
   intensity: 1,
   opacity: 1,
@@ -84,25 +84,25 @@ const DEFAULT_CONFIG: SilkAuroraConfig = {
   borderRadius: 0,
 };
 
-const PRESET_NAMES = Object.keys(SILK_AURORA_PRESETS) as SilkAuroraPreset[];
+const PRESET_NAMES = Object.keys(AURORA_FLOW_PRESETS) as AuroraFlowPreset[];
 
-interface SilkAuroraStore {
-  config: SilkAuroraConfig;
-  update: (updates: Partial<SilkAuroraConfig>) => void;
+interface AuroraFlowStore {
+  config: AuroraFlowConfig;
+  update: (updates: Partial<AuroraFlowConfig>) => void;
   reset: () => void;
 }
 
-const useSilkAuroraStore = create<SilkAuroraStore>((set) => ({
+const useAuroraFlowStore = create<AuroraFlowStore>((set) => ({
   config: DEFAULT_CONFIG,
   update: (updates) =>
     set((state) => ({ config: { ...state.config, ...updates } })),
   reset: () => set({ config: DEFAULT_CONFIG }),
 }));
 
-function generateCode(config: SilkAuroraConfig) {
-  return `import { SilkAurora } from "@/components/ui/silk-aurora"
+function generateCode(config: AuroraFlowConfig) {
+  return `import { AuroraFlow } from "@/components/ui/aurora-flow"
 
-<SilkAurora
+<AuroraFlow
   preset="${config.preset}"
   colors={${JSON.stringify(config.colors)}}
   speed={${config.speed}}
@@ -138,8 +138,8 @@ function generateCode(config: SilkAuroraConfig) {
 />`;
 }
 
-export function SilkAuroraPlayground() {
-  const config = useSilkAuroraStore((state) => state.config);
+export function AuroraFlowPlayground() {
+  const config = useAuroraFlowStore((state) => state.config);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -149,7 +149,7 @@ export function SilkAuroraPlayground() {
   }, [config]);
 
   return (
-    <SilkAurora
+    <AuroraFlow
       {...config}
       borderRadius={`${config.borderRadius}px`}
       className="h-full min-h-[560px] w-full"
@@ -158,13 +158,13 @@ export function SilkAuroraPlayground() {
   );
 }
 
-export function SilkAuroraPersonalizePanel() {
-  const config = useSilkAuroraStore((state) => state.config);
-  const update = useSilkAuroraStore((state) => state.update);
-  const reset = useSilkAuroraStore((state) => state.reset);
+export function AuroraFlowPersonalizePanel() {
+  const config = useAuroraFlowStore((state) => state.config);
+  const update = useAuroraFlowStore((state) => state.update);
+  const reset = useAuroraFlowStore((state) => state.reset);
 
-  const selectPreset = (preset: SilkAuroraPreset) => {
-    update({ preset, colors: [...SILK_AURORA_PRESETS[preset]] });
+  const selectPreset = (preset: AuroraFlowPreset) => {
+    update({ preset, colors: [...AURORA_FLOW_PRESETS[preset]] });
   };
   const updateColor = (index: number, color: string) => {
     const colors = [...config.colors];
@@ -212,7 +212,7 @@ export function SilkAuroraPersonalizePanel() {
                 <span
                   className="mb-1.5 block h-5 rounded-sm"
                   style={{
-                    background: `linear-gradient(120deg, ${SILK_AURORA_PRESETS[preset].join(", ")})`,
+                    background: `linear-gradient(120deg, ${AURORA_FLOW_PRESETS[preset].join(", ")})`,
                   }}
                 />
                 <span className="block truncate font-mono text-[9px] uppercase tracking-wider text-foreground/80">

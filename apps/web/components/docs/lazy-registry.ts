@@ -74,6 +74,10 @@ const docsImportMap: Record<
     import("@/components/docs/silk-aurora").then((m) => ({
       default: m.SilkAuroraDocs,
     })),
+  "aurora-flow": () =>
+    import("@/components/docs/aurora-flow").then((m) => ({
+      default: m.AuroraFlowDocs,
+    })),
   "closing-plasma": () =>
     import("@/components/docs/closing-plasma").then((m) => ({
       default: m.ClosingPlasmaDocs,

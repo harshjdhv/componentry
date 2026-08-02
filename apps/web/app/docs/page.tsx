@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils"
 import { AsciiCatalogPreview } from "@/components/docs/previews/ascii-effect-preview"
 import { TextMorphCardPreview } from "@/components/docs/previews/text-morph-card-preview"
-import { SilkAuroraCardPreview } from "@/components/docs/previews/silk-aurora-card-preview"
+import { AuroraFlowCardPreview } from "@/components/docs/previews/aurora-flow-card-preview"
 
 type PreviewSources = {
   mp4: string
@@ -197,7 +197,7 @@ function ComponentCard({
               <AsciiCatalogPreview />
             )}
             {component.slug === "text-morph" && <TextMorphCardPreview />}
-            {component.slug === "silk-aurora" && <SilkAuroraCardPreview />}
+            {component.slug === "aurora-flow" && <AuroraFlowCardPreview />}
             {previewPosterSrc && (
               <img
                 src={previewPosterSrc}

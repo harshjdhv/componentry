@@ -1,10 +1,10 @@
 "use client";
 
-import { SilkAurora } from "@workspace/ui/components/silk-aurora";
+import { AuroraFlow } from "@workspace/ui/components/aurora-flow";
 
-export function SilkAuroraCardPreview() {
+export function AuroraFlowCardPreview() {
   return (
-    <SilkAurora
+    <AuroraFlow
       preset="ocean"
       speed={0.82}
       intensity={1.08}

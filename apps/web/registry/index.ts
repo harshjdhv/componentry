@@ -261,9 +261,19 @@ export const components: Record<string, ComponentMetadata> = {
   "silk-aurora": {
     title: "Silk Aurora",
     description:
-      "Procedural atmospheric hero background with layered silk flow, diffused aurora light, and subtle interaction.",
+      "Premium WebGL hero background with satin-dark aurora ribbons, pearlescent highlights, fine grain, and cursor depth.",
     category: "Hero Backgrounds",
     slug: "silk-aurora",
+    addedAt: "2026-06-09",
+    previewVideo:
+      "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/silkaurora.webm",
+  },
+  "aurora-flow": {
+    title: "Aurora Flow",
+    description:
+      "Procedural atmospheric hero background with layered flowing color, diffused aurora light, and subtle interaction.",
+    category: "Hero Backgrounds",
+    slug: "aurora-flow",
     addedAt: "2026-08-02",
   },
   "closing-plasma": {
