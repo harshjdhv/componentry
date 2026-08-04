@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils"
 import { AsciiCatalogPreview } from "@/components/docs/previews/ascii-effect-preview"
 import { TextMorphCardPreview } from "@/components/docs/previews/text-morph-card-preview"
+import { FlippingWordSwapCardPreview } from "@/components/docs/previews/flipping-word-swap-card-preview"
 import { AuroraFlowCardPreview } from "@/components/docs/previews/aurora-flow-card-preview"
 
 type PreviewSources = {
@@ -197,6 +198,9 @@ function ComponentCard({
               <AsciiCatalogPreview />
             )}
             {component.slug === "text-morph" && <TextMorphCardPreview />}
+            {component.slug === "flipping-word-swap" && (
+              <FlippingWordSwapCardPreview />
+            )}
             {component.slug === "aurora-flow" && <AuroraFlowCardPreview />}
             {previewPosterSrc && (
               <img

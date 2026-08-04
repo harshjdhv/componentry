@@ -109,6 +109,14 @@ export const components: Record<string, ComponentMetadata> = {
     slug: "text-morph",
     addedAt: "2026-08-02",
   },
+  "flipping-word-swap": {
+    title: "Flipping Word Swap",
+    description:
+      "A clean character-by-character flip between two words on interaction.",
+    category: "Text Animations",
+    slug: "flipping-word-swap",
+    addedAt: "2026-08-04",
+  },
   "kinetic-text-reveal": {
     title: "Kinetic Text Reveal",
     description:

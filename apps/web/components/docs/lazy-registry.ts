@@ -130,6 +130,10 @@ const docsImportMap: Record<
     import("@/components/docs/text-morph").then((m) => ({
       default: m.TextMorphDocs,
     })),
+  "flipping-word-swap": () =>
+    import("@/components/docs/flipping-word-swap").then((m) => ({
+      default: m.FlippingWordSwapDocs,
+    })),
   "kinetic-text-reveal": () =>
     import("@/components/docs/kinetic-text-reveal").then((m) => ({
       default: m.KineticTextRevealDocs,

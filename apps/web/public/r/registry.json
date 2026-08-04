@@ -70,6 +70,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "flipping-word-swap",
+      "type": "registry:ui"
+    },
+    {
       "name": "github-calendar",
       "type": "registry:ui"
     },
