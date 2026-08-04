@@ -10,7 +10,7 @@ const basicUsageCode = `import { TextMorph } from "@/components/ui/text-morph"
 
 <TextMorph
   words={["IMAGINE", "REFINE", "RELEASE"]}
-  className="text-6xl font-semibold tracking-tight"
+  className="text-4xl font-bold tracking-tight md:text-5xl"
 />`;
 
 export async function TextMorphDocs() {

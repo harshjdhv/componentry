@@ -192,7 +192,13 @@ function ComponentCard({
               duration: 0.5,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="relative w-full rounded-xl bg-zinc-50 dark:bg-zinc-900/80 group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/80 transition-colors border border-dashed border-border shadow-surface-inset overflow-hidden"
+            className={cn(
+              "relative w-full rounded-xl transition-colors border border-dashed border-border shadow-surface-inset overflow-hidden",
+              component.slug === "text-morph" ||
+                component.slug === "flipping-word-swap"
+                ? "bg-background"
+                : "bg-zinc-50 dark:bg-zinc-900/80 group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/80",
+            )}
           >
             {component.category === "ASCII Effects" && (
               <AsciiCatalogPreview />

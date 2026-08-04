@@ -28,14 +28,14 @@ interface FlippingWordSwapConfig {
 }
 
 const DEFAULT_CONFIG: FlippingWordSwapConfig = {
-  word1: "Create",
-  word2: "Refine",
+  word1: "Componentry",
+  word2: "Consistency",
   word1LightColor: "#18181b",
   word1DarkColor: "#f5f5f5",
-  word2LightColor: "#6d28d9",
-  word2DarkColor: "#8b5cf6",
-  fontSize: 88,
-  fontWeight: 600,
+  word2LightColor: "#18181b",
+  word2DarkColor: "#f5f5f5",
+  fontSize: 48,
+  fontWeight: 700,
   letterSpacing: -0.025,
   duration: 400,
   stagger: 44,
@@ -57,7 +57,7 @@ const useFlippingWordSwapPlayground = create<FlippingWordSwapStore>((set) => ({
 function generateCode(config: FlippingWordSwapConfig) {
   return `import { FlippingWordSwap } from "@/components/ui/flipping-word-swap"
 
-<div className="flex min-h-[400px] items-center justify-center bg-white dark:bg-black">
+<div className="flex min-h-[400px] items-center justify-center">
   <FlippingWordSwap
     word1=${JSON.stringify(config.word1)}
     word2=${JSON.stringify(config.word2)}
@@ -68,6 +68,7 @@ function generateCode(config: FlippingWordSwapConfig) {
     style={{
       fontSize: ${config.fontSize},
       fontWeight: ${config.fontWeight},
+      lineHeight: 1,
       letterSpacing: "${config.letterSpacing}em",
     }}
   />
@@ -85,7 +86,7 @@ export function FlippingWordSwapPlayground() {
   }, [config]);
 
   return (
-    <div className="flex h-full min-h-[440px] w-full items-center justify-center overflow-hidden bg-white px-8 py-16 transition-colors dark:bg-black">
+    <div className="flex h-full min-h-[440px] w-full items-center justify-center overflow-hidden px-8 py-16">
       <FlippingWordSwap
         word1={config.word1}
         word2={config.word2}
@@ -96,10 +97,11 @@ export function FlippingWordSwapPlayground() {
         style={{
           "--flip-word-light": config.word1LightColor || "#18181b",
           "--flip-word-dark": config.word1DarkColor || "#f5f5f5",
-          "--flip-word-to-light": config.word2LightColor || "#6d28d9",
-          "--flip-word-to-dark": config.word2DarkColor || "#8b5cf6",
+          "--flip-word-to-light": config.word2LightColor || "#18181b",
+          "--flip-word-to-dark": config.word2DarkColor || "#f5f5f5",
           fontSize: `${config.fontSize}px`,
           fontWeight: config.fontWeight,
+          lineHeight: 1,
           letterSpacing: `${config.letterSpacing}em`,
         } as CSSProperties}
       />
@@ -180,13 +182,13 @@ export function FlippingWordSwapPersonalizePanel() {
           <PlaygroundColorPicker
             label="Second word · light"
             value={config.word2LightColor}
-            defaultColor="#6d28d9"
+            defaultColor="#18181b"
             onChange={(word2LightColor) => updateConfig({ word2LightColor })}
           />
           <PlaygroundColorPicker
             label="Second word · dark"
             value={config.word2DarkColor}
-            defaultColor="#8b5cf6"
+            defaultColor="#f5f5f5"
             onChange={(word2DarkColor) => updateConfig({ word2DarkColor })}
           />
         </div>

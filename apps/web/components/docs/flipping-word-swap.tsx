@@ -8,17 +8,18 @@ import { readComponentSource } from "@/lib/source-code";
 
 const defaultCode = `import { FlippingWordSwap } from "@/components/ui/flipping-word-swap"
 
-<div className="flex min-h-[400px] items-center justify-center bg-white dark:bg-black">
+<div className="flex min-h-[400px] items-center justify-center">
   <FlippingWordSwap
-    word1="Create"
-    word2="Refine"
+    word1="Componentry"
+    word2="Consistency"
     duration={400}
     stagger={44}
     className="text-zinc-950 dark:text-zinc-100"
-    toClassName="text-violet-700 dark:text-violet-500"
+    toClassName="text-zinc-950 dark:text-zinc-100"
     style={{
-      fontSize: 88,
-      fontWeight: 600,
+      fontSize: 48,
+      fontWeight: 700,
+      lineHeight: 1,
       letterSpacing: "-0.025em",
     }}
   />

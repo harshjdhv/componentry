@@ -3,8 +3,8 @@
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
 
-const FIRST_WORD = "CREATE";
-const SECOND_WORD = "REFINE";
+const FIRST_WORD = "COMPONENTRY";
+const SECOND_WORD = "CONSISTENCY";
 
 export function FlippingWordSwapCardPreview() {
   const previewRef = useRef<HTMLDivElement>(null);
@@ -70,14 +70,14 @@ export function FlippingWordSwapCardPreview() {
   return (
     <div
       ref={previewRef}
-      className="pointer-events-none flex size-full items-center justify-center overflow-hidden bg-black px-6"
+      className="pointer-events-none flex size-full items-center justify-center overflow-hidden px-6 text-foreground"
       aria-hidden="true"
     >
-      <span className="inline-grid overflow-hidden text-[clamp(2.5rem,5.8vw,4.25rem)] font-semibold leading-none tracking-[-0.035em] [perspective:800px]">
-        <span className="col-start-1 row-start-1 inline-flex justify-center gap-[0.012em] whitespace-nowrap text-zinc-100">
+      <span className="inline-grid overflow-hidden text-2xl font-bold tracking-tight [perspective:800px]">
+        <span className="col-start-1 row-start-1 inline-flex justify-center gap-[0.012em] whitespace-nowrap">
           {renderCharacters(FIRST_WORD, "first")}
         </span>
-        <span className="col-start-1 row-start-1 inline-flex justify-center gap-[0.012em] whitespace-nowrap text-violet-500">
+        <span className="col-start-1 row-start-1 inline-flex justify-center gap-[0.012em] whitespace-nowrap">
           {renderCharacters(SECOND_WORD, "second")}
         </span>
       </span>

@@ -49,7 +49,7 @@ function generateCode(config: TextMorphPlaygroundConfig) {
   words={${JSON.stringify(config.words)}}
   interval={${config.interval}}
   morphDuration={${config.morphDuration}}
-  className="text-7xl font-semibold tracking-tight"
+  className="text-4xl font-bold tracking-tight md:text-5xl"
 />`;
 }
 
@@ -65,7 +65,7 @@ export function TextMorphPlayground() {
 
   return (
     <div className="flex h-full min-h-[440px] w-full items-center justify-center overflow-hidden px-8 py-16">
-      <div className="text-center text-[clamp(4rem,13vw,9rem)] font-semibold leading-none tracking-[-0.07em] text-foreground">
+      <div className="text-center text-4xl font-bold tracking-tight text-foreground md:text-5xl">
         <TextMorph
           words={config.words}
           interval={config.interval}
