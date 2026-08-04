@@ -5,6 +5,16 @@ import gsap from "gsap";
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const graphemeSegmenter =
+  typeof Intl.Segmenter === "function"
+    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+    : null;
+
+function segmentCharacters(text: string) {
+  if (!graphemeSegmenter) return Array.from(text);
+  return Array.from(graphemeSegmenter.segment(text), ({ segment }) => segment);
+}
+
 export interface FlippingWordSwapProps {
   /** The word or short phrase shown at rest. */
   word1: string;
@@ -112,7 +122,7 @@ export function FlippingWordSwap({
   }, []);
 
   const renderCharacters = (text: string, layer: "first" | "second") =>
-    Array.from(text).map((character, index) => (
+    segmentCharacters(text).map((character, index) => (
       <span
         key={`${layer}-${index}-${character}`}
         data-flip-word={layer}
@@ -136,7 +146,7 @@ export function FlippingWordSwap({
       style={style}
       onMouseEnter={() => updateSwap(true)}
       onMouseLeave={() => updateSwap(false)}
-      onPointerDown={(event) => {
+      onPointerUp={(event) => {
         if (event.pointerType !== "mouse") updateSwap(!swappedRef.current);
       }}
       onFocus={(event) => {

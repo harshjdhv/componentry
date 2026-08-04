@@ -10,7 +10,9 @@ export function FlippingWordSwapCardPreview() {
   const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     const context = gsap.context(() => {
       const firstWord = gsap.utils.toArray<HTMLElement>(
@@ -25,6 +27,8 @@ export function FlippingWordSwapCardPreview() {
         opacity: 0,
         transformOrigin: "center bottom",
       });
+
+      if (prefersReducedMotion) return;
 
       gsap
         .timeline({ repeat: -1, repeatDelay: 1, yoyo: true })
