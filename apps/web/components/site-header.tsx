@@ -29,7 +29,6 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
     const pathname = usePathname()
     const [stars, setStars] = React.useState<number | null>(LAST_KNOWN_GITHUB_STARS)
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false)
-    const [isScrolled, setIsScrolled] = React.useState(false)
 
     React.useEffect(() => {
         setMobileNavOpen(false)
@@ -46,19 +45,6 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
             }
         } catch {
             // The regular fetch below remains the fallback.
-        }
-    }, [])
-
-    React.useEffect(() => {
-        const updateScrolledState = () => {
-            setIsScrolled(window.scrollY > 8)
-        }
-
-        updateScrolledState()
-        window.addEventListener("scroll", updateScrolledState, { passive: true })
-
-        return () => {
-            window.removeEventListener("scroll", updateScrolledState)
         }
     }, [])
 
@@ -141,9 +127,7 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
             className={cn(
                 "fixed top-0 left-0 right-0 z-50 w-full transition-[background-color,border-color] duration-200",
                 landingGutter
-                    ? isScrolled
-                        ? "border-b border-white/[0.06] bg-[#0a0a0a]"
-                        : "border-b border-transparent bg-transparent"
+                    ? "border-b border-transparent bg-white dark:bg-[#0a0a0a]"
                     : "border-b border-line bg-white dark:bg-background"
             )}
         >
@@ -154,7 +138,7 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
                 )}
             >
                 <div className="mx-auto flex h-full w-full max-w-[1360px] items-center">
-                <div className="flex flex-1 items-center gap-1.5">
+                <div className="flex flex-1 items-center gap-5">
                     {sidebarToggle && (
                         <div className="md:hidden">
                             {sidebarToggle}
@@ -165,9 +149,9 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
                         className="group inline-flex h-8 items-center gap-1.5 rounded-md px-1 transition-colors duration-200 hover:bg-muted/60 dark:hover:bg-muted/40"
                     >
                         <ComponentryLogomark className="size-5 text-zinc-900 dark:text-white transition-opacity group-hover:opacity-80" />
-                        <span className="text-[16px] font-bold font-display tracking-tight text-zinc-900 dark:text-white">COMPONENTRY</span>
+                        <span className="text-[16px] font-semibold font-display tracking-tight text-zinc-900 dark:text-white">COMPONENTRY</span>
                     </Link>
-                    <nav className="hidden items-center gap-0.5 text-sm font-normal sm:flex">
+                    <nav className="hidden items-center gap-0.5 text-sm font-medium lg:flex">
                         {navItems.map((item) => (
                             <Link
                                 key={item.href}
@@ -190,7 +174,7 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
                         href="https://shadcnblocks.com/?utm_source=componentry&utm_medium=sponsor&utm_campaign=header_badge"
                         target="_blank"
                         data-umami-event="click-sponsor-shadcnblocks"
-                        className="hidden h-8 items-center gap-1.5 rounded-md border border-input/50 bg-muted/30 pl-2 pr-2.5 text-sm font-normal transition-colors hover:border-input hover:bg-accent/50 md:inline-flex"
+                        className="hidden h-8 items-center gap-1.5 rounded-md border border-input/50 bg-muted/30 pl-2 pr-2.5 text-sm font-normal transition-colors hover:border-input hover:bg-accent/50 lg:inline-flex"
                     >
                         <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">Sponsor</span>
                         <span className="w-px h-4 bg-border/40" />
@@ -228,7 +212,7 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
                         </div>
                         <button
                             type="button"
-                            className="group relative flex size-8 touch-manipulation flex-col items-center justify-center gap-1 rounded-md border-none transition-colors before:absolute before:-inset-x-2 before:-top-8 before:-bottom-1 active:scale-none aria-expanded:bg-accent sm:hidden"
+                            className="group relative flex size-8 touch-manipulation flex-col items-center justify-center gap-1 rounded-md border-none transition-colors before:absolute before:-inset-x-2 before:-top-8 before:-bottom-1 active:scale-none aria-expanded:bg-accent lg:hidden"
                             aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
                             aria-expanded={mobileNavOpen}
                             onClick={() => setMobileNavOpen((open) => !open)}
@@ -251,7 +235,7 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
                 </div>
             </div>
             {mobileNavOpen && (
-                <div className="absolute right-4 top-[calc(100%+0.5rem)] z-50 flex w-48 origin-top-right flex-col gap-4 rounded-xl bg-popover p-1 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden sm:hidden dark:ring-foreground/20">
+                <div className="absolute right-4 top-[calc(100%+0.5rem)] z-50 flex w-48 origin-top-right flex-col gap-4 rounded-xl bg-popover p-1 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden lg:hidden dark:ring-foreground/20">
                     <nav className="flex flex-col" aria-label="Mobile navigation">
                         {navItems.map((item) => (
                             <Link
@@ -264,6 +248,7 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
                             </Link>
                         ))}
                     </nav>
+                    <div className="px-2 pb-2 sm:hidden"><ThemeToggle /></div>
                 </div>
             )}
         </header>

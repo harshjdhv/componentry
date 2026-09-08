@@ -1,44 +1,75 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { LayoutGrid, Terminal } from "lucide-react";
-import { CopyButton } from "@/components/copy-button";
+import { AnimatePresence, motion } from "framer-motion";
+import { Button } from "@workspace/ui/components/coss-button";
+import { ArrowUpRight, Check, Copy } from "lucide-react";
 import posthog from "posthog-js";
 
+const components = ["magnetic-dock", "text-morph", "hover-transition"];
+
 export function HeroButtons() {
-  const installCommand = "npx shadcn@latest add @componentry/magnetic-dock";
-
+  const [index, setIndex] = useState(0);
+  const [held, setHeld] = useState(false);
+  const [canAnimate, setCanAnimate] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const query = matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = false;
+    const update = () => setCanAnimate(visible && !document.hidden && !query.matches);
+    const observer = new IntersectionObserver(([entry]) => { visible = entry?.isIntersecting ?? false; update(); });
+    if (root.current) observer.observe(root.current);
+    query.addEventListener("change", update);
+    document.addEventListener("visibilitychange", update);
+    return () => { observer.disconnect(); query.removeEventListener("change", update); document.removeEventListener("visibilitychange", update); };
+  }, []);
+  useEffect(() => {
+    if (!canAnimate || held || status !== "idle") return;
+    const timer = setInterval(() => setIndex(value => (value + 1) % components.length), 4500);
+    return () => clearInterval(timer);
+  }, [canAnimate, held, status]);
+  useEffect(() => {
+    if (status === "idle") return;
+    const timer = setTimeout(() => setStatus("idle"), 2000);
+    return () => clearTimeout(timer);
+  }, [status]);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(`npx shadcn@latest add @componentry/${components[index]}`);
+      setStatus("copied");
+      posthog.capture("component_install_command_copied");
+    } catch { setStatus("error"); }
+  };
   return (
-    <div className="flex w-full min-w-0 flex-col items-stretch justify-center gap-3 pt-6 pb-2 sm:w-auto sm:flex-row sm:items-start">
-      <div className="relative z-10 w-full sm:w-fit">
-        <Link
-          href="/docs"
-          onClick={() => posthog.capture("components_browse_started")}
-          className="group flex h-12 w-full cursor-pointer items-center justify-center gap-2.5 whitespace-nowrap rounded-xl bg-gradient-to-b from-zinc-900 to-zinc-950 px-5 font-medium text-zinc-100 shadow-[0_1px_1px_0_rgba(0,0,0,0.2),0_8px_20px_-8px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.08),inset_0_1.5px_0_0_rgba(255,255,255,0.08)] transition-[box-shadow,background-color,color] duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:from-zinc-800 hover:to-zinc-900 hover:shadow-[0_2px_2px_0_rgba(0,0,0,0.24),0_14px_30px_-10px_rgba(0,0,0,0.58),0_0_0_1px_rgba(255,255,255,0.08),inset_0_1.5px_0_0_rgba(255,255,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:from-white dark:to-zinc-100 dark:text-zinc-950 dark:shadow-[0_1px_1px_0_rgba(0,0,0,0.06),0_8px_20px_-8px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.08),inset_0_1.5px_0_0_rgba(255,255,255,1),inset_0_-1px_0_0_rgba(0,0,0,0.03)] dark:hover:from-zinc-50 dark:hover:to-zinc-200 dark:focus-visible:ring-zinc-300/60 dark:focus-visible:ring-offset-background sm:w-fit"
-        >
-          <LayoutGrid className="size-4 transition-transform duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-px" />
-          <span className="text-sm font-semibold">Browse components</span>
-        </Link>
-      </div>
-
-      <div className="relative z-10 w-full sm:w-auto">
-        <div
-          className="group relative flex h-12 w-full min-w-0 items-center justify-center gap-2 overflow-hidden rounded-xl bg-white/75 px-3 text-sm font-semibold text-zinc-900 shadow-[0_0_0_1px_rgba(0,0,0,0.085),0_8px_20px_-14px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(255,255,255,0.82)] backdrop-blur-xl transition-[box-shadow,background-color,color] duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-white hover:text-zinc-950 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.12),0_12px_28px_-16px_rgba(0,0,0,0.52),inset_0_1px_0_0_rgba(255,255,255,0.92)] dark:bg-white/[0.065] dark:text-zinc-100 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.09),inset_0_1px_0_0_rgba(255,255,255,0.045)] dark:hover:bg-white/[0.085] dark:hover:text-white dark:hover:shadow-[0_0_0_1px_rgba(255,255,255,0.14),inset_0_1px_0_0_rgba(255,255,255,0.065)] sm:inline-flex sm:w-auto sm:gap-3 sm:px-4"
-          title={installCommand}
-        >
-          <Terminal className="size-4 shrink-0 text-zinc-600 transition-colors duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-zinc-100" />
-          <span className="min-w-0 flex-1 truncate text-left font-mono text-xs tracking-tight text-zinc-700 transition-colors duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-zinc-200 sm:text-sm">
-            {installCommand}
+    <div ref={root} className="flex w-full min-w-0 flex-wrap items-center justify-start gap-2 sm:justify-center">
+      <Button render={<Link href="/docs" />} onClick={() => posthog.capture("components_browse_started")} className="h-10 gap-1.5 rounded-[10px] px-4 text-sm before:rounded-[9px] sm:h-10">
+        Browse components <ArrowUpRight aria-hidden="true" className="size-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        onClick={copy}
+        onMouseEnter={() => setHeld(true)}
+        onMouseLeave={() => setHeld(false)}
+        onFocus={() => setHeld(true)}
+        onBlur={() => setHeld(false)}
+        aria-label={`Copy install command for ${components[index]}`}
+        className="hidden h-10 max-w-full gap-3 sm:inline-flex rounded-[10px] border-0 bg-zinc-100 text-zinc-900 shadow-none before:hidden hover:bg-zinc-200 dark:bg-white/[0.065] dark:text-zinc-300 dark:hover:bg-white/[0.085] px-3 font-mono text-sm font-medium sm:h-10 sm:text-sm"
+      >
+        <span aria-hidden="true" className="inline-flex min-w-0 items-center overflow-x-auto whitespace-pre">
+          <span className="shrink-0">npx shadcn<span className="hidden sm:inline">@latest</span> add @componentry/</span>
+          <span className="relative inline-grid w-[16ch] shrink-0 overflow-hidden text-left">
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.span key={index} initial={{ opacity: 0, y: canAnimate ? 6 : 0 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: canAnimate ? -6 : 0 }} transition={{ duration: canAnimate ? 0.2 : 0 }}>
+                {components[index]}
+              </motion.span>
+            </AnimatePresence>
           </span>
-          <CopyButton
-            code={installCommand}
-            eventName="component_install_command_copied"
-            absolute={false}
-            className="shrink-0 p-1.5"
-          />
-        </div>
-      </div>
-
+        </span>
+        {status === "copied" ? <Check aria-hidden="true" className="size-3.5" /> : <Copy aria-hidden="true" className="size-3.5" />}
+      </Button>
+      <span role="status" className="sr-only">{status === "copied" ? "Install command copied" : status === "error" ? "Could not copy the command. Please try again." : ""}</span>
     </div>
   );
 }
