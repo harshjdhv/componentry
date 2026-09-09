@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -129,54 +128,10 @@ const testimonials: Testimonial[] = [
   },
 ];
 
-function TestimonialSpotlight({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const itemRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
-    if (!itemRef.current) return;
-
-    const rect = itemRef.current.getBoundingClientRect();
-    itemRef.current.style.setProperty(
-      "--spotlight-x",
-      `${event.clientX - rect.left}px`,
-    );
-    itemRef.current.style.setProperty(
-      "--spotlight-y",
-      `${event.clientY - rect.top}px`,
-    );
-  };
-
-  return (
-    <div
-      ref={itemRef}
-      className={cn(
-        "group/testimonial-spotlight relative h-full overflow-hidden rounded-xl bg-white/70 ring-1 ring-inset ring-black/[0.055] transition-[background-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:shadow-[0_18px_60px_rgba(0,0,0,0.08)] active:scale-[0.98] dark:bg-[#141414]/85 dark:ring-white/[0.07] dark:hover:shadow-[0_22px_70px_rgba(0,0,0,0.34)]",
-        className,
-      )}
-      onMouseMove={handleMouseMove}
-    >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out group-hover/testimonial-spotlight:opacity-[var(--spotlight-opacity,0.65)]"
-        style={{
-          background:
-            "radial-gradient(circle at var(--spotlight-x) var(--spotlight-y), var(--spotlight-color,rgba(14,165,233,0.14)), transparent var(--spotlight-size,58%))",
-        }}
-      />
-      {children}
-    </div>
-  );
-}
-
 function TestimonialCard({ item }: { item: Testimonial }) {
   const isX = item.source === "x";
   const content = (
-    <TestimonialSpotlight className="h-[188px] w-[330px] [--spotlight-color:rgba(8,145,178,0.16)] dark:[--spotlight-color:rgba(255,255,255,0.16)] sm:w-[360px]">
+    <div className="relative h-[188px] w-[330px] overflow-hidden rounded-xl bg-white/70 ring-1 ring-inset ring-black/[0.055] dark:bg-[#141414]/85 dark:ring-white/[0.07] sm:w-[360px]">
       <figure className="relative z-10 flex h-full flex-col">
         <blockquote className="grow px-4 py-3 text-[0.98rem] leading-6 text-pretty text-foreground">
           <p>&ldquo;{item.quote}&rdquo;</p>
@@ -220,7 +175,7 @@ function TestimonialCard({ item }: { item: Testimonial }) {
           </span>
         </figcaption>
       </figure>
-    </TestimonialSpotlight>
+    </div>
   );
 
   if (!item.href) return content;
@@ -304,7 +259,7 @@ export function Testimonials() {
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-600">
           Wall of love
         </p>
-        <h2 className="text-3xl font-bold tracking-tighter text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+        <h2 className="text-balance text-3xl font-medium leading-[1.05] tracking-[-0.06em] text-zinc-950 dark:text-zinc-50 sm:text-4xl">
           Loved by builders with taste
         </h2>
       </motion.div>

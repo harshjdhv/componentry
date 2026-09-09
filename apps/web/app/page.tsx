@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
+import heroStyles from "./hero.module.css";
 import { motion } from "framer-motion";
+import { Badge } from "@workspace/ui/components/coss-badge";
 import { SiteHeader } from "@/components/site-header";
 import { HeroAtmosphere } from "@/components/landing/hero-atmosphere";
 import { HeroButtons } from "@/components/landing/hero-buttons";
@@ -61,14 +63,19 @@ export default function Home() {
         <LandingGutter>
           <LandingContent>
             <section aria-labelledby="hero-heading" className="relative mx-auto flex max-w-4xl min-w-0 flex-col items-center pt-[88px] pb-6 text-left sm:text-center sm:pt-[120px] md:pb-8 lg:pt-[136px]">
-              <div className="relative z-10 flex w-full min-w-0 flex-col items-start px-2 sm:items-center sm:px-4 lg:px-0">
-                <a
-                  href="https://vercel.com/open-source-program"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-950/[0.08] px-3 py-1 text-[11px] font-medium text-zinc-600 dark:border-white/[0.08] dark:text-zinc-400 sm:text-xs"
+              <div className={`${heroStyles.content} relative z-10 flex w-full min-w-0 flex-col items-start px-2 sm:items-center sm:px-4 lg:px-0`}>
+                <Badge
+                  variant="outline"
+                  className="h-auto gap-1.5 rounded-[6px] border-transparent bg-zinc-100/70 px-3 py-1 text-[11px] text-zinc-900 shadow-none dark:bg-[#1a1a1a]/70 dark:text-zinc-300 sm:h-auto sm:text-xs [button&,a&]:hover:bg-zinc-200/80 dark:[button&,a&]:hover:bg-[#1f1f1f]/80"
+                  render={
+                    <a
+                      href="https://vercel.com/open-source-program"
+                      target="_blank"
+                      rel="noreferrer"
+                    />
+                  }
                 >
-                  Backed by
+                  <span>Backed by</span>
                   <svg
                     viewBox="0 0 76 65"
                     aria-hidden="true"
@@ -77,11 +84,9 @@ export default function Home() {
                   >
                     <path d="M37.59.25l36.95 64H.64z" />
                   </svg>
-                  <span className="font-semibold tracking-tight">
-                    Vercel OSS
-                  </span>
-                  Program
-                </a>
+                  <span className="font-semibold tracking-tight">Vercel OSS</span>
+                  <span>Program</span>
+                </Badge>
                 <h1 id="hero-heading" className="mt-6 max-w-[720px] text-balance text-[8.4vw] sm:text-[clamp(2.5rem,4vw,3.5rem)] font-medium leading-[0.96] tracking-[-0.06em] text-zinc-950 dark:text-zinc-50">
                   <span className="block whitespace-nowrap sm:inline sm:whitespace-normal">The component library</span>{" "}<span className="block whitespace-nowrap sm:inline sm:whitespace-normal">for polished interfaces.</span>
                 </h1>

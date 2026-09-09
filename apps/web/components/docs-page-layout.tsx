@@ -257,12 +257,12 @@ export async function DocsPageLayout({
       {/* Right Column: Sticky Preview */}
       <div
         data-docs-right-column
-        className="flex-1 lg:basis-1/2 lg:max-w-1/2 lg:h-full lg:sticky lg:top-0 order-first lg:order-last bg-white dark:bg-[#121212] flex flex-col z-20"
+        className="flex-1 lg:basis-1/2 lg:max-w-1/2 lg:h-full lg:sticky lg:top-0 order-first lg:order-last bg-white dark:bg-background flex flex-col z-20"
       >
         {/* We use a large padding to offset the card from the left side, mimicking the image */}
         <div
           data-docs-preview-shell
-          className="relative w-full h-[55vh] lg:h-full p-4 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5 overflow-hidden bg-white dark:bg-[#121212]"
+          className="relative w-full h-[55vh] lg:h-full p-4 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5 overflow-hidden bg-white dark:bg-background"
         >
 
           {/* Floating Card Container */}

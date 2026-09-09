@@ -1,0 +1,43 @@
+/* Keep the entrance local to the hero, with readable content before JS loads. */
+@media (prefers-reduced-motion: no-preference) {
+  .content > * {
+    animation: hero-enter 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .content > :nth-child(2) {
+    animation-delay: 100ms;
+  }
+
+  .content > :nth-child(3) {
+    animation-delay: 200ms;
+  }
+
+  .content > :nth-child(4) {
+    animation-delay: 300ms;
+  }
+
+  .content :is(a, button) {
+    transition: scale 160ms cubic-bezier(0.2, 0, 0, 1),
+      background-color 160ms ease-out, box-shadow 160ms ease-out;
+  }
+
+  .content a:active {
+    scale: 0.99;
+  }
+}
+
+/* Keyboard focus must never wait for the entrance to finish. */
+.content > :focus-within {
+  animation: none;
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
