@@ -68,7 +68,6 @@ export function InfiniteImageField({
   const dimsRef = useRef({ w: 0, h: 0 });
   const camRef = useRef({ x: 0, y: 0 });
   const velRef = useRef({ x: 0, y: 0 });
-  const targetVelRef = useRef({ x: 0, y: 0 });
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
   const isInsideRef = useRef(false);
   const rafRef = useRef<number>(0);

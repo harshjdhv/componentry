@@ -181,6 +181,8 @@ export function ClosingPlasma({
   style,
   ...props
 }: ClosingPlasmaProps) {
+  // Preserve the legacy prop without forwarding it to the DOM.
+  void _themeMode;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef({ x: 0.5, y: 0.5 });

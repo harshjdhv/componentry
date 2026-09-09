@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence, type MotionValue } from "framer-motion"
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence, useReducedMotion, type MotionValue } from "framer-motion"
 import { cn } from "@workspace/ui/lib/utils"
 
 interface MagneticDockProps {
@@ -46,6 +46,7 @@ interface DockItemProps {
     magneticDistance: number
     showLabels: boolean
     isVertical: boolean
+    reducedMotion: boolean
 }
 
 function DockItem({
@@ -56,9 +57,12 @@ function DockItem({
     magneticDistance,
     showLabels,
     isVertical,
+    reducedMotion,
 }: DockItemProps) {
     const ref = React.useRef<HTMLButtonElement>(null)
     const [isHovered, setIsHovered] = React.useState(false)
+    const [isFocused, setIsFocused] = React.useState(false)
+    const showLabel = showLabels && (isHovered || isFocused)
 
     // Calculate distance from mouse to center of item
     const distance = useTransform(mouseX, (val: number) => {
@@ -87,7 +91,13 @@ function DockItem({
     return (
         <motion.button
             ref={ref}
+            type="button"
+            tabIndex={0}
+            aria-label={item.label}
+            aria-current={item.isActive ? "page" : undefined}
             onClick={item.onClick}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             className={cn(
@@ -97,12 +107,12 @@ function DockItem({
                 item.isActive && "bg-neutral-200/50 dark:bg-white/10"
             )}
             style={{
-                width: size,
-                height: size,
-                y: isVertical ? 0 : smoothY,
-                x: isVertical ? smoothY : 0,
+                width: reducedMotion ? iconSize : size,
+                height: reducedMotion ? iconSize : size,
+                y: reducedMotion || isVertical ? 0 : smoothY,
+                x: reducedMotion || !isVertical ? 0 : smoothY,
             }}
-            whileTap={{ scale: 0.9 }}
+            whileTap={reducedMotion ? undefined : { scale: 0.9 }}
         >
             {/* Icon Container */}
             <motion.div
@@ -114,7 +124,7 @@ function DockItem({
                     "border border-neutral-300 dark:border-neutral-700",
                     "shadow-lg shadow-black/10 dark:shadow-black/30",
                     "flex items-center justify-center",
-                    "transition-all duration-200"
+                    "transition-colors duration-200"
                 )}
                 style={{
                     boxShadow: isHovered
@@ -123,7 +133,7 @@ function DockItem({
                 }}
             >
                 {/* Icon */}
-                <div className="w-[60%] h-[60%] flex items-center justify-center text-neutral-700 dark:text-white">
+                <div aria-hidden="true" className="w-[60%] h-[60%] flex items-center justify-center text-neutral-700 dark:text-white">
                     {item.icon}
                 </div>
 
@@ -139,12 +149,12 @@ function DockItem({
             </motion.div>
 
             {/* Badge */}
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
                 {item.badge !== undefined && item.badge > 0 && (
                     <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
+                        initial={reducedMotion ? false : { scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
+                        exit={reducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
                         className={cn(
                             "absolute -top-1 -right-1",
                             "min-w-[20px] h-5 px-1.5",
@@ -162,12 +172,12 @@ function DockItem({
             </AnimatePresence>
 
             {/* Active Indicator */}
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
                 {item.isActive && (
                     <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
+                        initial={reducedMotion ? false : { scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
+                        exit={reducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
                         className={cn(
                             "absolute -bottom-2",
                             "w-1.5 h-1.5 rounded-full",
@@ -178,12 +188,13 @@ function DockItem({
             </AnimatePresence>
 
             {/* Tooltip */}
-            <AnimatePresence>
-                {showLabels && isHovered && (
+            <AnimatePresence initial={false}>
+                {showLabel && (
                     <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                        aria-hidden="true"
+                        initial={reducedMotion ? false : { opacity: 0, y: 8, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.9 }}
+                        exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.9 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
                         className={cn(
                             "absolute -top-10 left-1/2 -translate-x-1/2",
@@ -235,6 +246,7 @@ function MagneticDock({
     className,
 }: MagneticDockProps) {
     const mousePosition = useMotionValue(Infinity)
+    const reducedMotion = useReducedMotion() ?? false
     const isVertical = position === "left" || position === "right"
 
     const handleMouseMove = React.useCallback(
@@ -274,7 +286,7 @@ function MagneticDock({
 
     return (
         <motion.div
-            onMouseMove={handleMouseMove}
+            onMouseMove={reducedMotion ? undefined : handleMouseMove}
             onMouseLeave={handleMouseLeave}
             className={cn(
                 "inline-flex items-end gap-2 p-3 rounded-3xl",
@@ -283,7 +295,7 @@ function MagneticDock({
                 "shadow-xl shadow-black/10 dark:shadow-black/30",
                 className
             )}
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
@@ -297,6 +309,7 @@ function MagneticDock({
                     magneticDistance={magneticDistance}
                     showLabels={showLabels}
                     isVertical={isVertical}
+                    reducedMotion={reducedMotion}
                 />
             ))}
         </motion.div>

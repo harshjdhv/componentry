@@ -7,7 +7,9 @@
     "framer-motion",
     "opentype.js"
   ],
-  "devDependencies": [],
+  "devDependencies": [
+    "@types/opentype.js"
+  ],
   "registryDependencies": [],
   "description": "Component for signature",
   "files": [

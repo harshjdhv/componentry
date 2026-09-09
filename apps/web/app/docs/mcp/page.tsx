@@ -1,5 +1,6 @@
 "use client"
 
+import { registryNamespace, registryUrl } from "@/lib/install-command"
 import { SiteHeader } from "@/components/site-header"
 import { DocsScrollEdgeFade } from "@/components/docs-scroll-edge-fade"
 import { LandingGuideLines } from "@/components/landing/landing-frame"
@@ -38,8 +39,6 @@ function CodeBlock({ code }: { code: string }) {
 
 
 export default function McpDocsPage() {
-  const registryNamespace = process.env.NEXT_PUBLIC_REGISTRY_NAMESPACE || "@componentry"
-  const selectedRegistryUrl = "https://componentry.fun/r/{name}.json"
 
   return (
     <div className="min-h-screen bg-white dark:bg-background text-zinc-900 dark:text-zinc-100 font-sans overflow-x-hidden">
@@ -75,7 +74,7 @@ export default function McpDocsPage() {
               code={JSON.stringify(
                 {
                   registries: {
-                    [registryNamespace]: selectedRegistryUrl,
+                    [registryNamespace]: registryUrl,
                   },
                 },
                 null,
@@ -89,9 +88,9 @@ export default function McpDocsPage() {
               You can now ask your IDE to use any Componentry component. Here are some examples:
             </p>
             <ul className="space-y-2 text-zinc-700 dark:text-zinc-300">
-              <li className="font-mono text-[13px] sm:text-sm">"Add a badge component"</li>
-              <li className="font-mono text-[13px] sm:text-sm">"Add a blur reveal animation"</li>
-              <li className="font-mono text-[13px] sm:text-sm">"Add a vertical marquee of logos"</li>
+              <li className="font-mono text-[13px] sm:text-sm">"Add the magnetic dock component"</li>
+              <li className="font-mono text-[13px] sm:text-sm">"Add the kinetic text reveal animation"</li>
+              <li className="font-mono text-[13px] sm:text-sm">"Add the sticky scroll cards"</li>
             </ul>
           </Section>
         </div>

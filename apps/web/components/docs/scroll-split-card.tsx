@@ -1,4 +1,5 @@
 import React from "react";
+import { readComponentSource } from "@/lib/source-code";
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { ScrollSplitCardPreview } from "@/components/docs/previews/scroll-split-card-preview";
 
@@ -69,6 +70,7 @@ export function ScrollSplitCardPreview() {
 }`;
 
 export async function ScrollSplitCardDocs() {
+  const sourceCode = (await readComponentSource("scroll-split-card")) || "// Unable to load source code";
   return (
     <DocsPageLayout
       title="Scroll Split Card"
@@ -76,6 +78,14 @@ export async function ScrollSplitCardDocs() {
       preview={<ScrollSplitCardPreview />}
       previewCode={previewCode}
       installPackageName="scroll-split-card"
+      installSourceCode={sourceCode}
+      installDependencies="framer-motion"
+      props={[
+        { name: "imageSrc", type: "string", description: "Image split across the three panels." },
+        { name: "cards", type: "ScrollSplitCardItem[]", description: "Three cards with title, description, bgColor, textColor and an optional icon." },
+        { name: "containerRef", type: "React.RefObject<HTMLElement | null>", description: "Optional scroll container; otherwise tracks page scrolling." },
+        { name: "className", type: "string", description: "Styles for the outer scroll region; controls its scroll distance." },
+      ]}
       usageCode={usageCode}
       fullWidthPreview={true}
     />

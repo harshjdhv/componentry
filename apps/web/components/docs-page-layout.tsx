@@ -1,7 +1,7 @@
 // apps/web/components/docs-page-layout.tsx
 import type React from "react"
 import Link from "next/link"
-import { Suspense } from "react"
+import { Suspense, isValidElement } from "react"
 import { InstallCommand } from "@/components/install-command"
 import { ImportCodeBlock } from "@/components/import-code-block"
 import { DynamicCodeBlock } from "@/components/dynamic-code-block"
@@ -89,7 +89,12 @@ export async function DocsPageLayout({
     installDependencies,
     installSourceCode,
     installSourceFilename,
-    usageCode: typeof usageCode === "string" ? usageCode : "",
+    usageCode:
+      typeof usageCode === "string"
+        ? usageCode
+        : isValidElement<{ defaultCode?: string }>(usageCode)
+          ? usageCode.props.defaultCode ?? ""
+          : "",
     examples,
     props,
   })

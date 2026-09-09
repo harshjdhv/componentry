@@ -1,5 +1,6 @@
 const fs = require("fs")
 const path = require("path")
+const { validatePayload } = require("./lib/registry")
 
 const ROOT = path.join(__dirname, "..")
 const REGISTRY_DIR = path.join(ROOT, "apps/web/public/r")
@@ -23,7 +24,6 @@ const LEGACY_UNDOCUMENTED_ITEMS = new Set([
   "scrub-input",
   "shimmer-button",
   "showcase-card",
-  "signature",
   "spotlight-card",
   "testimonial-marquee",
   "text-animate",
@@ -43,9 +43,8 @@ function readJson(filePath) {
 }
 
 function readDocsRegistrySlugs() {
-  const source = fs.readFileSync(DOCS_REGISTRY_PATH, "utf8")
-  const matches = [...source.matchAll(/^\s*"([a-z0-9-]+)"\s*:\s*{/gm)]
-  return new Set(matches.map((match) => match[1]))
+  const { components } = require("./validate-docs").loadData(DOCS_REGISTRY_PATH)
+  return new Set(Object.keys(components))
 }
 
 function readBlockRegistrySlugs() {
@@ -88,6 +87,7 @@ function validateRegistryItemFile(slug) {
   }
 
   const item = readJson(itemPath)
+  try { validatePayload(item) } catch (error) { fail(error.message) }
 
   if (item.$schema && item.$schema !== REGISTRY_ITEM_SCHEMA_URL) {
     fail(
@@ -178,6 +178,7 @@ function main() {
 
   const docsSlugs = readDocsRegistrySlugs()
   const blockSlugs = readBlockRegistrySlugs()
+  try { require("./validate-docs").validateDocs(docsSlugs) } catch (error) { fail(error.message) }
 
   for (const slug of docsSlugs) {
     if (!uniqueItemNames.has(slug)) {

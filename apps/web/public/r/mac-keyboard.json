@@ -3,7 +3,9 @@
   "name": "mac-keyboard",
   "type": "registry:ui",
   "title": "Mac Keyboard",
-  "dependencies": [],
+  "dependencies": [
+    "lucide-react"
+  ],
   "devDependencies": [],
   "registryDependencies": [],
   "description": "Component for mac-keyboard",

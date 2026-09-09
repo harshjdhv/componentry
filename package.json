@@ -12,7 +12,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "screenshot": "node scripts/screenshot.js",
     "optimize:previews": "./scripts/optimize-preview-videos.sh",
-    "recompress:previews": "scripts/venv/bin/python scripts/recompress-and-reupload-previews.py"
+    "recompress:previews": "scripts/venv/bin/python scripts/recompress-and-reupload-previews.py",
+    "registry:generate": "node scripts/generate-registry.js --all && node scripts/build-blocks-registry.js",
+    "registry:check": "node scripts/generate-registry.js --check && node scripts/build-blocks-registry.js --check && node scripts/validate-registry.js",
+    "test": "node --test tests/registry.test.cjs",
+    "test:registry:install": "node scripts/smoke-registry.mjs",
+    "typecheck": "turbo typecheck"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

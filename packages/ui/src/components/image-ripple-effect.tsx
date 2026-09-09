@@ -1,3 +1,5 @@
+/* React Three Fiber elements use Three.js properties, not DOM attributes. */
+/* eslint react/no-unknown-property: ["error", { "ignore": ["args", "vertexShader", "fragmentShader", "transparent", "uniforms"] }] */
 "use client";
 
 import { OrthographicCamera, useFBO, useTexture } from "@react-three/drei";

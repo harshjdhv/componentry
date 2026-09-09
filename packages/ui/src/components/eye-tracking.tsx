@@ -72,7 +72,6 @@ function Eye({
   showEyelids,
   mouseX,
   mouseY,
-  index,
 }: EyeProps) {
   const eyeRef = React.useRef<HTMLDivElement>(null)
   const [isBlinking, setIsBlinking] = React.useState(false)
@@ -467,7 +466,6 @@ export function EyeTracking({
   React.useEffect(() => {
     if (!idleAnimation) return
 
-    let idleTimeout: ReturnType<typeof setTimeout>
     let idleInterval: ReturnType<typeof setInterval>
     let lastX = mouseX.current
     let lastY = mouseY.current
@@ -491,7 +489,7 @@ export function EyeTracking({
       lastY = mouseY.current
     }
 
-    idleTimeout = setInterval(checkIdle, 3000)
+    const idleTimeout = setInterval(checkIdle, 3000)
 
     return () => {
       clearInterval(idleTimeout)

@@ -3,7 +3,9 @@
   "name": "music-player",
   "type": "registry:ui",
   "title": "Music Player",
-  "dependencies": [],
+  "dependencies": [
+    "framer-motion"
+  ],
   "devDependencies": [],
   "registryDependencies": [],
   "description": "Component for music-player",

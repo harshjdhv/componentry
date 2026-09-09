@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const ts = require("typescript");
+const { withDependencies, validatePayload } = require("./lib/registry");
+const check = process.argv.includes("--check");
 
 const ROOT = path.join(__dirname, "..");
 const WEB_DIR = path.join(ROOT, "apps/web");
@@ -25,11 +27,17 @@ function readJson(filePath, fallback = null) {
 }
 
 function writeJson(filePath, value) {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+  writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
 function writeFile(filePath, content) {
+  if (check) {
+    if (!fs.existsSync(filePath) || fs.readFileSync(filePath, "utf8") !== content) {
+      throw new Error(`Stale block output: ${path.relative(ROOT, filePath)}. Run pnpm registry:blocks.`);
+    }
+    return;
+  }
+  if (fs.existsSync(filePath) && fs.readFileSync(filePath, "utf8") === content) return;
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content);
 }
@@ -254,10 +262,11 @@ function main() {
   validateRegistry(source);
 
   const blocks = source.blocks.map(buildIndexBlock);
-  const publicBlocks = source.blocks.map((block) => ({
+  const publicBlocks = source.blocks.map((block) => withDependencies({
     ...block,
     files: block.files.map((file) => readInstallFile(block, file)),
   }));
+  for (const block of publicBlocks) validatePayload(block);
 
   const existingRegistry = readJson(
     path.join(PUBLIC_REGISTRY_DIR, "registry.json"),
@@ -298,7 +307,7 @@ function main() {
     buildGeneratedIndex(blocks),
   );
 
-  console.log(`[blocks-registry] Built ${blocks.length} blocks.`);
+  console.log(`[blocks-registry] ${check ? "Checked" : "Built"} ${blocks.length} blocks.`);
 }
 
 main();

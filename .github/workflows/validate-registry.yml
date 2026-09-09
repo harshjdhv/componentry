@@ -1,37 +1,50 @@
-name: Validate Registry
+name: Validate Library
 
 on:
   pull_request:
-    paths:
-      - "apps/web/public/r/**"
-      - "apps/web/registry/index.ts"
-      - "scripts/validate-registry.js"
-      - ".github/workflows/validate-registry.yml"
-      - "package.json"
-      - "pnpm-lock.yaml"
   push:
-    branches:
-      - main
-    paths:
-      - "apps/web/public/r/**"
-      - "apps/web/registry/index.ts"
-      - "scripts/validate-registry.js"
-      - ".github/workflows/validate-registry.yml"
-      - "package.json"
-      - "pnpm-lock.yaml"
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: library-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  validate-registry:
+  validate:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm registry:check
+      - run: pnpm test
+      - run: pnpm lint
+      - run: pnpm --filter web exec next typegen
+      - run: pnpm typecheck
+      - run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
 
-      - name: Validate shadcn registry files
-        run: node scripts/validate-registry.js
+  consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:registry:install
+        env:
+          REGISTRY_SMOKE_BROWSER: "1"

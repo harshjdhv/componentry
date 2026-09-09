@@ -6,12 +6,12 @@ import { Canvas, useFrame, ThreeElements } from "@react-three/fiber";
 import * as THREE from "three";
 import { motion } from "framer-motion";
 
-import { cn } from "../lib/utils";
+import { cn } from "@workspace/ui/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare module "react" {
     namespace JSX {
-        // eslint-disable-next-line @typescript-eslint/no-empty-interface
+        // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         interface IntrinsicElements extends ThreeElements { }
     }
 }

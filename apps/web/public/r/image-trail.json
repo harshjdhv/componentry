@@ -3,7 +3,9 @@
   "name": "image-trail",
   "type": "registry:ui",
   "title": "Image Trail",
-  "dependencies": [],
+  "dependencies": [
+    "gsap"
+  ],
   "devDependencies": [],
   "registryDependencies": [],
   "description": "Component for image-trail",

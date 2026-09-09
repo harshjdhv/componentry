@@ -1,173 +1,82 @@
-const fs = require('fs');
-const path = require('path');
-
-const REGISTRY_ITEM_SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json';
-
-// Configuration
-const COMPONENT_DIR = path.join(__dirname, '../packages/ui/src/components');
-const REGISTRY_DIR = path.join(__dirname, '../apps/web/public/r');
-const REGISTRY_INDEX_PATH = path.join(REGISTRY_DIR, 'registry.json');
-const WEBGL_ERROR_BOUNDARY_FILENAME = 'webgl-error-boundary.tsx';
-const WEBGL_ERROR_BOUNDARY_SOURCE_PATH = path.join(COMPONENT_DIR, WEBGL_ERROR_BOUNDARY_FILENAME);
+const fs = require("node:fs");
+const path = require("node:path");
+const {
+  REGISTRY_DIR,
+  buildComponent,
+  validatePayload,
+} = require("./lib/registry");
 
 const args = process.argv.slice(2);
-
-if (args.length === 0) {
-  console.error('Please provide a component name (e.g., scroll-based-velocity)');
+const check = args.includes("--check");
+const all = args.includes("--all") || check;
+const slug = args.find((arg) => !arg.startsWith("--"));
+if (
+  (!all && !slug) ||
+  (slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) ||
+  args.some(
+    (arg) =>
+      arg.startsWith("--") && !["--all", "--check", "--write"].includes(arg),
+  )
+) {
+  console.error(
+    "Usage: node scripts/generate-registry.js <slug> | --all [--check]",
+  );
   process.exit(1);
 }
-
-const componentName = args[0];
-const componentFilename = `${componentName}.tsx`;
-const sourcePath = path.join(COMPONENT_DIR, componentFilename);
-const registryPath = path.join(REGISTRY_DIR, `${componentName}.json`);
-
-// Check if source component exists
-if (!fs.existsSync(sourcePath)) {
-  console.error(`Component file not found at: ${sourcePath}`);
+try {
+  const names = all
+    ? fs
+        .readdirSync(REGISTRY_DIR)
+        .filter((file) => file.endsWith(".json") && file !== "registry.json")
+        .map((file) => file.slice(0, -5))
+        .sort()
+    : [slug];
+  const outputs = new Map();
+  for (const name of names) {
+    const filename = path.join(REGISTRY_DIR, `${name}.json`);
+    const item = fs.existsSync(filename)
+      ? JSON.parse(fs.readFileSync(filename, "utf8"))
+      : {
+          $schema: "https://ui.shadcn.com/schema/registry-item.json",
+          name,
+          type: "registry:ui",
+          title: name
+            .split("-")
+            .map((word) => word[0].toUpperCase() + word.slice(1))
+            .join(" "),
+          description: `Component for ${name}`,
+          dependencies: [],
+          devDependencies: [],
+          registryDependencies: [],
+          files: [{ path: `components/ui/${name}.tsx`, type: "registry:ui" }],
+        };
+    if (item.type === "registry:block") continue;
+    const generated = buildComponent(item);
+    validatePayload(generated);
+    if (JSON.stringify(item) !== JSON.stringify(generated))
+      outputs.set(filename, `${JSON.stringify(generated, null, 2)}\n`);
+  }
+  const indexPath = path.join(REGISTRY_DIR, "registry.json");
+  const index = JSON.parse(fs.readFileSync(indexPath, "utf8"));
+  const existing = new Set(
+    index.items.map((item) => (typeof item === "string" ? item : item.name)),
+  );
+  const missing = names.filter((name) => !existing.has(name));
+  if (missing.length) {
+    index.items.push(...missing.map((name) => ({ name, type: "registry:ui" })));
+    outputs.set(indexPath, `${JSON.stringify(index, null, 2)}\n`);
+  }
+  if (check && outputs.size)
+    throw new Error(
+      `Stale registry output: ${[...outputs.keys()].map((file) => path.basename(file)).join(", ")}. Run pnpm registry:generate.`,
+    );
+  if (!check)
+    for (const [filename, content] of outputs)
+      fs.writeFileSync(filename, content);
+  console.log(
+    `[registry-generate] ${check ? "Checked" : "Generated"} ${names.length} entries (${outputs.size} changed).`,
+  );
+} catch (error) {
+  console.error(`[registry-generate] ${error.message}`);
   process.exit(1);
-}
-
-// Read source content
-const sourceContent = fs.readFileSync(sourcePath, 'utf8');
-
-function toTitleCase(slug) {
-  return slug
-    .split('-')
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
-
-function normalizeRegistryContent(content) {
-  return content
-    .replace(/@workspace\/ui\/lib\/utils/g, '@/lib/utils')
-    .replace(
-      /@workspace\/ui\/components\/webgl-error-boundary/g,
-      './webgl-error-boundary'
-    );
-}
-
-// Prepare registry data
-let registryData;
-if (fs.existsSync(registryPath)) {
-  try {
-    registryData = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
-    console.log(`Updating existing registry file for ${componentName}...`);
-  } catch (error) {
-    console.error('Error parsing existing registry file:', error);
-    process.exit(1);
-  }
-} else {
-  console.log(`Creating new registry file for ${componentName}...`);
-  registryData = {
-    $schema: REGISTRY_ITEM_SCHEMA,
-    name: componentName,
-    type: 'registry:ui',
-    title: toTitleCase(componentName),
-    dependencies: [],
-    devDependencies: [],
-    registryDependencies: [],
-    description: `Component for ${componentName}`, // Default description
-    files: []
-  };
-}
-
-if (!registryData.$schema) {
-  registryData.$schema = REGISTRY_ITEM_SCHEMA;
-}
-
-if (!registryData.title) {
-  registryData.title = toTitleCase(componentName);
-}
-
-if (!Array.isArray(registryData.dependencies)) {
-  registryData.dependencies = [];
-}
-
-if (!Array.isArray(registryData.devDependencies)) {
-  registryData.devDependencies = [];
-}
-
-if (!Array.isArray(registryData.registryDependencies)) {
-  registryData.registryDependencies = [];
-}
-
-// Update or add the main file content
-// We assume simple 1-file component structure for now or find the matching file path
-const targetFilePath = `components/ui/${componentFilename}`;
-
-if (!registryData.files) {
-    registryData.files = [];
-}
-
-const existingFileIndex = registryData.files.findIndex(f => f.path === targetFilePath || f.path.endsWith(componentFilename));
-
-if (existingFileIndex >= 0) {
-  registryData.files[existingFileIndex].content = normalizeRegistryContent(sourceContent);
-} else {
-  registryData.files.push({
-    path: targetFilePath,
-    content: normalizeRegistryContent(sourceContent),
-    type: 'registry:ui'
-  });
-}
-
-// Include shared helper file when the component uses the WebGL error boundary.
-const usesWebGLErrorBoundary = sourceContent.includes('webgl-error-boundary');
-if (usesWebGLErrorBoundary && fs.existsSync(WEBGL_ERROR_BOUNDARY_SOURCE_PATH)) {
-  const boundaryContent = normalizeRegistryContent(
-    fs.readFileSync(WEBGL_ERROR_BOUNDARY_SOURCE_PATH, 'utf8')
-  );
-  const boundaryTargetPath = `components/ui/${WEBGL_ERROR_BOUNDARY_FILENAME}`;
-  const boundaryIndex = registryData.files.findIndex(
-    (f) => f.path === boundaryTargetPath || f.path.endsWith(WEBGL_ERROR_BOUNDARY_FILENAME)
-  );
-
-  if (boundaryIndex >= 0) {
-    registryData.files[boundaryIndex].content = boundaryContent;
-  } else {
-    registryData.files.push({
-      path: boundaryTargetPath,
-      content: boundaryContent,
-      type: 'registry:ui'
-    });
-  }
-}
-
-// Write back to registry file
-fs.writeFileSync(registryPath, JSON.stringify(registryData, null, 2));
-
-console.log(`Successfully updated ${registryPath}`);
-
-// Keep registry.json in sync when present.
-if (fs.existsSync(REGISTRY_INDEX_PATH)) {
-  try {
-    const registryIndex = JSON.parse(fs.readFileSync(REGISTRY_INDEX_PATH, 'utf8'));
-    if (!Array.isArray(registryIndex.items)) {
-      registryIndex.items = [];
-    }
-
-    const existingNames = new Set(
-      registryIndex.items
-        .map((item) => (typeof item === 'string' ? item : item?.name))
-        .filter(Boolean)
-    );
-
-    if (!existingNames.has(componentName)) {
-      registryIndex.items.push({
-        name: componentName,
-        type: 'registry:ui',
-      });
-      registryIndex.items.sort((a, b) => {
-        const aName = typeof a === 'string' ? a : a.name;
-        const bName = typeof b === 'string' ? b : b.name;
-        return aName.localeCompare(bName);
-      });
-      fs.writeFileSync(REGISTRY_INDEX_PATH, JSON.stringify(registryIndex, null, 2));
-      console.log(`Added ${componentName} to ${REGISTRY_INDEX_PATH}`);
-    }
-  } catch (error) {
-    console.error('Warning: could not sync apps/web/public/r/registry.json:', error.message);
-  }
 }

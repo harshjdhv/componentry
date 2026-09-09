@@ -127,10 +127,6 @@ export function FloatingDocsSidebarPanel() {
   }, [isOpen])
 
   React.useEffect(() => {
-    if (!hoverPreview) {
-      setIsHoverVideoReady(false)
-      return
-    }
     setIsHoverVideoReady(false)
   }, [hoverPreview?.videoSrc])
 

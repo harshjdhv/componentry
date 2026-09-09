@@ -5,15 +5,8 @@ import { Terminal } from "lucide-react"
 import { DocsCodePanel } from "@/components/docs-code-panel"
 import { useSmoothCodeHeight } from "@/hooks/use-smooth-code-height"
 
-export const PACKAGE_MANAGERS = ["bun", "npm", "pnpm", "yarn"] as const
-export type PackageManager = (typeof PACKAGE_MANAGERS)[number]
-
-export const INSTALL_COMMANDS: Record<PackageManager, string> = {
-  pnpm: "pnpm dlx shadcn@latest add",
-  npm: "npx shadcn@latest add",
-  yarn: "yarn dlx shadcn@latest add",
-  bun: "bunx --bun shadcn@latest add",
-}
+import { PACKAGE_MANAGERS, type PackageManager } from "@/lib/install-command"
+export { INSTALL_COMMANDS, PACKAGE_MANAGERS, type PackageManager } from "@/lib/install-command"
 
 interface PackageManagerCommandProps {
   getCommand: (pm: PackageManager) => string

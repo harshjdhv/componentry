@@ -48,7 +48,7 @@ Componentry is a collection of beautifully designed, interactive UI components b
 - **Copy & Paste** - Not a dependency. You own the code.
 - **Interactive** - Cursor-following effects, 3D transforms, and smooth animations.
 - **Customizable** - Built with Tailwind CSS. Easy to modify.
-- **Accessible** - WAI-ARIA compliant components.
+- **Accessible foundations** - Native controls and component-specific keyboard and motion support. Validate accessibility in your application.
 - **Dark Mode** - All components support light and dark modes.
 - **TypeScript** - Fully typed for the best developer experience.
 
@@ -109,6 +109,11 @@ componentry/
 | `pnpm build` | Build all packages |
 | `pnpm lint` | Run linting |
 | `pnpm format` | Format code with Prettier |
+| `pnpm registry:generate` | Regenerate component and block payloads |
+| `pnpm registry:check` | Check registry freshness, dependencies and docs coverage |
+| `pnpm test` | Run distribution regression tests |
+| `pnpm typecheck` | Typecheck the web and UI workspaces |
+| `pnpm test:registry:install` | Install and typecheck representative payloads in a fresh app |
 
 ## Contributing
 
@@ -118,6 +123,8 @@ We welcome contributions! Whether it's:
 - Submitting a fix
 - Proposing new features
 - Creating new components
+
+See [the component creation guide](docs/COMPONENT_CREATION_GUIDE.md) for source, registry and documentation steps, and [the maintenance guide](docs/README.md) for validation commands.
 
 ### How to Contribute
 

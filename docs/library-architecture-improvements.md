@@ -1,57 +1,28 @@
-# Library Architecture Improvements
+# Componentry architecture
 
-Based on an analysis of production-grade libraries (specifically ReactBits) and comparison with the current state of Componentry, here are high-impact improvements to help the library scale.
+This document describes the current architecture. The earlier proposal for introducing centralized metadata, separate previews and dynamic docs routing has been implemented and is no longer a migration plan.
 
-### 1. Centralized Metadata Registry
-**What ReactBits does:**
-Instead of hardcoding titles, descriptions, and tags inside every page file (e.g., `app/docs/components/hyper-text/page.tsx`), ReactBits maintains a single source of truth (e.g., `src/constants/Information.js`).
+## Keep these boundaries
 
-*   **Benefits:** You can programmatically generate navigation, search indexes, and SEO tags without opening 50 different files.
-*   **Adoption for Componentry:**
-    Create a `registry.ts` file that exports an object mapping component slugs to their metadata.
-    ```typescript
-    // registry.ts
-    export const registry = {
-      "hyper-text": {
-        name: "Hyper Text",
-        description: "A text scramble effect...",
-        component: React.lazy(() => import("@/components/ui/hyper-text")),
-        demo: React.lazy(() => import("@/demos/hyper-text-demo")),
-      }
-    }
-    ```
+- Reusable source lives in the private `packages/ui` workspace.
+- The Next.js website owns documentation layouts, previews and marketing pages.
+- `apps/web/registry/index.ts` supplies component metadata, navigation, search and page metadata.
+- `components/docs/lazy-registry.ts` maps component slugs to async documentation modules.
+- One `[slug]` route handles component pages.
+- Registry JSON is the distribution format for shadcn installations.
+- Blocks have their own typed source registry and generated artifacts. The public `/blocks` page currently points to Componentry Pro.
 
-### 2. Separation of "Source" and "Demo"
-**What ReactBits does:**
-It strictly separates the *consumable component* from the *demonstration UI*.
-*   **Source:** `src/content/TextAnimations/BlurText/BlurText.jsx` (The clean code users copy).
-*   **Demo:** `src/demo/TextAnimations/BlurTextDemo.jsx` (The showcase with buttons, controls, and layout).
+## Distribution checks
 
-*   **Why it matters:** Your current `page.tsx` mixes the component's preview, the installation instructions, and the code block string. This makes the file huge and hard to maintain.
-*   **Adoption for Componentry:**
-    Move the interactive example into a separate file (e.g., `demos/hyper-text-demo.tsx`). Your documentation page should just import and render this demo wrapper.
+The component and block generators support read-only freshness checks. Registry validation checks dependency declarations, internal imports, helper resolution, index membership and documentation coverage. A fresh-consumer smoke test installs representative payloads with the real CLI and typechecks them without workspace aliases. Its browser mode exercises the installed magnetic dock.
 
-### 3. Multi-Flavor Support (The "Production Grade" Move)
-**What ReactBits does:**
-It organizes source code by "flavor" in directories like `ts-default` (TypeScript + CSS) and `ts-tailwind` (TypeScript + Tailwind).
+The legacy payload-only entries are explicitly enumerated in `scripts/lib/registry.js`. Keep them installable without treating missing source for a current component as acceptable.
 
-*   **Why it matters:** Early-stage libraries often force one stack (e.g., "we only support Tailwind"). Stable libraries meet users where they are.
-*   **Adoption for Componentry:**
-    You don't need to duplicate files manually yet. Start by deciding on your primary support (e.g., TS + Tailwind) but structure your folders to allow adding a `css-modules` or `javascript` version later without breaking usage.
+## Further improvements should follow evidence
 
-### 4. Interactive "Playground" Pattern
-**What ReactBits does:**
-In `BlurTextDemo.jsx`, they use a `useComponentProps` hook and a `Customize` component.
-*   The demo isn't static; it has controls for `delay`, `direction`, etc.
-*   The code block dynamically updates when you change these controls.
+- Add targeted interaction, accessibility or graphics regression tests when a component exposes a gap.
+- Expand the consumer smoke sample when adding a new dependency or installation pattern.
+- Document assets, themes and provider requirements next to the component that needs them.
+- Introduce more documentation fields only when they answer a recurring user question.
 
-*   **Adoption for Componentry:**
-    Instead of just showing the component, wrap it in a `ComponentPlayground` that accepts a schema of props (knobs) and lets users tweak them in real-time.
-
-### 5. Dynamic Documentation Routing
-**What ReactBits does:**
-It uses a single dynamic route `CategoryPage.jsx` that catches `/:category/:subcategory`. It uses the registry to look up which component to load.
-
-*   **Why it matters:** You currently have `app/docs/components/hyper-text/page.tsx`. If you add 50 components, you'll create 50 folders and 50 page files.
-*   **Adoption for Componentry:**
-    Switch to a dynamic route `app/docs/components/[slug]/page.tsx`. Use your new `registry.ts` to look up the component metadata and render the standard layout. This eliminates 90% of your boilerplate code.
+A custom MCP server, multiple language/style variants, or a new documentation framework are product decisions, not prerequisites for reliable source distribution.

@@ -97,6 +97,11 @@ export default function KeyboardShortcutDemo() {
       installSourceCode={sourceCode}
       installSourceFilename="components/ui/mac-keyboard.tsx"
       usageNote={installationNote}
+      props={[
+        { name: "soundSrc", type: "string", default: '"/audio/key-press.wav"', description: "URL of a key-click audio asset. Supply your own file or an empty string to disable sound." },
+        { name: "children", type: "React.ReactNode", description: "Optional custom MacKey children instead of the full keyboard layout." },
+        { name: "className", type: "string", description: "Additional container styles." },
+      ]}
       usageCode={usageCode}
       examples={[specificKeysVariant]}
       fullWidthPreview={true}

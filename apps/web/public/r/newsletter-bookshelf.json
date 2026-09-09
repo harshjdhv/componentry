@@ -8,7 +8,9 @@
     "@react-three/fiber",
     "lucide-react"
   ],
-  "devDependencies": [],
+  "devDependencies": [
+    "@types/three"
+  ],
   "registryDependencies": [],
   "description": "A tactile 3D newsletter archive with cloth-bound covers, camera navigation, hover lift, focused inspection, and a book-opening transition.",
   "files": [

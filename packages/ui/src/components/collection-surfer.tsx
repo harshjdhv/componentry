@@ -1,3 +1,5 @@
+"use client";
+
 import { motion, useScroll, useTransform, useSpring, useMotionValue, MotionValue } from "framer-motion";
 import React from "react";
 
@@ -161,7 +163,7 @@ function Card({
     const ref = React.useRef<HTMLDivElement>(null);
 
     // Calculate distance from mouse to center of card
-    const distance = useTransform([mouseX, mouseY, scrollSpring], ([x, y]: any[]) => {
+    const distance = useTransform([mouseX, mouseY, scrollSpring], ([x = 0, y = 0]: number[]) => {
         if (!ref.current || variant === "simple") return 200; // Default large distance
         const rect = ref.current.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -193,7 +195,7 @@ function Card({
     // Combine transforms based on variant
     const transform = useTransform(
         [springScale, springUplift],
-        ([s, u]: any[]) => {
+        ([s, u]: number[]) => {
             let scaleValue = 1;
             let upliftValue = 0;
 

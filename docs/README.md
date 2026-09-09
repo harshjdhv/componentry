@@ -1,52 +1,49 @@
-# Componentry Internal Documentation
+# Maintaining Componentry
 
-This directory contains internal documentation for maintaining and extending the Componentry UI library.
+Start with [the component creation guide](./COMPONENT_CREATION_GUIDE.md).
 
-## 📄 Available Guides
+## Structure
 
-| Document | Description |
-|----------|-------------|
-| [CREATING_COMPONENTS.md](./CREATING_COMPONENTS.md) | Complete guide for adding new components |
+- `packages/ui/src/components/`: reusable component source.
+- `apps/web/components/docs/`: documentation and optional client previews.
+- `apps/web/registry/index.ts`: component metadata used by navigation, search, SEO and `llms.txt`.
+- `apps/web/components/docs/lazy-registry.ts`: documentation import map used by the shared `/docs/components/[slug]` route.
+- `apps/web/public/r/`: installable shadcn registry payloads.
+- `apps/web/registry/blocks/_registry.ts`: block definitions and source mappings.
+- `scripts/`: generation, validation and fresh-consumer installation checks.
 
-## 🏗️ Architecture Overview
+`@workspace/ui` is a private workspace package. Users install source through the shadcn registry; it is not an npm package release.
 
-```
-componentry/
-├── packages/ui/          # Core component library (publishable)
-├── apps/web/             # Documentation website (Next.js)
-└── docs/                 # Internal documentation (this folder)
-```
+## Contributor workflow
 
-### Key Concepts
+1. Implement a component in `packages/ui/src/components/{slug}.tsx`.
+2. Generate its payload with `node scripts/generate-registry.js {slug}`.
+3. Add metadata in `apps/web/registry/index.ts`.
+4. Add an async docs component and register its import in `lazy-registry.ts`.
+5. Run the checks below, then verify the rendered preview and interaction.
 
-1. **Monorepo Structure** - Uses pnpm workspaces with Turborepo
-2. **Component Registry** - shadcn/ui compatible JSON files for easy installation
-3. **Documentation Site** - Next.js App Router with MDX-free component pages
-
-## 🚀 Quick Start for Contributors
+Navigation and documentation routes are derived from metadata and the import map. Do not create a separate route or manually add sidebar entries.
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Start development server
-pnpm run dev
-
-# Build for production
-pnpm run build
+pnpm install --frozen-lockfile
+pnpm registry:generate
+pnpm registry:check
+pnpm test
+pnpm lint
+pnpm --filter web exec next typegen
+pnpm typecheck
+pnpm build
+REGISTRY_SMOKE_BROWSER=1 pnpm test:registry:install
 ```
 
-## 📦 Adding a New Component (Quick Steps)
+The consumer smoke test creates a temporary Next.js project, installs representative local registry payloads with the shadcn CLI, and checks TypeScript. The browser option also checks the installed dock's keyboard activation, focus labels, form behavior and reduced motion. It needs Chromium (`pnpm exec playwright install chromium`). It uses network access for npm installation and deletes its fixture afterward. Set `KEEP_REGISTRY_SMOKE=1` to retain the fixture for debugging.
 
-1. **Create component:** `packages/ui/src/components/{name}.tsx`
-2. **Create registry JSON:** `apps/web/public/r/{name}.json`
-3. **Create docs page:** `apps/web/app/docs/components/{name}/page.tsx`
-4. **Add to sidebar:** `apps/web/config/docs.ts`
+## References
 
-See [CREATING_COMPONENTS.md](./CREATING_COMPONENTS.md) for detailed instructions.
+- [Component creation guide](./COMPONENT_CREATION_GUIDE.md)
+- [Current architecture and remaining opportunities](./library-architecture-improvements.md)
+- [Registry index submission notes](./SHADCN_REGISTRY_INDEX_SUBMISSION.md)
+- [Historical performance analysis](./performance_analysis.md)
+- [Website](https://componentry.dev)
 
-## 🔗 Useful Links
-
-- **Live Site:** https://componentry.dev
-- **Registry URL:** https://componentry.fun/r/{component}.json
-- **Install Example:** `pnpm dlx shadcn@latest add @componentry/showcase-card`
+Install a component with `npx shadcn@latest add @componentry/magnetic-dock`. The canonical registry URL is `https://componentry.dev/r/{name}.json`.

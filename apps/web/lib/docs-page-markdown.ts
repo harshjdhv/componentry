@@ -1,3 +1,5 @@
+import { getInstallCommand } from "./install-command"
+
 export interface DocsPageMarkdownInput {
   title: string
   description: string
@@ -21,7 +23,7 @@ export function buildDocsPageMarkdown(props: DocsPageMarkdownInput): string {
   lines.push("## Installation")
   lines.push("")
   lines.push(`\`\`\`bash`)
-  lines.push(`npx componentry@latest add ${props.installPackageName}`)
+  lines.push(getInstallCommand(props.installPackageName))
   lines.push(`\`\`\``)
   if (props.installDependencies) {
     lines.push("")
@@ -57,7 +59,7 @@ export function buildDocsPageMarkdown(props: DocsPageMarkdownInput): string {
       const name = `\`${prop.name}\``
       const type = `\`${prop.type}\``
       const defaultVal = prop.default ? `\`${prop.default}\`` : "-"
-      lines.push(`| ${name} | ${type} | ${defaultVal} | ${prop.description} |`)
+      lines.push(`| ${[name, type, defaultVal, prop.description].map((value) => value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ")).join(" | ")} |`)
     }
     lines.push("")
   }
