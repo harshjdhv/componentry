@@ -16,7 +16,7 @@ This document describes the current architecture. The earlier proposal for intro
 
 The component and block generators support read-only freshness checks. Registry validation checks dependency declarations, internal imports, helper resolution, index membership and documentation coverage. A fresh-consumer smoke test installs representative payloads with the real CLI and typechecks them without workspace aliases. Its browser mode exercises the installed magnetic dock.
 
-The legacy payload-only entries are explicitly enumerated in `scripts/lib/registry.js`. Keep them installable without treating missing source for a current component as acceptable.
+The public registry contains documented components and registered blocks. Older undocumented entries have been retired; component generation requires canonical source, and validation rejects entries without documentation or a block definition. Previously copied source continues to work, but retired registry URLs are no longer provided.
 
 ## Further improvements should follow evidence
 

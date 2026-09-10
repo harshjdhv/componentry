@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
-    "@radix-ui/react-slot": "^1.2.3",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "class-variance-authority": "^0.7.1",
@@ -24,8 +23,7 @@
     "react-dom": "^19.2.1",
     "tailwind-merge": "^3.3.1",
     "three": "^0.182.0",
-    "tw-animate-css": "^1.3.6",
-    "vaul": "^1.1.2"
+    "tw-animate-css": "^1.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",

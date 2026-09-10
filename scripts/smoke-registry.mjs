@@ -17,7 +17,7 @@ const uiPackage = JSON.parse(
   await readFile(path.join(root, "packages/ui/package.json"), "utf8"),
 );
 const items = [
-  "spotlight-card",
+  "signature",
   "circuit-board",
   "magnetic-dock",
   "webgl-liquid",

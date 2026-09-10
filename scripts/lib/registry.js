@@ -5,22 +5,6 @@ const ts = require("typescript");
 const ROOT = path.resolve(__dirname, "../..");
 const REGISTRY_DIR = path.join(ROOT, "apps/web/public/r");
 const SOURCE_DIR = path.join(ROOT, "packages/ui/src");
-// These older, unlisted components exist only in their published payload. Do not
-// silently fall back to JSON if an active component's source is deleted.
-const PAYLOAD_ONLY_ITEMS = new Set([
-  "auth-modal",
-  "border-beam",
-  "command-menu",
-  "hyper-text",
-  "liquid-blob",
-  "noise-texture",
-  "particle-galaxy",
-  "scrub-input",
-  "showcase-card",
-  "spotlight-card",
-  "testimonial-marquee",
-  "text-animate",
-]);
 const HOST_IMPORTS = new Set(["react", "react-dom"]);
 const HOST_ALIASES = new Set(["@/lib/utils"]); // Supplied by shadcn init.
 const TYPE_PACKAGES = {
@@ -164,25 +148,20 @@ function sourcePathForFile(file) {
 
 function buildComponent(item) {
   const mainSource = path.join(SOURCE_DIR, "components", `${item.name}.tsx`);
-  if (!fs.existsSync(mainSource) && !PAYLOAD_ONLY_ITEMS.has(item.name)) {
+  if (!fs.existsSync(mainSource)) {
     throw new Error(`${item.name}: missing canonical source ${mainSource}`);
   }
-  if (
-    fs.existsSync(mainSource) &&
-    !item.files.some((file) => sourcePathForFile(file) === mainSource)
-  ) {
+  if (!item.files.some((file) => sourcePathForFile(file) === mainSource)) {
     throw new Error(`${item.name}: payload is missing its main component file`);
   }
   const files = item.files.map((file) => {
     const source = sourcePathForFile(file);
-    if (source && fs.existsSync(source))
-      return {
-        ...file,
-        content: normalizeContent(fs.readFileSync(source, "utf8"), source),
-      };
-    if (!PAYLOAD_ONLY_ITEMS.has(item.name))
+    if (!source || !fs.existsSync(source))
       throw new Error(`${item.name}: missing source for ${file.path}`);
-    return { ...file, content: normalizeContent(file.content, file.path) };
+    return {
+      ...file,
+      content: normalizeContent(fs.readFileSync(source, "utf8"), source),
+    };
   });
   // Bundle local helpers, including transitive helpers, without adding an app-only
   // dependency to the installed component. utils remains the shadcn host utility.
@@ -267,7 +246,6 @@ module.exports = {
   ROOT,
   REGISTRY_DIR,
   SOURCE_DIR,
-  PAYLOAD_ONLY_ITEMS,
   imports,
   normalizeContent,
   packageName,

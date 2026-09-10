@@ -3,14 +3,14 @@
 This repository now exposes a namespaced registry at:
 
 - `https://componentry.fun/r/registry.json`
-- Example item: `https://componentry.fun/r/text-animate.json`
+- Example item: `https://componentry.fun/r/magnetic-dock.json`
 
 ## Goal
 
 Get zero-config installs working:
 
 ```bash
-npx shadcn@latest add @componentry/text-animate
+npx shadcn@latest add @componentry/magnetic-dock
 ```
 
 ## Required change in `shadcn-ui/ui`
@@ -39,7 +39,7 @@ pnpm registry:build
 ## Suggested PR checklist
 
 - [ ] `https://componentry.fun/r/registry.json` is publicly accessible.
-- [ ] `https://componentry.fun/r/text-animate.json` is publicly accessible.
+- [ ] `https://componentry.fun/r/magnetic-dock.json` is publicly accessible.
 - [ ] Local validation passes in this repo: `pnpm validate:registry`.
-- [ ] New namespace works with explicit registry flag:
-      `npx shadcn@latest add @componentry/text-animate --registry "https://componentry.fun/r/registry.json"`.
+- [ ] Direct URL installation works:
+      `npx shadcn@latest add https://componentry.fun/r/magnetic-dock.json`.

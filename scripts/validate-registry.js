@@ -11,23 +11,6 @@ const BLOCKS_REGISTRY_PATH = path.join(ROOT, "apps/web/registry/generated/blocks
 const REQUIRED_ALIASES = ["componentry", "componentryui", "ui", "cmp"]
 const REGISTRY_SCHEMA_URL = "https://ui.shadcn.com/schema/registry.json"
 const REGISTRY_ITEM_SCHEMA_URL = "https://ui.shadcn.com/schema/registry-item.json"
-const LEGACY_UNDOCUMENTED_ITEMS = new Set([
-  "auth-modal",
-  "border-beam",
-  "command-menu",
-  "hyper-text",
-  "interactive-hover-button",
-  "liquid-blob",
-  "noise-texture",
-  "particle-galaxy",
-  "pulsating-button",
-  "scrub-input",
-  "shimmer-button",
-  "showcase-card",
-  "spotlight-card",
-  "testimonial-marquee",
-  "text-animate",
-])
 
 function fail(message) {
   console.error(`\n[registry-check] ${message}`)
@@ -187,13 +170,9 @@ function main() {
   }
 
   for (const slug of uniqueItemNames) {
-    if (
-      !docsSlugs.has(slug) &&
-      !blockSlugs.has(slug) &&
-      !LEGACY_UNDOCUMENTED_ITEMS.has(slug)
-    ) {
+    if (!docsSlugs.has(slug) && !blockSlugs.has(slug)) {
       fail(
-        `registry.json item "${slug}" is not present in apps/web/registry/index.ts. Add metadata or allowlist it.`
+        `registry.json item "${slug}" has no component documentation or block definition. Add the matching metadata.`
       )
     }
   }

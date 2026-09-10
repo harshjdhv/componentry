@@ -61,7 +61,7 @@ Componentry is a collection of beautifully designed, interactive UI components b
 The fastest way to add components is using the shadcn CLI:
 
 ```bash
-npx shadcn@latest add @componentry/spotlight-card
+npx shadcn@latest add @componentry/magnetic-dock
 ```
 
 

@@ -35,7 +35,7 @@ pnpm registry:check
 
 `registry:check` is read-only. It fails on stale component/block payloads, private imports, missing dependencies or helpers, invalid registry membership, and inconsistent documentation routes.
 
-Twelve older unlisted entries only have source in their published payloads. They are explicitly listed in `scripts/lib/registry.js`; their JSON is their source of truth until they are restored to the UI package. Deleting an active component source must fail generation rather than silently falling back to a stale payload. Do not add new payload-only entries.
+Every published component must have source in the UI package and a documentation entry. Deleting source must fail generation rather than silently falling back to a stale payload. There are no payload-only or undocumented component exceptions.
 
 Block source and metadata live under `apps/web/registry/blocks/`. Generate blocks with `pnpm registry:blocks`; `node scripts/build-blocks-registry.js --check` checks all generated block artifacts without writing them.
 

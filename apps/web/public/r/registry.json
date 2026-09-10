@@ -22,14 +22,6 @@
       "type": "registry:ui"
     },
     {
-      "name": "auth-modal",
-      "type": "registry:ui"
-    },
-    {
-      "name": "border-beam",
-      "type": "registry:ui"
-    },
-    {
       "name": "case-study-flip-stack",
       "type": "registry:ui"
     },
@@ -43,10 +35,6 @@
     },
     {
       "name": "collection-surfer",
-      "type": "registry:ui"
-    },
-    {
-      "name": "command-menu",
       "type": "registry:ui"
     },
     {
@@ -94,10 +82,6 @@
       "type": "registry:ui"
     },
     {
-      "name": "hyper-text",
-      "type": "registry:ui"
-    },
-    {
       "name": "image-ripple-effect",
       "type": "registry:ui"
     },
@@ -110,10 +94,6 @@
       "type": "registry:ui"
     },
     {
-      "name": "interactive-hover-button",
-      "type": "registry:ui"
-    },
-    {
       "name": "kinetic-text-reveal",
       "type": "registry:ui"
     },
@@ -123,10 +103,6 @@
     },
     {
       "name": "letter-cascade",
-      "type": "registry:ui"
-    },
-    {
-      "name": "liquid-blob",
       "type": "registry:ui"
     },
     {
@@ -158,15 +134,7 @@
       "type": "registry:ui"
     },
     {
-      "name": "noise-texture",
-      "type": "registry:ui"
-    },
-    {
       "name": "orbit-card-stack",
-      "type": "registry:ui"
-    },
-    {
-      "name": "particle-galaxy",
       "type": "registry:ui"
     },
     {
@@ -179,10 +147,6 @@
     },
     {
       "name": "prism-gradient",
-      "type": "registry:ui"
-    },
-    {
-      "name": "pulsating-button",
       "type": "registry:ui"
     },
     {
@@ -206,18 +170,6 @@
       "type": "registry:ui"
     },
     {
-      "name": "scrub-input",
-      "type": "registry:ui"
-    },
-    {
-      "name": "shimmer-button",
-      "type": "registry:ui"
-    },
-    {
-      "name": "showcase-card",
-      "type": "registry:ui"
-    },
-    {
       "name": "signature",
       "type": "registry:ui"
     },
@@ -234,19 +186,7 @@
       "type": "registry:ui"
     },
     {
-      "name": "spotlight-card",
-      "type": "registry:ui"
-    },
-    {
       "name": "sticky-scroll-cards",
-      "type": "registry:ui"
-    },
-    {
-      "name": "testimonial-marquee",
-      "type": "registry:ui"
-    },
-    {
-      "name": "text-animate",
       "type": "registry:ui"
     },
     {
