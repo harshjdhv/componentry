@@ -254,7 +254,10 @@ export function DocsPreviewWrapper({
       {/* Toolbar — same frosted treatment as variant tabs */}
       <section
         aria-label="Preview controls"
-        className="relative z-20 m-3 mb-0 flex shrink-0 self-end select-none lg:fixed lg:right-6 lg:top-6 lg:z-[99] lg:m-0 items-center gap-1 rounded-lg bg-zinc-100/30 p-1.5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)] backdrop-blur-md dark:bg-zinc-950/30 dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.2)]"
+        className={cn(
+          "z-20 m-3 mb-0 flex shrink-0 self-end select-none lg:fixed lg:right-6 lg:top-6 lg:z-[99] lg:m-0 items-center gap-1 rounded-lg bg-zinc-100/30 p-1.5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)] backdrop-blur-md dark:bg-zinc-950/30 dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.2)]",
+          fullWidthPreview ? "absolute right-0 top-0" : "relative"
+        )}
       >
         <PreviewToolbarCell>
           <React.Suspense

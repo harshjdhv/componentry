@@ -13,6 +13,7 @@ import { AsciiCatalogPreview } from "@/components/docs/previews/ascii-effect-pre
 import { TextMorphCardPreview } from "@/components/docs/previews/text-morph-card-preview"
 import { FlippingWordSwapCardPreview } from "@/components/docs/previews/flipping-word-swap-card-preview"
 import { AuroraFlowCardPreview } from "@/components/docs/previews/aurora-flow-card-preview"
+import { SpectralRibbonCardPreview } from "@/components/docs/previews/spectral-ribbon-card-preview"
 
 type PreviewSources = {
   mp4: string
@@ -201,6 +202,8 @@ function ComponentCard({
               component.slug === "text-morph" ||
                 component.slug === "flipping-word-swap"
                 ? "bg-background"
+                : component.slug === "spectral-ribbon"
+                  ? "bg-black"
                 : "bg-zinc-50 dark:bg-zinc-900/80 group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/80",
             )}
           >
@@ -215,6 +218,9 @@ function ComponentCard({
             )}
             {!videoOnly && component.slug === "aurora-flow" && (
               <AuroraFlowCardPreview />
+            )}
+            {!videoOnly && component.slug === "spectral-ribbon" && (
+              <SpectralRibbonCardPreview />
             )}
             {previewPosterSrc && (
               <img
@@ -268,7 +274,7 @@ function ComponentCard({
               {component.title}
             </h3>
             {isNewComponent(component) && (
-              <span className="shrink-0 rounded-full border border-border bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-600 shadow-panel dark:bg-zinc-800 dark:text-zinc-400">
+              <span className="shrink-0 rounded-md bg-[#4775c7]/8 px-2 py-0.5 text-[10px] font-medium leading-4 text-[#345b9e] dark:bg-[#4775c7]/15 dark:text-[#b5d0ff]">
                 New
               </span>
             )}
@@ -336,7 +342,7 @@ export default function DocsPage() {
                   key={component.slug}
                   component={component}
                   index={i}
-                  videoOnly
+                  videoOnly={Boolean(component.previewVideo)}
                 />
               ))}
             </div>

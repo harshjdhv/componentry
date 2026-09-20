@@ -86,6 +86,10 @@ const docsImportMap: Record<
     import("@/components/docs/webgl-liquid").then((m) => ({
       default: m.WebGLLiquidDocs,
     })),
+  "spectral-ribbon": () =>
+    import("@/components/docs/spectral-ribbon").then((m) => ({
+      default: m.SpectralRibbonDocs,
+    })),
   "silk-aurora": () =>
     import("@/components/docs/silk-aurora").then((m) => ({
       default: m.SilkAuroraDocs,

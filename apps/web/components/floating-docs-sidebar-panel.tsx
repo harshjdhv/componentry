@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { docsConfig } from "@/config/docs"
 import { components, isNewComponent } from "@/registry"
+import { Badge } from "@workspace/ui/components/coss-badge"
 import { useDocsSidebar } from "@/components/docs-sidebar-context"
 import { LineNav, type LineNavItem } from "@/components/line-nav"
 
@@ -174,9 +175,9 @@ export function FloatingDocsSidebarPanel() {
                     title: item.title,
                     href: item.href,
                     accessory: isNew ? (
-                      <span className="inline-flex items-center rounded-full bg-blue-500/10 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400">
-                        NEW
-                      </span>
+                      <Badge variant="outline" size="sm">
+                        New
+                      </Badge>
                     ) : undefined,
                   }
                 })

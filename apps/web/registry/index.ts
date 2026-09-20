@@ -25,7 +25,7 @@ export function isNewComponent(component: ComponentMetadata): boolean {
 
 /** Curated showroom order for /docs — strongest video-preview pieces first. */
 export const featuredComponentSlugs = [
-  "cursor-driven-particle-typography",
+  "spectral-ribbon",
   "image-ripple-effect",
   "fisheye-infinite-grid",
   "newsletter-bookshelf",
@@ -356,6 +356,16 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/webglliquid.mov",
   },
+  "spectral-ribbon": {
+    title: "Spectral Ribbon",
+    description:
+      "A soft spectral light ribbon on pure black — slow liquid motion and rainbow fringe.",
+    category: "Hero Backgrounds",
+    slug: "spectral-ribbon",
+    addedAt: "2026-09-20",
+    previewVideo:
+      "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/spectralribbon.webm",
+  },
   "silk-aurora": {
     title: "Silk Aurora",
     description:
@@ -520,9 +530,7 @@ export const components: Record<string, ComponentMetadata> = {
 export function getFeaturedComponents(): ComponentMetadata[] {
   return featuredComponentSlugs
     .map((slug) => components[slug])
-    .filter((component): component is ComponentMetadata =>
-      Boolean(component?.previewVideo),
-    );
+    .filter((component): component is ComponentMetadata => Boolean(component));
 }
 
 export function getComponent(slug: string) {

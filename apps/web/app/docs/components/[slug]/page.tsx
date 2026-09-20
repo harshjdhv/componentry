@@ -95,7 +95,7 @@ function DocsPageSkeleton() {
     return (
         <div className="flex flex-col lg:flex-row w-full h-full min-h-screen lg:h-screen bg-white dark:bg-background overflow-hidden">
             {/* Left Column: Scrollable Content Skeleton */}
-            <div className="w-full lg:basis-1/2 lg:max-w-1/2 h-full flex flex-col relative z-20 bg-white dark:bg-background">
+            <div className="relative z-20 flex h-full w-full min-w-0 flex-col bg-white dark:bg-background lg:h-full lg:w-1/2 lg:max-w-[50%] lg:basis-1/2">
                 <div className="pointer-events-none absolute inset-x-0 top-0 z-30 hidden h-[150px] select-none bg-[linear-gradient(to_top,transparent,#ffffff)] backdrop-blur-[4px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,#000_50%,transparent)] lg:block dark:bg-[linear-gradient(to_top,transparent,var(--background))]" />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[150px] select-none bg-[linear-gradient(to_bottom,transparent,#ffffff)] backdrop-blur-[4px] [mask-image:linear-gradient(to_top,#000_50%,transparent)] [-webkit-mask-image:linear-gradient(to_top,#000_50%,transparent)] dark:bg-[linear-gradient(to_bottom,transparent,var(--background))]" />
 
@@ -127,8 +127,8 @@ function DocsPageSkeleton() {
             </div>
 
             {/* Right Column: Sticky Preview Skeleton */}
-            <div className="flex-1 lg:basis-1/2 lg:max-w-1/2 lg:h-full lg:sticky lg:top-0 order-first lg:order-last bg-white dark:bg-[#121212] flex flex-col z-10">
-                <div className="relative w-full h-[400px] lg:h-full p-4 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5 overflow-hidden bg-white dark:bg-[#121212]">
+            <div className="order-first z-10 flex aspect-[4/5] w-full max-h-[75svh] flex-col bg-white dark:bg-[#121212] lg:sticky lg:top-0 lg:order-last lg:aspect-auto lg:h-full lg:max-h-none lg:w-1/2 lg:max-w-[50%] lg:flex-1 lg:basis-1/2">
+                <div className="relative h-full w-full overflow-hidden bg-white p-3 dark:bg-[#121212] lg:p-0 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5">
                     <div className="w-full h-full bg-[#f7f7f7] dark:bg-zinc-800/20 rounded-xl border border-zinc-200 dark:border-zinc-800 animate-pulse" />
                 </div>
             </div>

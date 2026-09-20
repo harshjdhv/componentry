@@ -148,7 +148,7 @@ export async function DocsPageLayout({
       {/* Left Column: Scrollable Content */}
       <div
         data-docs-left-column
-        className="w-full lg:basis-1/2 lg:max-w-1/2 lg:h-full min-w-0 flex flex-col relative z-10 bg-white dark:bg-background"
+        className="w-full min-w-0 flex flex-col relative z-10 bg-white dark:bg-background lg:h-full lg:w-1/2 lg:max-w-[50%] lg:basis-1/2"
       >
         {/* Progressive blur edge fades — content softens into the column edges */}
         <DocsScrollEdgeFade
@@ -242,12 +242,12 @@ export async function DocsPageLayout({
       {/* Right Column: Sticky Preview */}
       <div
         data-docs-right-column
-        className="mt-14 h-[clamp(380px,55svh,540px)] min-w-0 shrink-0 lg:mt-0 lg:flex-1 lg:basis-1/2 lg:max-w-1/2 lg:h-full lg:sticky lg:top-0 order-first lg:order-last bg-white dark:bg-background flex flex-col z-20"
+        className="order-first z-20 mt-14 flex aspect-[4/5] w-full max-h-[75svh] min-w-0 shrink-0 flex-col bg-white dark:bg-background lg:sticky lg:top-0 lg:order-last lg:mt-0 lg:aspect-auto lg:h-full lg:max-h-none lg:w-1/2 lg:max-w-[50%] lg:flex-1 lg:basis-1/2"
       >
         {/* We use a large padding to offset the card from the left side, mimicking the image */}
         <div
           data-docs-preview-shell
-          className="relative w-full h-full p-4 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5 overflow-hidden bg-white dark:bg-background"
+          className="relative h-full w-full overflow-hidden bg-white p-3 dark:bg-background lg:p-0 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5"
         >
 
           {/* Floating Card Container */}

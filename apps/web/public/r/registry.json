@@ -214,6 +214,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "spectral-ribbon",
+      "type": "registry:ui"
+    },
+    {
       "name": "gradient-hero-01",
       "type": "registry:block"
     },
