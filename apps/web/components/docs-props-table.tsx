@@ -41,14 +41,17 @@ export function DocsPropsTable({ props, className }: DocsPropsTableProps) {
               className="border-b border-zinc-100 last:border-b-0 dark:border-white/[0.05]"
             >
               <td className="py-2.5 pr-3 align-top">
-                <code className="inline-flex max-w-full rounded-md bg-zinc-100 px-1.5 py-0.5 font-mono text-[12.5px] font-medium text-zinc-800 dark:bg-white/[0.06] dark:text-zinc-200">
+                <code className="inline-flex max-w-full break-all rounded-md bg-zinc-100 px-1.5 py-0.5 font-mono text-[12.5px] font-medium text-zinc-800 dark:bg-white/[0.06] dark:text-zinc-200">
                   {prop.name}
                 </code>
               </td>
               <td className="py-2.5 pr-3 align-top">
-                <code className="block break-words font-mono text-[12.5px] leading-snug text-zinc-500 line-clamp-2 dark:text-zinc-400">
+                <code className="block break-words font-mono text-[12.5px] leading-snug text-zinc-500 dark:text-zinc-400">
                   {prop.type}
                 </code>
+                <p className="mt-1.5 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400">
+                  {prop.description}
+                </p>
               </td>
               <td className="py-2.5 align-top">
                 {prop.default ? (

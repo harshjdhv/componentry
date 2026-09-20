@@ -1,4 +1,5 @@
 import { components } from "@/registry";
+import { componentCollections } from "@/lib/component-collections";
 
 type NavItem = {
   title: string;
@@ -70,6 +71,11 @@ const getLlmsText = () => {
 
   gettingStarted.items.forEach((item) => {
     text += `\n- [${item.title}](${baseUrl}${item.href}): Getting started with Componentry.`;
+  });
+
+  text += `\n\n## Collections\n`;
+  componentCollections.forEach((collection) => {
+    text += `- [${collection.title}](${baseUrl}/collections/${collection.slug}): ${collection.description}\n`;
   });
 
   text += `\n\n## Components`;

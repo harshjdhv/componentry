@@ -13,6 +13,8 @@ interface SiteHeaderProps {
     sidebarToggle?: React.ReactNode
     /** Kept for existing call sites; the header rail stays consistent across pages. */
     landingGutter?: boolean
+    /** Match component docs inset — full bleed, no max-width rail. */
+    docsInset?: boolean
 }
 
 const LAST_KNOWN_GITHUB_STARS = 465
@@ -25,7 +27,7 @@ function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
     )
 }
 
-export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
+export function SiteHeader({ sidebarToggle, landingGutter, docsInset }: SiteHeaderProps) {
     const pathname = usePathname()
     const [stars, setStars] = React.useState<number | null>(LAST_KNOWN_GITHUB_STARS)
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false)
@@ -134,10 +136,17 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
             <div
                 className={cn(
                     "h-14 w-full",
-                    landingGutterClass
+                    docsInset
+                        ? "px-6 sm:px-8 lg:px-8 xl:px-10"
+                        : landingGutterClass
                 )}
             >
-                <div className="mx-auto flex h-full w-full max-w-[1360px] items-center">
+                <div
+                    className={cn(
+                        "mx-auto flex h-full w-full items-center",
+                        docsInset ? "2xl:max-w-[1360px]" : "max-w-[1360px]"
+                    )}
+                >
                 <div className="flex flex-1 items-center gap-5">
                     {sidebarToggle && (
                         <div className="md:hidden">

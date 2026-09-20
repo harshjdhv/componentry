@@ -15,6 +15,7 @@ const componentLinks = Object.values(components).sort((a, b) =>
 
 const footerLinks = [
   { label: "Components", href: "/docs" },
+  { label: "Collections", href: "/collections" },
   { label: "Blocks", href: "/blocks" },
   { label: "MCP", href: "/docs/mcp" },
   { label: "Sponsor", href: "https://github.com/sponsors/harshjdhv" },

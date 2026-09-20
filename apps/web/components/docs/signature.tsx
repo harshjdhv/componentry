@@ -47,13 +47,19 @@ export async function SignatureDocs() {
       installSourceCode={sourceCode}
       installSourceFilename="components/ui/signature.tsx"
       
-      usageNote={installationNote}
+      installationNote={installationNote}
       usageCode={<LiveCodeBlock defaultCode={defaultCode} />}
       
       props={[
         {
+          name: "fontUrl",
+          type: "string",
+          description: "URL of a font file to load instead of the default Lastoria font paths.",
+        },
+        {
           name: "text",
           type: "string",
+          default: '"Signature"',
           description: "Text to generate signature for.",
         },
         {
@@ -72,7 +78,7 @@ export async function SignatureDocs() {
           name: "duration",
           type: "number",
           default: "1.5",
-          description: "Animation duration in seconds.",
+          description: "Drawing duration per character in seconds. Characters start 0.2 seconds apart.",
         },
         {
           name: "delay",
@@ -95,7 +101,7 @@ export async function SignatureDocs() {
           name: "once",
           type: "boolean",
           default: "true",
-          description: "Only animate once.",
+          description: "Animate only on the first viewport entry when inView is enabled.",
         },
       ]}
     />

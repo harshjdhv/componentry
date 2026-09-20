@@ -1,3 +1,5 @@
+import { componentGuides } from "./component-guides"
+import { getComponentCollections } from "./component-collections"
 import { getInstallCommand } from "./install-command"
 
 export interface DocsPageMarkdownInput {
@@ -75,6 +77,22 @@ export function buildDocsPageMarkdown(props: DocsPageMarkdownInput): string {
         lines.push("")
       }
     }
+  }
+
+  const guide = componentGuides[props.installPackageName]
+  if (guide) {
+    lines.push("## Working with this component", "")
+    for (const section of guide.sections) {
+      lines.push(`### ${section.title}`, "", section.body, "")
+    }
+  }
+  const collections = getComponentCollections(props.installPackageName)
+  if (collections.length) {
+    lines.push("## Collections", "")
+    for (const collection of collections) {
+      lines.push(`- [${collection.title}](https://componentry.dev/collections/${collection.slug})`)
+    }
+    lines.push("")
   }
 
   lines.push("---")

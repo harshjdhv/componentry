@@ -15,6 +15,8 @@ import type { BundledLanguage } from "shiki"
 import { FloatingDocsSidebarLazy } from "@/components/floating-docs-sidebar-lazy"
 import { DocsScrollEdgeFade } from "@/components/docs-scroll-edge-fade"
 import { ChevronRight } from "lucide-react"
+import { ComponentGuidance } from "@/components/component-guidance"
+import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld"
 
 export interface PropItem {
   name: string
@@ -120,6 +122,7 @@ export async function DocsPageLayout({
       data-docs-layout
       className="relative flex flex-col lg:flex-row w-full min-h-screen lg:h-screen bg-white dark:bg-background text-foreground"
     >
+      <BreadcrumbJsonLd items={[{ name: "Docs", path: "/docs" }, { name: title, path: `/docs/components/${installPackageName}` }]} />
       {/* Minimal Navigation Cluster — optically align icon glyph with heading left edge */}
       <div className="group/docs-navigation pointer-events-none absolute left-6 top-3 z-50 flex items-center gap-2 sm:left-8 lg:absolute lg:left-8 lg:top-6 xl:left-10">
         <div className="pointer-events-auto -ml-2 shrink-0">
@@ -181,6 +184,11 @@ export async function DocsPageLayout({
                 </div>
               )}
               <InstallCommand component={installPackageName} />
+              {installDependencies && (
+                <p className="mt-4 break-words text-[13px] leading-6 text-zinc-500 dark:text-zinc-400">
+                  Dependencies: <code className="font-mono text-[12px]">{installDependencies}</code>
+                </p>
+              )}
             </Section>
 
             {/* Usage */}
@@ -215,6 +223,8 @@ export async function DocsPageLayout({
                 <DocsPropsTable props={props} />
               </Section>
             )}
+
+            <ComponentGuidance slug={installPackageName} />
 
             <div className="mt-12 space-y-10">
               <DocsFooterSection />

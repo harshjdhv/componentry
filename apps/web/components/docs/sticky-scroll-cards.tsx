@@ -6,7 +6,16 @@ import { StickyScrollCardsPreview } from "@/components/docs/previews/sticky-scro
 const defaultCode = `import { StickyScrollCards } from "@/components/ui/sticky-scroll-cards"
 
 export default function Page() {
-  return <StickyScrollCards />
+  return (
+    <StickyScrollCards
+      hint="Explore the landscapes"
+      cards={[
+        { title: "Misty Alps", src: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=85" },
+        { title: "Sunlit Grove", src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=85" },
+        { title: "Turquoise Shore", src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=85" },
+      ]}
+    />
+  )
 }`;
 
 export async function StickyScrollCardsDocs() {
@@ -41,7 +50,7 @@ export async function StickyScrollCardsDocs() {
         {
           name: "hint",
           type: "string",
-          default: '"scroll down to see card stack"',
+          default: '"scroll to explore"',
           description: "Short hint label shown above the card stack before scrolling begins.",
         },
         {

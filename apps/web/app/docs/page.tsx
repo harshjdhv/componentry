@@ -4,13 +4,10 @@ import type React from "react"
 import { useState, useEffect, useMemo, useRef } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { components, isNewComponent, type ComponentCategory, type ComponentMetadata } from "@/registry"
+import { components, getFeaturedComponents, isNewComponent, type ComponentCategory, type ComponentMetadata } from "@/registry"
 
 import { SiteHeader } from "@/components/site-header"
 import { DocsScrollEdgeFade } from "@/components/docs-scroll-edge-fade"
-import {
-  landingGutterClass,
-} from "@/components/landing/landing-frame"
 import { cn } from "@/lib/utils"
 import { AsciiCatalogPreview } from "@/components/docs/previews/ascii-effect-preview"
 import { TextMorphCardPreview } from "@/components/docs/previews/text-morph-card-preview"
@@ -61,9 +58,12 @@ function getPreviewPosterSrc(previewVideo?: string) {
 function ComponentCard({
   component,
   index,
+  videoOnly = false,
 }: {
   component: ComponentMetadata
   index: number
+  /** Skip live/WebGL previews — catalog video/poster only (featured strip). */
+  videoOnly?: boolean
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -204,14 +204,18 @@ function ComponentCard({
                 : "bg-zinc-50 dark:bg-zinc-900/80 group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/80",
             )}
           >
-            {component.category === "ASCII Effects" && (
+            {!videoOnly && component.category === "ASCII Effects" && (
               <AsciiCatalogPreview />
             )}
-            {component.slug === "text-morph" && <TextMorphCardPreview />}
-            {component.slug === "flipping-word-swap" && (
+            {!videoOnly && component.slug === "text-morph" && (
+              <TextMorphCardPreview />
+            )}
+            {!videoOnly && component.slug === "flipping-word-swap" && (
               <FlippingWordSwapCardPreview />
             )}
-            {component.slug === "aurora-flow" && <AuroraFlowCardPreview />}
+            {!videoOnly && component.slug === "aurora-flow" && (
+              <AuroraFlowCardPreview />
+            )}
             {previewPosterSrc && (
               <img
                 src={previewPosterSrc}
@@ -258,18 +262,18 @@ function ComponentCard({
         </div>
 
         {/* ── Info area ── */}
-        <div className="flex flex-col gap-1.5 px-4 pb-4 pt-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors">
+        <div className="flex flex-col gap-1 px-4 pb-4 pt-2">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-[15px] font-medium tracking-[-0.01em] text-zinc-900 transition-colors group-hover:text-zinc-700 dark:text-zinc-100 dark:group-hover:text-zinc-300">
               {component.title}
             </h3>
             {isNewComponent(component) && (
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-border shadow-panel">
+              <span className="shrink-0 rounded-full border border-border bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-600 shadow-panel dark:bg-zinc-800 dark:text-zinc-400">
                 New
               </span>
             )}
           </div>
-          <p className="text-[13px] text-zinc-500 dark:text-zinc-400 line-clamp-1">
+          <p className="line-clamp-1 text-[13px] leading-5 tracking-[-0.01em] text-zinc-500 dark:text-zinc-400">
             {component.description}
           </p>
         </div>
@@ -289,6 +293,7 @@ const categoryOrder: ComponentCategory[] = [
 // ─── Main Docs Page ─────────────────────────────────────────────────────────
 export default function DocsPage() {
   const allComponents = Object.values(components)
+  const featured = getFeaturedComponents()
   const grouped = categoryOrder
     .map(cat => ({
       category: cat,
@@ -301,36 +306,54 @@ export default function DocsPage() {
       <DocsScrollEdgeFade position="bottom" />
 
       {/* ── Top Floating Header ── */}
-      <SiteHeader />
+      <SiteHeader docsInset />
 
-      <main className={cn("relative z-10 pt-32 pb-32", landingGutterClass)}>
-        <div className="mx-auto w-full max-w-[1360px]">
+      {/* Docs inset on normal screens; cap width only on 2xl+ */}
+      <main className="relative z-10 px-6 pt-28 pb-32 sm:px-8 lg:px-8 xl:px-10">
+        <div className="mx-auto w-full 2xl:max-w-[1360px]">
 
         {/* ── Hero ── */}
-        <div className="mb-12 max-w-3xl">
-          <h1 className="inline-block text-3xl font-semibold leading-[1.05] tracking-[-0.04em] text-foreground sm:text-4xl">
+        <header className="mb-12 max-w-2xl space-y-2.5">
+          <h1 className="text-[28px] font-medium leading-[1.1] tracking-[-0.035em] text-zinc-900 sm:text-[32px] dark:text-zinc-50">
             Crafted Components.
           </h1>
-          <p className="mt-1.5 max-w-2xl text-pretty text-sm font-medium tracking-tight text-muted-foreground sm:text-base">
+          <p className="max-w-xl text-pretty text-[15px] font-normal leading-6 tracking-[-0.01em] text-zinc-500 sm:text-[16px] sm:leading-7 dark:text-zinc-400">
             A growing collection of animated primitives for React.
           </p>
-        </div>
+        </header>
 
-
-
-
+        {/* ── Featured (video previews only) ── */}
+        {featured.length > 0 && (
+          <section id="featured" className="mb-20 scroll-mt-32">
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <h2 className="text-[13px] font-medium uppercase leading-5 tracking-[0.06em] text-zinc-500 dark:text-zinc-400">
+                Featured
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((component, i) => (
+                <ComponentCard
+                  key={component.slug}
+                  component={component}
+                  index={i}
+                  videoOnly
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── Categories ── */}
-        <div className="space-y-24">
+        <div className="space-y-20">
           {grouped.map(({ category, items }) => {
             return (
               <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-32">
-                <div className="mb-8 flex items-center justify-between gap-4">
-                  <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                <div className="mb-6 flex items-center justify-between gap-4">
+                  <h2 className="text-[13px] font-medium uppercase leading-5 tracking-[0.06em] text-zinc-500 dark:text-zinc-400">
                     {category}
                   </h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((component, i) => (
                     <ComponentCard
                       key={component.slug}

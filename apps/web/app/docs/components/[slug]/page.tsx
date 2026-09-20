@@ -5,6 +5,7 @@ import { getComponent } from "@/registry";
 import { getDocsImporter, getDocsSlugs } from "@/components/docs/lazy-registry";
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { absoluteUrl, siteConfig } from "@/lib/site";
+import { componentGuides } from "@/lib/component-guides";
 
 // -----------------------------------------------------------------------------
 // PERFORMANCE OPTIMIZATIONS:
@@ -38,12 +39,15 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
         return {};
     }
 
+    const guide = componentGuides[component.slug];
+    const description = guide?.description ?? component.description;
+    const title = guide?.title ?? `${component.title} React Component`;
     const componentUrl = absoluteUrl(`/docs/components/${component.slug}`);
     const ogImageUrl = absoluteUrl(`/docs/components/${component.slug}/opengraph-image`);
 
     return {
-        title: `${component.title} React Component`,
-        description: component.description,
+        title: { absolute: `${title} | Componentry` },
+        description,
         keywords: [
             component.title,
             `${component.title} component`,
@@ -59,8 +63,8 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
             canonical: componentUrl,
         },
         openGraph: {
-            title: `${component.title} React Component | Componentry`,
-            description: component.description,
+            title: `${title} | Componentry`,
+            description,
             url: componentUrl,
             type: "article",
             siteName: siteConfig.name,
@@ -68,8 +72,8 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
         },
         twitter: {
             card: 'summary_large_image',
-            title: `${component.title} React Component | Componentry`,
-            description: component.description,
+            title: `${title} | Componentry`,
+            description,
             images: [ogImageUrl],
         },
         robots: {

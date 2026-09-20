@@ -34,14 +34,7 @@ export function JsonLd() {
       name: siteConfig.author.name,
       url: siteConfig.author.twitter,
     },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${siteConfig.url}/docs?search={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
+
   }
 
   const softwareApplicationSchema = {
@@ -93,25 +86,6 @@ export function JsonLd() {
     },
   }
 
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: siteConfig.url,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Components",
-        item: absoluteUrl("/docs"),
-      },
-    ],
-  }
-
   return (
     <>
       <script
@@ -131,10 +105,6 @@ export function JsonLd() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
     </>
   )

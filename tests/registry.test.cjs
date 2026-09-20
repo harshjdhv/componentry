@@ -75,6 +75,8 @@ function loadTs(relative, env = {}) {
     require: (id) => {
       if (id === "./install-command")
         return loadTs("apps/web/lib/install-command.ts", env);
+      if (id === "./component-guides" || id === "./component-collections")
+        return loadTs(`apps/web/lib/${id.slice(2)}.ts`, env);
       throw new Error(`Unexpected import ${id}`);
     },
   });
@@ -111,6 +113,18 @@ test("UI and Markdown install commands share namespace and package-manager handl
   assert.ok(markdown.includes("npx shadcn@latest add @custom/magnetic-dock"));
   assert.ok(markdown.includes('"top" \\| "bottom"'));
   assert.ok(!markdown.includes("npx componentry@latest"));
+});
+
+test("exported docs retain component guidance and collection discovery", () => {
+  const { buildDocsPageMarkdown } = loadTs("apps/web/lib/docs-page-markdown.ts");
+  const markdown = buildDocsPageMarkdown({
+    title: "Signature",
+    description: "SVG handwriting",
+    installPackageName: "signature",
+    usageCode: '<Signature text="Hello" />',
+  });
+  assert.ok(markdown.includes("Font loading and timing"));
+  assert.ok(markdown.includes("/collections/react-text-animations"));
 });
 
 test("Closing Plasma consumes custom props while forwarding HTML attributes", () => {

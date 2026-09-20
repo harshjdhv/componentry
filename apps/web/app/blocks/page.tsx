@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import { ArrowUpRight } from "lucide-react";
 
 
 export const dynamic = "force-static";
 
-export const metadata: Metadata = {
-  title: "Componentry Pro Blocks | Componentry",
-  description:
-    "A new library of production-ready blocks is coming soon to Componentry Pro.",
-};
+export const metadata = pageMetadata({
+  title: "Pro Blocks",
+  description: "A new library of production-ready blocks is coming soon to Componentry Pro.",
+  path: "/blocks",
+});
 
 export default function BlocksPage() {
   return (

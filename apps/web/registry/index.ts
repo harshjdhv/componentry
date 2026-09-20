@@ -23,6 +23,16 @@ export function isNewComponent(component: ComponentMetadata): boolean {
   return Date.now() - addedTime < NEW_BADGE_DURATION_MS;
 }
 
+/** Curated showroom order for /docs — strongest video-preview pieces first. */
+export const featuredComponentSlugs = [
+  "cursor-driven-particle-typography",
+  "image-ripple-effect",
+  "fisheye-infinite-grid",
+  "newsletter-bookshelf",
+  "dithered-logo",
+  "ripple-transition",
+] as const;
+
 export const components: Record<string, ComponentMetadata> = {
   "grain-gradient": {
     title: "Grain Gradient",
@@ -506,6 +516,14 @@ export const components: Record<string, ComponentMetadata> = {
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/visual-effects/matrixrain.mov",
   },
 };
+
+export function getFeaturedComponents(): ComponentMetadata[] {
+  return featuredComponentSlugs
+    .map((slug) => components[slug])
+    .filter((component): component is ComponentMetadata =>
+      Boolean(component?.previewVideo),
+    );
+}
 
 export function getComponent(slug: string) {
   return components[slug];
