@@ -295,7 +295,7 @@ export const components: Record<string, ComponentMetadata> = {
     slug: "liquid-glass-carousel",
     addedAt: "2026-09-21",
     previewImage:
-      "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/liquidglasscarousel-2s.webp",
+      "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/liquidglasscarousel-4s.webp",
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/liquidglasscarousel.webm",
   },
