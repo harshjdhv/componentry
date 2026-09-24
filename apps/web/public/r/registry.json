@@ -218,6 +218,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "liquid-glass-carousel",
+      "type": "registry:ui"
+    },
+    {
       "name": "gradient-hero-01",
       "type": "registry:block"
     },

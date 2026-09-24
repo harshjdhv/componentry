@@ -81,9 +81,13 @@ export function buildDocsPageMarkdown(props: DocsPageMarkdownInput): string {
 
   const guide = componentGuides[props.installPackageName]
   if (guide) {
-    lines.push("## Working with this component", "")
+    lines.push(`## ${guide.heading ?? "Working with this component"}`, "")
     for (const section of guide.sections) {
-      lines.push(`### ${section.title}`, "", section.body, "")
+      if (section.title) lines.push(`### ${section.title}`, "")
+      const linked = section.href
+        ? `${section.body ? `${section.body} ` : ""}[${section.linkLabel ?? "Source"}](${section.href})`
+        : section.body
+      lines.push(`${linked}${guide.tone === "credit" ? "." : ""}`, "")
     }
   }
   const collections = getComponentCollections(props.installPackageName)

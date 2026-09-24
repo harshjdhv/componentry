@@ -1,7 +1,16 @@
+export interface ComponentGuideSection {
+  title: string
+  body: string
+  href?: string
+  linkLabel?: string
+}
+
 export interface ComponentGuide {
   title: string
   description: string
-  sections: { title: string; body: string }[]
+  heading?: string
+  tone?: "guide" | "credit"
+  sections: ComponentGuideSection[]
   related: string[]
 }
 
@@ -235,6 +244,25 @@ export const componentGuides: Record<string, ComponentGuide> = {
       "flipping-word-swap",
       "kinetic-text-reveal",
       "signature"
+    ]
+  },
+  "liquid-glass-carousel": {
+    "title": "React Liquid Glass Carousel",
+    "description": "An infinite image carousel with a WebGL liquid-glass lens.",
+    "heading": "Inspired by",
+    "tone": "credit",
+    "sections": [
+      {
+        "title": "",
+        "body": "The glass lens and snap-scrolling row are from",
+        "href": "https://github.com/Yousuf-developer/liquid-glass-carousel",
+        "linkLabel": "Yousuf Soomro"
+      }
+    ],
+    "related": [
+      "wheel-carousel",
+      "image-ripple-effect",
+      "fisheye-infinite-grid"
     ]
   }
 }

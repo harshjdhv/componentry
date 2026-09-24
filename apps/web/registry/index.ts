@@ -27,7 +27,7 @@ export function isNewComponent(component: ComponentMetadata): boolean {
 export const featuredComponentSlugs = [
   "spectral-ribbon",
   "image-ripple-effect",
-  "fisheye-infinite-grid",
+  "liquid-glass-carousel",
   "newsletter-bookshelf",
   "dithered-logo",
   "ripple-transition",
@@ -286,6 +286,16 @@ export const components: Record<string, ComponentMetadata> = {
     addedAt: "2026-08-10",
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/wheelcarousel.webm",
+  },
+  "liquid-glass-carousel": {
+    title: "Liquid Glass Carousel",
+    description:
+      "An infinite image carousel seen through a WebGL liquid-glass lens — chromatic rim, snap scroll, and a focus expand.",
+    category: "Components",
+    slug: "liquid-glass-carousel",
+    addedAt: "2026-09-21",
+    previewVideo:
+      "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/liquidglasscarousel.webm",
   },
   "spiral-3d-slider": {
     title: "Spiral 3D Slider",
