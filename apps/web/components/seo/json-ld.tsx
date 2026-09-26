@@ -6,7 +6,7 @@ export function JsonLd() {
     "@type": "Organization",
     name: siteConfig.name,
     url: siteConfig.url,
-    logo: absoluteUrl("/icon.svg"),
+    logo: absoluteUrl("/logo-new.svg"),
     sameAs: [
       siteConfig.repository,
       siteConfig.author.twitter,

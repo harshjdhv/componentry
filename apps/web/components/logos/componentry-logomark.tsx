@@ -1,13 +1,19 @@
 import type React from "react"
 
-export function ComponentryLogomark({ className, ...props }: React.SVGProps<SVGSVGElement>): React.JSX.Element {
+export function ComponentryLogomark({ className, style, ...props }: React.HTMLAttributes<HTMLSpanElement>): React.JSX.Element {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="380 350 500 520" fill="currentColor" className={className} {...props}>
-            <g>
-                <path d="M493 376 C467 383 448 394 430 411 C417 432 409 454 409 460 L409 749 C414 769 421 785 431 800 C447 816 464 827 478 833 C489 836 501 838 586 838 C603 828 610 817 610 813 L610 695 C610 651 584 614 543 600 C531 596 525 591 525 584 C525 576 531 571 544 567 C586 554 610 519 610 474 L610 401 C610 389 601 379 589 376 Z" />
-                <rect x="634" y="376" width="210" height="206" rx="42" />
-                <rect x="634" y="633" width="210" height="205" rx="42" />
-            </g>
-        </svg>
+        <span
+            aria-hidden="true"
+            className={className}
+            style={{
+                display: "inline-block",
+                flexShrink: 0,
+                backgroundColor: "currentColor",
+                mask: 'url("/logo-new.svg") center / contain no-repeat',
+                WebkitMask: 'url("/logo-new.svg") center / contain no-repeat',
+                ...style,
+            }}
+            {...props}
+        />
     )
 }

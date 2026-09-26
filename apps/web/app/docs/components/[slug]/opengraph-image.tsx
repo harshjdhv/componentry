@@ -1,7 +1,9 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 import { getComponent } from "@/registry";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export const size = {
   width: 1200,
@@ -24,23 +26,6 @@ const albertSans600 = fetch(
   "https://fonts.gstatic.com/s/albertsans/v4/i7dZIFdwYjGaAMFtZd_QA3xXSKZqhr-TenSHdZT_rA.ttf",
 ).then((res) => res.arrayBuffer());
 
-function Mark({ size = 46 }: { size?: number }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="380 350 500 520"
-      width={size}
-      height={size}
-    >
-      <g fill="currentColor">
-        <path d="M493 376 C467 383 448 394 430 411 C417 432 409 454 409 460 L409 749 C414 769 421 785 431 800 C447 816 464 827 478 833 C489 836 501 838 586 838 C603 828 610 817 610 813 L610 695 C610 651 584 614 543 600 C531 596 525 591 525 584 C525 576 531 571 544 567 C586 554 610 519 610 474 L610 401 C610 389 601 379 589 376 Z" />
-        <rect x="634" y="376" width="210" height="206" rx="42" />
-        <rect x="634" y="633" width="210" height="205" rx="42" />
-      </g>
-    </svg>
-  );
-}
-
 function getTitleFontSize(title: string) {
   if (title.length > 28) return 64;
   if (title.length > 22) return 70;
@@ -50,6 +35,10 @@ function getTitleFontSize(title: string) {
 
 export default async function Image({ params }: Props) {
   const { slug } = await params;
+  const logoSvg = await readFile(path.join(process.cwd(), "public/logo-new.svg"), "utf8");
+  const logoSrc = `data:image/svg+xml;base64,${Buffer.from(
+    logoSvg.replace(/<style>[\s\S]*?<\/style>/, "<style>g { fill: #ffffff; }</style>"),
+  ).toString("base64")}`;
   const component = getComponent(slug);
   const title = component?.title ?? slug;
   const category = component?.category ?? "Component";
@@ -124,7 +113,7 @@ export default async function Image({ params }: Props) {
             justifyContent: "center",
           }}
         >
-          <Mark size={46} />
+          <img src={logoSrc} width={46} height={46} alt="" />
         </span>
         Componentry
       </div>

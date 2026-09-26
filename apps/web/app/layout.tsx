@@ -145,9 +145,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    icon: "/logo-new.svg",
+    shortcut: "/logo-new.svg",
+    apple: "/logo-new.svg",
   },
   manifest: "/manifest.json",
   category: "technology",
