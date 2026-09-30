@@ -31,5 +31,9 @@
   "engines": {
     "node": ">=20"
   },
-  "dependencies": {}
+  "pnpm": {
+    "patchedDependencies": {
+      "screen-space-reflections@2.5.0": "patches/screen-space-reflections@2.5.0.patch"
+    }
+  }
 }

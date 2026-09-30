@@ -1,0 +1,179 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 8ca2dfcb2e4be6ecc78da6933fd540f6f4d15783..27f4ad8ffa53d3b81b6bb92c15b7ba9c419950bf 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -60,6 +60,7 @@ class MRTMaterial extends three.ShaderMaterial {
+                     varying vec3 vViewPosition;
+                 #endif
+                 #include <common>
++                uniform mat3 uvTransform;
+                 #include <uv_pars_vertex>
+                 #include <displacementmap_pars_vertex>
+                 #include <normal_pars_vertex>
+@@ -287,12 +288,13 @@ class ReflectionsPass extends postprocessing.Pass {
+ 
+     if (this.USE_MRT) {
+       // buffers: normal, depth (2), roughness will be written to the alpha channel of the normal buffer
+-      this.gBuffersRenderTarget = new three.WebGLMultipleRenderTargets(width, height, 2, {
++      this.gBuffersRenderTarget = new three.WebGLRenderTarget(width, height, {
++        count: 2,
+         minFilter: three.LinearFilter,
+         magFilter: three.LinearFilter
+       });
+-      this.normalTexture = this.gBuffersRenderTarget.texture[0];
+-      this.depthTexture = this.gBuffersRenderTarget.texture[1];
++      this.normalTexture = this.gBuffersRenderTarget.textures[0];
++      this.depthTexture = this.gBuffersRenderTarget.textures[1];
+     } else {
+       // depth pass
+       this.webgl1DepthPass = new postprocessing.DepthPass(this._scene, this._camera);
+@@ -327,6 +329,11 @@ class ReflectionsPass extends postprocessing.Pass {
+   }
+ 
+   dispose() {
++    this._scene.traverse(object => {
++      const cached = this.cachedMaterials.get(object);
++      if (cached) cached[1].dispose();
++      this.cachedMaterials.delete(object);
++    });
+     this.renderTarget.dispose();
+     this.gBuffersRenderTarget.dispose();
+     this.renderPass.dispose();
+@@ -401,10 +408,13 @@ class ReflectionsPass extends postprocessing.Pass {
+   }
+ 
+   render(renderer, inputBuffer) {
++    const background = this._scene.background;
++    this._scene.background = null;
+     this.setMRTMaterialInScene();
+     renderer.setRenderTarget(this.gBuffersRenderTarget);
+     this.renderPass.render(renderer, this.gBuffersRenderTarget);
+-    this.unsetMRTMaterialInScene(); // render depth and velocity in seperate passes
++    this.unsetMRTMaterialInScene();
++    this._scene.background = background; // render depth and velocity in seperate passes
+ 
+     if (!this.USE_MRT) this.webgl1DepthPass.renderPass.render(renderer, this.webgl1DepthPass.renderTarget);
+     this.fullscreenMaterial.uniforms.inputTexture.value = inputBuffer.texture;
+@@ -912,9 +922,9 @@ class TemporalResolvePass extends postprocessing.Pass {
+     renderer.setRenderTarget(this.renderTarget);
+     renderer.render(this.scene, this.camera); // save the render target's texture for use in next frame
+ 
+-    renderer.copyFramebufferToTexture(zeroVec2, this.accumulatedTexture);
++    renderer.copyFramebufferToTexture(this.accumulatedTexture, zeroVec2);
+     renderer.setRenderTarget(this.velocityPass.renderTarget);
+-    renderer.copyFramebufferToTexture(zeroVec2, this.lastVelocityTexture);
++    renderer.copyFramebufferToTexture(this.lastVelocityTexture, zeroVec2);
+   }
+ 
+ }
+diff --git a/dist/index.js b/dist/index.js
+index 1e17a6fc66e70edc0935a9b022b0c09e72e0f5d3..932f288186d578d4aaded926473c646a0a1e21fb 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,5 +1,5 @@
+ import { Pass, RenderPass, DepthPass, Effect, Selection } from 'postprocessing';
+-import { ShaderMaterial, Uniform, Vector2, Matrix3, TangentSpaceNormalMap, GLSL3, Matrix4, Vector3, WebGLRenderTarget, LinearFilter, HalfFloatType, WebGLMultipleRenderTargets, ShaderChunk, Color, Quaternion, VideoTexture, DataTexture, RGBAFormat, FloatType, NearestFilter, FramebufferTexture, WebGLCubeRenderTarget, CubeCamera, PMREMGenerator, Texture } from 'three';
++import { ShaderMaterial, Uniform, Vector2, Matrix3, TangentSpaceNormalMap, GLSL3, Matrix4, Vector3, WebGLRenderTarget, LinearFilter, HalfFloatType, ShaderChunk, Color, Quaternion, VideoTexture, DataTexture, RGBAFormat, FloatType, NearestFilter, FramebufferTexture, WebGLCubeRenderTarget, CubeCamera, PMREMGenerator, Texture } from 'three';
+ 
+ function _extends() {
+   _extends = Object.assign ? Object.assign.bind() : function (target) {
+@@ -56,6 +56,7 @@ class MRTMaterial extends ShaderMaterial {
+                     varying vec3 vViewPosition;
+                 #endif
+                 #include <common>
++                uniform mat3 uvTransform;
+                 #include <uv_pars_vertex>
+                 #include <displacementmap_pars_vertex>
+                 #include <normal_pars_vertex>
+@@ -283,12 +284,13 @@ class ReflectionsPass extends Pass {
+ 
+     if (this.USE_MRT) {
+       // buffers: normal, depth (2), roughness will be written to the alpha channel of the normal buffer
+-      this.gBuffersRenderTarget = new WebGLMultipleRenderTargets(width, height, 2, {
++      this.gBuffersRenderTarget = new WebGLRenderTarget(width, height, {
++        count: 2,
+         minFilter: LinearFilter,
+         magFilter: LinearFilter
+       });
+-      this.normalTexture = this.gBuffersRenderTarget.texture[0];
+-      this.depthTexture = this.gBuffersRenderTarget.texture[1];
++      this.normalTexture = this.gBuffersRenderTarget.textures[0];
++      this.depthTexture = this.gBuffersRenderTarget.textures[1];
+     } else {
+       // depth pass
+       this.webgl1DepthPass = new DepthPass(this._scene, this._camera);
+@@ -323,6 +325,11 @@ class ReflectionsPass extends Pass {
+   }
+ 
+   dispose() {
++    this._scene.traverse(object => {
++      const cached = this.cachedMaterials.get(object);
++      if (cached) cached[1].dispose();
++      this.cachedMaterials.delete(object);
++    });
+     this.renderTarget.dispose();
+     this.gBuffersRenderTarget.dispose();
+     this.renderPass.dispose();
+@@ -397,10 +404,13 @@ class ReflectionsPass extends Pass {
+   }
+ 
+   render(renderer, inputBuffer) {
++    const background = this._scene.background;
++    this._scene.background = null;
+     this.setMRTMaterialInScene();
+     renderer.setRenderTarget(this.gBuffersRenderTarget);
+     this.renderPass.render(renderer, this.gBuffersRenderTarget);
+-    this.unsetMRTMaterialInScene(); // render depth and velocity in seperate passes
++    this.unsetMRTMaterialInScene();
++    this._scene.background = background; // render depth and velocity in seperate passes
+ 
+     if (!this.USE_MRT) this.webgl1DepthPass.renderPass.render(renderer, this.webgl1DepthPass.renderTarget);
+     this.fullscreenMaterial.uniforms.inputTexture.value = inputBuffer.texture;
+@@ -908,9 +918,9 @@ class TemporalResolvePass extends Pass {
+     renderer.setRenderTarget(this.renderTarget);
+     renderer.render(this.scene, this.camera); // save the render target's texture for use in next frame
+ 
+-    renderer.copyFramebufferToTexture(zeroVec2, this.accumulatedTexture);
++    renderer.copyFramebufferToTexture(this.accumulatedTexture, zeroVec2);
+     renderer.setRenderTarget(this.velocityPass.renderTarget);
+-    renderer.copyFramebufferToTexture(zeroVec2, this.lastVelocityTexture);
++    renderer.copyFramebufferToTexture(this.lastVelocityTexture, zeroVec2);
+   }
+ 
+ }
+diff --git a/index.d.mts b/index.d.mts
+new file mode 100644
+index 0000000000000000000000000000000000000000..6b173872fbb6fd8c9e3bbe0b047c362e96fbb268
+--- /dev/null
++++ b/index.d.mts
+@@ -0,0 +1,8 @@
++import { Effect, Selection } from "postprocessing";
++import { Camera, Scene } from "three";
++
++export class SSREffect extends Effect {
++  constructor(scene: Scene, camera: Camera, options?: Record<string, number | boolean>);
++  selection: Selection;
++  intensity: number;
++}
+diff --git a/package.json b/package.json
+index e3a801140b68eafa48d86b01484b184cb691cad1..4b0347b29c741593576ff65c2cbe586dc0a78ecc 100644
+--- a/package.json
++++ b/package.json
+@@ -20,7 +20,8 @@
+ 	],
+ 	"files": [
+ 		"dist/index.js",
+-		"dist/index.cjs"
++		"dist/index.cjs",
++		"index.d.mts"
+ 	],
+ 	"author": "0beqz",
+ 	"license": "MIT",
+@@ -71,5 +72,6 @@
+ 	"version": "2.5.0",
+ 	"lint-staged": {
+ 		"*.{js,css,md}": "prettier --write"
+-	}
++	},
++	"types": "index.d.mts"
+ }
