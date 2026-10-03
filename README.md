@@ -2,7 +2,9 @@
 
 
 <div align="center">
-  <img src="apps/web/public/banner.png" alt="Componentry Banner" width="100%" />
+  <a href="https://componentry.dev">
+    <img src="apps/web/public/readme-cover.png" alt="Componentry" width="100%" />
+  </a>
 </div>
 
 <h1 align="center">Componentry</h1>
