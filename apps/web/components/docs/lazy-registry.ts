@@ -10,6 +10,10 @@ const docsImportMap: Record<
     | { [key: string]: React.ComponentType<Record<string, unknown>> }
   >
 > = {
+  "lens-clock": () =>
+    import("@/components/docs/lens-clock").then((m) => ({
+      default: m.LensClockDocs,
+    })),
   "grain-gradient": () =>
     import("@/components/docs/grain-gradient").then((m) => ({
       default: m.GrainGradientDocs,

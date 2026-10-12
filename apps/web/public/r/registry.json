@@ -222,6 +222,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "lens-clock",
+      "type": "registry:ui"
+    },
+    {
       "name": "gradient-hero-01",
       "type": "registry:block"
     },

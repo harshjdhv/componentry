@@ -34,6 +34,14 @@ export const featuredComponentSlugs = [
 ] as const;
 
 export const components: Record<string, ComponentMetadata> = {
+  "lens-clock": {
+    title: "Lens Clock",
+    description:
+      "A clock widget that pans across a large dial to follow the hour hand, with soft focus at the edges.",
+    category: "Components",
+    slug: "lens-clock",
+    addedAt: "2026-10-12",
+  },
   "grain-gradient": {
     title: "Grain Gradient",
     description:
