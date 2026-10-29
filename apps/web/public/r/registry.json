@@ -226,6 +226,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "heatmap-logo",
+      "type": "registry:ui"
+    },
+    {
       "name": "gradient-hero-01",
       "type": "registry:block"
     },
