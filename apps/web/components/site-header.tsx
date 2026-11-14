@@ -8,7 +8,7 @@ import { CommandMenu } from "@/components/command-menu"
 import { landingGutterClass } from "@/components/landing/landing-frame"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
-import { LAST_KNOWN_GITHUB_STARS, useGithubStars } from "@/hooks/use-github-stars"
+import { formatStars, useGithubStars } from "@/hooks/use-github-stars"
 
 interface SiteHeaderProps {
     sidebarToggle?: React.ReactNode
@@ -35,16 +35,7 @@ export function SiteHeader({ sidebarToggle, landingGutter, docsInset }: SiteHead
         setMobileNavOpen(false)
     }, [pathname])
 
-    const formattedStars =
-        stars === null
-            ? null
-            : new Intl.NumberFormat("en-US", {
-                notation: "compact",
-                compactDisplay: "short",
-            })
-                .format(stars)
-                .toLowerCase()
-    const fullStars = stars === null ? "GitHub" : `${new Intl.NumberFormat("en-US").format(stars)} stars`
+    const fullStars = `${new Intl.NumberFormat("en-US").format(stars)} stars`
     const navItems = [
         {
             href: "/docs",
@@ -135,11 +126,10 @@ export function SiteHeader({ sidebarToggle, landingGutter, docsInset }: SiteHead
                         >
                             <GitHubIcon className="size-4 transition-opacity group-hover:opacity-100" />
                             <span
-                                aria-hidden={stars === null}
                                 className="hidden w-[3ch] text-right tabular-nums leading-none sm:inline-block"
                                 style={{ textBox: "trim-end cap alphabetic" }}
                             >
-                                {formattedStars ?? LAST_KNOWN_GITHUB_STARS}
+                                {formatStars(stars)}
                             </span>
                             <span className="sr-only">GitHub</span>
                         </Link>
