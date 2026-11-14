@@ -2,8 +2,7 @@ export type ComponentCategory =
   | "Text Animations"
   | "Components"
   | "Hero Backgrounds"
-  | "Visual Effects"
-  | "ASCII Effects";
+  | "Visual Effects";
 
 export interface ComponentMetadata {
   title: string;
@@ -452,17 +451,16 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/liquidchrome.webm",
   },
-  // ASCII Effects
+  // Visual Effects
   "ascii-effect": {
     title: "ASCII Effect",
     description: "Render images as responsive ASCII artwork with image, flow, and glitch variations.",
-    category: "ASCII Effects",
+    category: "Visual Effects",
     slug: "ascii-effect",
     addedAt: "2026-07-21",
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/ascii-effects/asciieffect.webm",
   },
-  // Visual Effects
   "image-trail": {
     title: "Image Trail",
     description:
