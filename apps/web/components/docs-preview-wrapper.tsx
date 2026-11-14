@@ -255,7 +255,7 @@ export function DocsPreviewWrapper({
       <section
         aria-label="Preview controls"
         className={cn(
-          "z-20 m-3 mb-0 flex shrink-0 self-end select-none lg:fixed lg:right-6 lg:top-6 lg:z-[99] lg:m-0 items-center gap-1 rounded-lg bg-zinc-100/30 p-1.5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)] backdrop-blur-md dark:bg-zinc-950/30 dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.2)]",
+          "z-20 m-3 mb-0 flex shrink-0 self-end select-none lg:fixed lg:right-6 lg:top-6 lg:z-[99] lg:m-0 items-center gap-1 rounded-lg border border-black/[0.06] bg-zinc-100/30 p-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] backdrop-blur-md dark:border-white/[0.05] dark:bg-zinc-950/30 dark:shadow-[0_1px_2px_rgb(0_0_0/0.3)]",
           fullWidthPreview ? "absolute right-0 top-0" : "relative"
         )}
       >

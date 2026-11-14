@@ -1,9 +1,6 @@
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { LiveCodeBlock } from "@/components/live-code-block";
-import {
-  GrainGradientPersonalizePanel,
-  GrainGradientPlayground,
-} from "@/components/docs/previews/grain-gradient-playground";
+import { GrainGradientPlayground } from "@/components/docs/previews/grain-gradient-playground";
 import { readComponentSource } from "@/lib/source-code";
 
 const usageCode = `import { GrainGradient } from "@/components/ui/grain-gradient"
@@ -24,7 +21,6 @@ export async function GrainGradientDocs() {
       title="Grain Gradient"
       description="A softly curved color field with fine film grain. Breathing light and flowing shadows, with customizable palette, composition, texture, and motion."
       preview={<GrainGradientPlayground />}
-      personalizeContent={<GrainGradientPersonalizePanel />}
       previewCode={usageCode}
       usageCode={<LiveCodeBlock defaultCode={usageCode} />}
       installPackageName="grain-gradient"

@@ -1,4 +1,4 @@
-/* Componentry skin for inline DialKit controls in docs previews.
+/* Componentry skin for DialKit controls inside DocsPlayground.
    Our own card (class "cy-dial") is the container; DialKit renders bare rows inside it. */
 
 /* Solid surfaces, same as the control bar's cells. */
