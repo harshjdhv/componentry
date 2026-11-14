@@ -8,6 +8,7 @@ import { CommandMenu } from "@/components/command-menu"
 import { landingGutterClass } from "@/components/landing/landing-frame"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
+import { LAST_KNOWN_GITHUB_STARS, useGithubStars } from "@/hooks/use-github-stars"
 
 interface SiteHeaderProps {
     sidebarToggle?: React.ReactNode
@@ -16,8 +17,6 @@ interface SiteHeaderProps {
     /** Match component docs inset — full bleed, no max-width rail. */
     docsInset?: boolean
 }
-
-const LAST_KNOWN_GITHUB_STARS = 465
 
 function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -29,67 +28,12 @@ function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function SiteHeader({ sidebarToggle, landingGutter, docsInset }: SiteHeaderProps) {
     const pathname = usePathname()
-    const [stars, setStars] = React.useState<number | null>(LAST_KNOWN_GITHUB_STARS)
+    const stars = useGithubStars()
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false)
 
     React.useEffect(() => {
         setMobileNavOpen(false)
     }, [pathname])
-
-    React.useLayoutEffect(() => {
-        try {
-            const cached = localStorage.getItem("github-stars-cache")
-            if (!cached) return
-
-            const { count } = JSON.parse(cached) as { count?: unknown }
-            if (typeof count === "number") {
-                setStars(count)
-            }
-        } catch {
-            // The regular fetch below remains the fallback.
-        }
-    }, [])
-
-    React.useEffect(() => {
-        const fetchStars = async () => {
-            try {
-                const cacheKey = "github-stars-cache"
-                const cacheExpiry = 15 * 60 * 1000
-                const cached = localStorage.getItem(cacheKey)
-
-                if (cached) {
-                    const { count, timestamp } = JSON.parse(cached) as {
-                        count?: unknown
-                        timestamp?: unknown
-                    }
-
-                    if (typeof count === "number") {
-                        setStars(count)
-
-                        if (typeof timestamp === "number" && Date.now() - timestamp < cacheExpiry) {
-                            return
-                        }
-                    }
-                }
-
-                const response = await fetch("https://api.github.com/repos/harshjdhv/componentry")
-                if (!response.ok) return
-
-                const data = (await response.json()) as { stargazers_count?: number }
-                if (typeof data.stargazers_count === "number") {
-                    setStars(data.stargazers_count)
-                    localStorage.setItem(
-                        cacheKey,
-                        JSON.stringify({ count: data.stargazers_count, timestamp: Date.now() })
-                    )
-                }
-            } catch {
-                // Keep the header quiet if GitHub rate-limits or localStorage is unavailable.
-            }
-        }
-
-        fetchStars()
-    }, [])
 
     const formattedStars =
         stars === null
