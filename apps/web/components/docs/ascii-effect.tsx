@@ -2,10 +2,11 @@ import { DocsPageLayout, type PropItem } from "@/components/docs-page-layout";
 import { AsciiFlowPreview } from "@/components/docs/previews/ascii-effect-preview";
 import { readComponentSource } from "@/lib/source-code";
 
-const importCode = `import { AsciiEffect } from "@/components/ui/ascii-effect"
+const flowCode = `import { AsciiEffect } from "@/components/ui/ascii-effect"
 
 <div className="h-[520px] overflow-hidden rounded-2xl">
   <AsciiEffect
+    variant="flow"
     imageSrc="/images/portrait.jpg"
     flowSpeed={0.22}
     flowStrength={12}
@@ -14,13 +15,17 @@ const importCode = `import { AsciiEffect } from "@/components/ui/ascii-effect"
   />
 </div>`;
 
-const flowCode = importCode;
-
 const props: PropItem[] = [
   {
     name: "imageSrc",
     type: "string",
     description: "Image URL rendered as ASCII characters.",
+  },
+  {
+    name: "variant",
+    type: '"image" | "flow" | "glitch"',
+    default: '"image"',
+    description: "Visual effect variation.",
   },
   {
     name: "chars",
@@ -98,7 +103,7 @@ const props: PropItem[] = [
     name: "flowSpeed",
     type: "number",
     default: "0.22",
-    description: "Flow cycles per second.",
+    description: "Flow cycles per second for the flow variant.",
   },
   {
     name: "flowDirection",
@@ -170,6 +175,24 @@ const props: PropItem[] = [
     type: "boolean",
     default: "false",
     description: "Reverse the luminance-to-character mapping.",
+  },
+  {
+    name: "glitchIntensity",
+    type: "number",
+    default: "0.65",
+    description: "Strength and number of displaced signal bands.",
+  },
+  {
+    name: "glitchFrequency",
+    type: "number",
+    default: "1.4",
+    description: "Approximate glitches per second.",
+  },
+  {
+    name: "revealDuration",
+    type: "number",
+    default: "1400",
+    description: "Radial reveal duration in milliseconds.",
   },
   {
     name: "alt",
