@@ -46,17 +46,17 @@ export default function McpDocsPage() {
 
       <SiteHeader />
 
-      <main className={`${landingGutterClass} relative z-10 pt-32 pb-32`}>
-        <div className="w-full max-w-3xl">
+      <main className={`${landingGutterClass} relative z-10 pt-28 pb-32`}>
+        <div className="mx-auto w-full max-w-3xl">
         {/* ── Hero (match /docs) ── */}
-        <div className="mb-12">
-          <h1 className="inline-block text-3xl font-semibold leading-[1.05] tracking-[-0.04em] text-zinc-900 dark:text-white sm:text-4xl">
+        <header className="mb-12 max-w-2xl space-y-2.5">
+          <h1 className="text-[28px] font-medium leading-[1.1] tracking-[-0.035em] text-zinc-900 sm:text-[32px] dark:text-zinc-50">
             MCP
           </h1>
-          <p className="mt-3 max-w-2xl text-sm font-medium tracking-tight text-zinc-400 sm:text-base dark:text-zinc-600">
+          <p className="max-w-xl text-pretty text-[15px] font-normal leading-6 tracking-[-0.01em] text-zinc-500 sm:text-[16px] sm:leading-7 dark:text-zinc-400">
             Integrating MCP with Componentry lets you control it via AI.
           </p>
-        </div>
+        </header>
 
         <div className="space-y-16">
           <Section title="Installation" id="installation" className="pt-2">

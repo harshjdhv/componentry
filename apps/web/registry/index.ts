@@ -2,8 +2,7 @@ export type ComponentCategory =
   | "Text Animations"
   | "Components"
   | "Hero Backgrounds"
-  | "Visual Effects"
-  | "ASCII Effects";
+  | "Visual Effects";
 
 export interface ComponentMetadata {
   title: string;
@@ -41,6 +40,8 @@ export const components: Record<string, ComponentMetadata> = {
     category: "Visual Effects",
     slug: "heatmap-logo",
     addedAt: "2026-10-28",
+    previewVideo:
+      "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/visual-effects/heatmaplogo.webm",
   },
   "lens-clock": {
     title: "Lens Clock",
@@ -51,14 +52,6 @@ export const components: Record<string, ComponentMetadata> = {
     addedAt: "2026-10-12",
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/lensclock.webm",
-  },
-  "grain-gradient": {
-    title: "Grain Gradient",
-    description:
-      "A breathing color field with flowing shadows, customizable film grain, and soft atmospheric light.",
-    category: "Hero Backgrounds",
-    slug: "grain-gradient",
-    addedAt: "2026-09-18",
   },
   "annotated-text": {
     title: "Annotated Text",
@@ -452,17 +445,16 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/liquidchrome.webm",
   },
-  // ASCII Effects
+  // Visual Effects
   "ascii-effect": {
     title: "ASCII Effect",
     description: "Render images as responsive ASCII artwork with image, flow, and glitch variations.",
-    category: "ASCII Effects",
+    category: "Visual Effects",
     slug: "ascii-effect",
     addedAt: "2026-07-21",
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/ascii-effects/asciieffect.webm",
   },
-  // Visual Effects
   "image-trail": {
     title: "Image Trail",
     description:

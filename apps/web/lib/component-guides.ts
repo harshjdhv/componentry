@@ -81,8 +81,7 @@ export const componentGuides: Record<string, ComponentGuide> = {
     ],
     "related": [
       "silk-aurora",
-      "animated-gradient",
-      "grain-gradient"
+      "animated-gradient"
     ]
   },
   "collection-surfer": {
