@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useDialKitController } from "dialkit";
 import { ImageRippleEffect } from "@workspace/ui/components/image-ripple-effect";
 import {
+  CUSTOM_PRESET,
   DocsPlayground,
-  gradientSwatch,
   useLiveCode,
+  usePresetSelect,
 } from "@/components/docs-playground";
 
 const IMAGE = {
@@ -29,11 +30,11 @@ const defaults = {
 };
 type Config = typeof defaults;
 
-const presets: Array<{ name: string; colors: string[]; config: Config }> = [
-  { name: "Default", colors: ["#a5c8ff", "#4f7fd9"], config: defaults },
+// Effect presets, not colors, so they live in the panel as a select.
+const presets: Array<{ name: string; config: Config }> = [
+  { name: "Default", config: defaults },
   {
     name: "Gentle",
-    colors: ["#d9f2e6", "#7fbfa4"],
     config: {
       ...defaults,
       distortionStrength: 0.05,
@@ -44,7 +45,6 @@ const presets: Array<{ name: string; colors: string[]; config: Config }> = [
   },
   {
     name: "Punchy",
-    colors: ["#ffd29a", "#f0643c"],
     config: {
       ...defaults,
       distortionStrength: 0.1,
@@ -57,7 +57,6 @@ const presets: Array<{ name: string; colors: string[]; config: Config }> = [
   },
   {
     name: "Dense",
-    colors: ["#d8c8ff", "#6c4fd1"],
     config: {
       ...defaults,
       waveCount: 180,
@@ -68,13 +67,13 @@ const presets: Array<{ name: string; colors: string[]; config: Config }> = [
   },
 ];
 
-const PRESETS = presets.map(({ name, colors }) => ({
-  name,
-  swatch: gradientSwatch(colors),
-}));
-
 type Slider = [number, number, number, number];
 const controls = {
+  preset: {
+    type: "select" as const,
+    options: [...presets.map((p) => p.name), CUSTOM_PRESET],
+    default: "Default",
+  },
   distortionStrength: [defaults.distortionStrength, 0.01, 0.2, 0.001] as Slider,
   waveCount: [defaults.waveCount, 20, 220, 1] as Slider,
   waveSize: [defaults.waveSize, 20, 120, 1] as Slider,
@@ -114,30 +113,36 @@ export function ImageRippleEffectPlayground() {
   const dial = useDialKitController("Image Ripple Effect", controls, {
     id: "image-ripple-effect",
   });
-  const config: Config = { ...defaults, ...dial.values };
+  const { preset: selected, ...values } = dial.values;
+  const config: Config = { ...defaults, ...values };
   // Choosing a preset restarts the scene so its waves start clean.
   const [renderVersion, setRenderVersion] = useState(0);
 
-  const preset =
+  const matching =
     presets.find(({ config: p }) =>
       (Object.keys(p) as Array<keyof Config>).every((key) => p[key] === config[key]),
     )?.name ?? null;
 
+  const { setValues } = dial;
+  usePresetSelect(
+    selected,
+    matching,
+    useCallback(
+      (name: string) => {
+        const next = presets.find((p) => p.name === name)?.config;
+        if (!next) return;
+        setValues(next);
+        setRenderVersion((version) => version + 1);
+      },
+      [setValues],
+    ),
+    useCallback((name: string) => setValues({ preset: name }), [setValues]),
+  );
+
   useLiveCode(code(config));
 
   return (
-    <DocsPlayground
-      presets={PRESETS}
-      preset={preset}
-      presetsLabel="Preset"
-      onPresetChange={(name) => {
-        const next = presets.find((p) => p.name === name)?.config;
-        if (next) {
-          dial.setValues(next);
-          setRenderVersion((version) => version + 1);
-        }
-      }}
-    >
+    <DocsPlayground>
       <ImageRippleEffect
         key={renderVersion}
         className="h-full w-full !min-h-full"

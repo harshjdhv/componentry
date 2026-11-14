@@ -11,8 +11,8 @@
  */
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
-import { motion, useDragControls } from "framer-motion"
-import { ChevronUp, GripVertical } from "lucide-react"
+import { motion, useDragControls, useMotionValue } from "framer-motion"
+import { ChevronUp, GripVertical, SlidersHorizontal, X } from "lucide-react"
 import { useTheme } from "next-themes"
 import { DialRoot, DialStore, type ControlMeta } from "dialkit"
 import "dialkit/styles.css"
@@ -35,7 +35,7 @@ interface DocsPlaygroundProps {
   onPresetChange?: (name: string) => void
   /** Accessible name for the swatch group. */
   presetsLabel?: string
-  /** Text shown in the bar when there are no presets. */
+  /** Name of the corner launcher and panel title when there are no presets. */
   label?: string
   /** Set false when the page registers no DialKit controls (hides the chevron). */
   controls?: boolean
@@ -116,6 +116,35 @@ function useHexColors() {
   }, [])
 }
 
+/** Option shown in a preset select once values no longer match a preset. */
+export const CUSTOM_PRESET = "Custom"
+
+/**
+ * Presets that aren't colors belong in the panel as a DialKit select (swatches are
+ * for colors). Picking one calls `apply`; editing values away from every preset
+ * flips the select to "Custom", and landing back on one selects it again.
+ *
+ * @param selected the select's current value (e.g. `dial.values.preset`)
+ * @param matching the preset whose values match the current ones, or null
+ */
+export function usePresetSelect(
+  selected: string,
+  matching: string | null,
+  apply: (name: string) => void,
+  select: (name: string) => void,
+) {
+  const previous = useRef({ selected, matching })
+  useEffect(() => {
+    const before = previous.current
+    previous.current = { selected, matching }
+    if (selected !== before.selected) {
+      if (selected !== CUSTOM_PRESET && selected !== matching) apply(selected)
+    } else if (matching !== before.matching) {
+      select(matching ?? CUSTOM_PRESET)
+    }
+  }, [selected, matching, apply, select])
+}
+
 /** Push generated code to the Usage section's <LiveCodeBlock>. */
 export function useLiveCode(code: string) {
   useEffect(() => {
@@ -129,6 +158,10 @@ export function useLiveCode(code: string) {
 /** Quiet surface, after coss: hairline border and a barely-there shadow. */
 const SURFACE =
   "relative flex select-none flex-col-reverse border border-black/[0.06] bg-[#f1f1f2] p-2 shadow-[0_1px_2px_rgb(0_0_0/0.04)] dark:border-white/[0.05] dark:bg-[#131313] dark:shadow-[0_1px_2px_rgb(0_0_0/0.3)]"
+
+/** Round corner launcher for pages without swatches; same surface as the bar. */
+const LAUNCHER =
+  "pointer-events-auto absolute bottom-0 right-0 flex size-11 items-center justify-center rounded-full border border-black/[0.06] bg-[#f1f1f2] text-foreground/70 shadow-[0_1px_2px_rgb(0_0_0/0.04)] transition-[opacity,scale,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)] hover:text-foreground active:scale-[0.96] motion-reduce:transition-none dark:border-white/[0.05] dark:bg-[#131313] dark:shadow-[0_1px_2px_rgb(0_0_0/0.3)]"
 
 /** Swatch with a hairline edge; the chosen one gets the site focus ring. */
 const SWATCH =
@@ -158,8 +191,120 @@ export function DocsPlayground({
   const [dragging, setDragging] = useState(false)
   const [open, setOpen] = useState(false)
   const hasPresets = Boolean(presets?.length)
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
   const toggle = () => setOpen((value) => !value)
+  const launcherRef = useRef<HTMLButtonElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
   useHexColors()
+
+  // Corner launcher: focus moves into the panel on open, Escape closes it, and
+  // focus returns to the launcher.
+  useEffect(() => {
+    if (hasPresets || !open) return
+    closeRef.current?.focus({ preventScroll: true })
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return
+      setOpen(false)
+      requestAnimationFrame(() => launcherRef.current?.focus({ preventScroll: true }))
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [hasPresets, open])
+
+  const dragProps = {
+    drag: true,
+    dragListener: false,
+    dragControls,
+    dragConstraints: stageRef,
+    dragElastic: 0,
+    dragMomentum: false,
+    onDragStart: () => setDragging(true),
+    onDragEnd: () => setDragging(false),
+  } as const
+
+  const grip = (
+    <button
+      type="button"
+      aria-label="Drag to move"
+      onPointerDown={(event) => dragControls.start(event)}
+      className={`${ICON_BUTTON} w-5 touch-none ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+    >
+      <GripVertical className="size-4" />
+    </button>
+  )
+
+  // Long panels scroll inside the bar instead of growing past the preview.
+  const dial = (
+    <div className="max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain rounded-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <DialRoot mode="inline" productionEnabled theme={resolvedTheme === "light" ? "light" : "dark"} />
+    </div>
+  )
+
+  // No color swatches to show: a round launcher in the corner instead of a mostly empty bar.
+  if (!hasPresets) {
+    const openPanel = () => {
+      x.set(0) // always open anchored to the launcher, even if it was dragged last time
+      y.set(0)
+      setOpen(true)
+    }
+    return (
+      <div ref={stageRef} className={cn("relative h-full w-full", className)}>
+        {children}
+
+        {controls && (
+          <div className="pointer-events-none absolute bottom-4 right-4 z-30">
+            <button
+              type="button"
+              ref={launcherRef}
+              aria-label={label}
+              aria-expanded={open}
+              inert={open}
+              onClick={openPanel}
+              className={cn(
+                LAUNCHER,
+                open && "pointer-events-none scale-75 opacity-0",
+              )}
+            >
+              <SlidersHorizontal className="size-4" />
+            </button>
+
+            {/* Always mounted so DialKit's height is settled; it fades and scales from the corner. */}
+            <motion.div
+              {...dragProps}
+              inert={!open}
+              aria-hidden={!open}
+              style={{ x, y, borderRadius: 8, minWidth }}
+              className={cn(
+                "cy-dial pointer-events-auto",
+                SURFACE,
+                "absolute bottom-0 right-0 origin-bottom-right transition-[opacity,scale] duration-200 ease-[cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none",
+                !open && "pointer-events-none scale-95 opacity-0",
+              )}
+            >
+              <div className="flex items-center gap-2">
+                {grip}
+                <span className="flex-1 text-center text-[13px] font-medium text-foreground/70">{label}</span>
+                <button
+                  type="button"
+                  ref={closeRef}
+                  aria-label="Close options"
+                  onClick={() => {
+                    setOpen(false)
+                    requestAnimationFrame(() => launcherRef.current?.focus({ preventScroll: true }))
+                  }}
+                  className={`${ICON_BUTTON} w-5`}
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <div className="pb-2">{dial}</div>
+            </motion.div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div ref={stageRef} className={cn("relative h-full w-full", className)}>
@@ -168,53 +313,28 @@ export function DocsPlayground({
       {/* Centering lives on this wrapper so it doesn't fight the drag transform. */}
       <div className="pointer-events-none absolute inset-x-0 bottom-4 z-30 flex justify-center">
         <motion.div
-          drag
-          dragListener={false}
-          dragControls={dragControls}
-          dragConstraints={stageRef}
-          dragElastic={0}
-          dragMomentum={false}
-          onDragStart={() => setDragging(true)}
-          onDragEnd={() => setDragging(false)}
+          {...dragProps}
           style={{ borderRadius: 8, minWidth }}
           className={`cy-dial pointer-events-auto ${SURFACE}`}
         >
-          <div className="flex items-center justify-center gap-2">
-            <button
-              type="button"
-              aria-label="Drag to move"
-              onPointerDown={(event) => dragControls.start(event)}
-              className={`${ICON_BUTTON} w-5 touch-none ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
-            >
-              <GripVertical className="size-4" />
-            </button>
+          <div className="flex items-center gap-2">
+            {grip}
 
-            {hasPresets ? (
-              <div role="radiogroup" aria-label={presetsLabel} className="flex items-center gap-2">
-                {presets!.map(({ name, swatch }) => (
-                  <button
-                    key={name}
-                    type="button"
-                    role="radio"
-                    aria-checked={preset === name}
-                    aria-label={name}
-                    title={name}
-                    onClick={() => onPresetChange?.(name)}
-                    style={{ "--swatch": swatch } as CSSProperties}
-                    className={SWATCH}
-                  />
-                ))}
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={controls ? toggle : undefined}
-                tabIndex={-1}
-                className="h-8 px-1 text-[13px] font-medium text-foreground/70"
-              >
-                {label}
-              </button>
-            )}
+            <div role="radiogroup" aria-label={presetsLabel} className="flex flex-1 items-center justify-center gap-2">
+              {presets!.map(({ name, swatch }) => (
+                <button
+                  key={name}
+                  type="button"
+                  role="radio"
+                  aria-checked={preset === name}
+                  aria-label={name}
+                  title={name}
+                  onClick={() => onPresetChange?.(name)}
+                  style={{ "--swatch": swatch } as CSSProperties}
+                  className={SWATCH}
+                />
+              ))}
+            </div>
 
             {controls && (
               <button
@@ -241,16 +361,7 @@ export function DocsPlayground({
             >
               <div className="min-h-0 overflow-hidden">
                 {/* Gap sits outside the scroller so it never scrolls away from the swatch row. */}
-                <div className="pb-2">
-                  {/* Long panels scroll inside the bar instead of growing past the preview. */}
-                  <div className="max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain rounded-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    <DialRoot
-                      mode="inline"
-                      productionEnabled
-                      theme={resolvedTheme === "light" ? "light" : "dark"}
-                    />
-                  </div>
-                </div>
+                <div className="pb-2">{dial}</div>
               </div>
             </div>
           )}

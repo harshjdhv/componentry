@@ -1,39 +1,38 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useDialKitController } from "dialkit";
 import { TextMorph } from "@workspace/ui/components/text-morph";
 import {
+  CUSTOM_PRESET,
   DocsPlayground,
-  gradientSwatch,
   useLiveCode,
+  usePresetSelect,
 } from "@/components/docs-playground";
 
+// Word sets, not colors, so they live in the panel as a select.
 const PRESETS = [
   {
     name: "Studio",
     words: ["IMAGINE", "REFINE", "RELEASE"],
-    colors: ["#e4e4e7", "#71717a", "#18181b"],
   },
   {
     name: "Metrics",
     words: ["1.2K", "8.4K", "25K"],
-    colors: ["#dbeafe", "#60a5fa", "#1e3a8a"],
   },
   {
     name: "Pricing",
     words: ["$29", "$49", "$99"],
-    colors: ["#dcfce7", "#4ade80", "#14532d"],
   },
 ] as const;
 
-const SWATCHES = PRESETS.map(({ name, colors }) => ({
-  name,
-  swatch: gradientSwatch(colors),
-}));
-
 type Slider = [number, number, number, number];
 const controls = {
+  preset: {
+    type: "select" as const,
+    options: [...PRESETS.map((p) => p.name), CUSTOM_PRESET],
+    default: PRESETS[0].name,
+  },
   words: {
     type: "text" as const,
     default: PRESETS[0].words.join(", "),
@@ -76,21 +75,28 @@ export function TextMorphPlayground() {
   const words = useMemo(() => parseWords(text), [text]);
   const { interval, morphDuration } = dial.values;
 
-  const preset =
+  const matching =
     PRESETS.find((p) => p.words.join("|") === words.join("|"))?.name ?? null;
+
+  const { setValues } = dial;
+  usePresetSelect(
+    dial.values.preset,
+    matching,
+    useCallback(
+      (name: string) => {
+        const next = PRESETS.find((p) => p.name === name);
+        if (next) setValues({ words: next.words.join(", ") });
+      },
+      [setValues],
+    ),
+    useCallback((name: string) => setValues({ preset: name }), [setValues]),
+  );
 
   useLiveCode(generateCode({ words, interval, morphDuration }));
 
   return (
     <DocsPlayground
-      presets={SWATCHES}
-      preset={preset}
-      presetsLabel="Values"
       minWidth={280}
-      onPresetChange={(name) => {
-        const next = PRESETS.find((p) => p.name === name);
-        if (next) dial.setValues({ words: next.words.join(", ") });
-      }}
       className="flex min-h-[440px] items-center justify-center overflow-hidden px-8 py-16"
     >
       <div className="text-center text-4xl font-bold tracking-tight text-foreground md:text-5xl">
