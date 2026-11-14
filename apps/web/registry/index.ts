@@ -448,7 +448,7 @@ export const components: Record<string, ComponentMetadata> = {
   // Visual Effects
   "ascii-effect": {
     title: "ASCII Effect",
-    description: "Render images as responsive ASCII artwork with image, flow, and glitch variations.",
+    description: "Render images as flowing ASCII artwork that reacts to your cursor.",
     category: "Visual Effects",
     slug: "ascii-effect",
     addedAt: "2026-07-21",

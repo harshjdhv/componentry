@@ -1,29 +1,11 @@
 import { DocsPageLayout, type PropItem } from "@/components/docs-page-layout";
-import {
-  AsciiFlowPreview,
-  AsciiGlitchPreview,
-  AsciiImagePreview,
-} from "@/components/docs/previews/ascii-effect-preview";
+import { AsciiFlowPreview } from "@/components/docs/previews/ascii-effect-preview";
 import { readComponentSource } from "@/lib/source-code";
 
-const importCode = `import { AsciiEffect } from "@/components/ui/ascii-effect"`;
-
-const imageCode = `${importCode}
+const importCode = `import { AsciiEffect } from "@/components/ui/ascii-effect"
 
 <div className="h-[520px] overflow-hidden rounded-2xl">
   <AsciiEffect
-    variant="image"
-    imageSrc="/images/portrait.jpg"
-    fontSize={9}
-    scale={1.15}
-  />
-</div>`;
-
-const flowCode = `${importCode}
-
-<div className="h-[520px] overflow-hidden rounded-2xl">
-  <AsciiEffect
-    variant="flow"
     imageSrc="/images/portrait.jpg"
     flowSpeed={0.22}
     flowStrength={12}
@@ -32,29 +14,13 @@ const flowCode = `${importCode}
   />
 </div>`;
 
-const glitchCode = `${importCode}
-
-<div className="h-[520px] overflow-hidden rounded-2xl">
-  <AsciiEffect
-    variant="glitch"
-    imageSrc="/images/portrait.jpg"
-    glitchIntensity={0.65}
-    glitchFrequency={1.4}
-    revealDuration={1400}
-  />
-</div>`;
+const flowCode = importCode;
 
 const props: PropItem[] = [
   {
     name: "imageSrc",
     type: "string",
     description: "Image URL rendered as ASCII characters.",
-  },
-  {
-    name: "variant",
-    type: '"image" | "flow" | "glitch"',
-    default: '"image"',
-    description: "Visual effect variation.",
   },
   {
     name: "chars",
@@ -132,7 +98,7 @@ const props: PropItem[] = [
     name: "flowSpeed",
     type: "number",
     default: "0.22",
-    description: "Flow cycles per second for the flow variant.",
+    description: "Flow cycles per second.",
   },
   {
     name: "flowDirection",
@@ -206,24 +172,6 @@ const props: PropItem[] = [
     description: "Reverse the luminance-to-character mapping.",
   },
   {
-    name: "glitchIntensity",
-    type: "number",
-    default: "0.65",
-    description: "Strength and number of displaced signal bands.",
-  },
-  {
-    name: "glitchFrequency",
-    type: "number",
-    default: "1.4",
-    description: "Approximate glitches per second.",
-  },
-  {
-    name: "revealDuration",
-    type: "number",
-    default: "1400",
-    description: "Radial reveal duration in milliseconds.",
-  },
-  {
     name: "alt",
     type: "string",
     default: '"ASCII rendering"',
@@ -242,17 +190,13 @@ export async function AsciiEffectDocs() {
   return (
     <DocsPageLayout
       title="ASCII Effect"
-      description="A responsive image-to-ASCII renderer with image, flowing ripple, and signal-glitch variations."
-      preview={<AsciiImagePreview />}
-      previewCode={imageCode}
+      description="A responsive image-to-ASCII renderer with a flowing ripple that reacts to your cursor."
+      preview={<AsciiFlowPreview />}
+      previewCode={flowCode}
       installPackageName="ascii-effect"
       installSourceCode={source ?? "// Unable to load source code"}
       installSourceFilename="components/ui/ascii-effect.tsx"
-      usageCode={imageCode}
-      examples={[
-        { title: "Flow", preview: <AsciiFlowPreview />, code: flowCode },
-        { title: "Glitch", preview: <AsciiGlitchPreview />, code: glitchCode },
-      ]}
+      usageCode={flowCode}
       props={props}
       fullWidthPreview
     />

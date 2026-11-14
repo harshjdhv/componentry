@@ -6,7 +6,6 @@ import { useEffect, useRef, type HTMLAttributes, type PointerEvent } from "react
 export interface AsciiEffectProps extends Omit<HTMLAttributes<HTMLDivElement>, "color"> {
   imageSrc: string
   alt?: string
-  variant?: "image" | "flow" | "glitch"
   chars?: string
   fontSize?: number
   fontFamily?: string
@@ -32,16 +31,9 @@ export interface AsciiEffectProps extends Omit<HTMLAttributes<HTMLDivElement>, "
   colorMode?: "gradient" | "source"
   backgroundColor?: string
   invert?: boolean
-  glitchIntensity?: number
-  glitchFrequency?: number
-  revealDuration?: number
 }
 
-export type AsciiPresetProps = Omit<AsciiEffectProps, "variant">
-
-const IMAGE_COLORS = ["#f4f4f5", "#a1a1aa"]
 const FLOW_COLORS = ["#e2e8f0", "#67e8f9", "#818cf8"]
-const GLITCH_COLORS = ["#ecfccb", "#a3e635", "#22d3ee"]
 
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value))
@@ -70,7 +62,6 @@ function gradientColor(colors: string[], amount: number) {
 export function AsciiEffect({
   imageSrc,
   alt = "ASCII rendering",
-  variant = "image",
   chars = " .:-=+*#%@",
   fontSize = 9,
   fontFamily = "Arial, Helvetica, sans-serif",
@@ -92,13 +83,10 @@ export function AsciiEffect({
   mouseWaveSpeed = 1.2,
   scale = 1.15,
   fit = "cover",
-  colors = IMAGE_COLORS,
+  colors = FLOW_COLORS,
   colorMode = "gradient",
   backgroundColor = "#07090d",
   invert = false,
-  glitchIntensity = 0.65,
-  glitchFrequency = 1.4,
-  revealDuration = 1400,
   className,
   onPointerMove,
   onPointerLeave,
@@ -123,10 +111,6 @@ export function AsciiEffect({
     let frame = 0
     let width = 0
     let height = 0
-    let startedAt = 0
-    let nextGlitchAt = 0
-    let glitchUntil = 0
-    let glitchBands = new Map<number, number>()
     let loaded = false
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
@@ -141,21 +125,6 @@ export function AsciiEffect({
       canvas.style.height = `${height}px`
       context.setTransform(dpr, 0, 0, dpr, 0, 0)
       if (loaded) draw(performance.now())
-    }
-
-    const updateGlitch = (now: number, rows: number) => {
-      if (variant !== "glitch" || reduceMotion || glitchFrequency <= 0 || now < nextGlitchAt) return
-
-      glitchBands = new Map()
-      const bandCount = Math.max(1, Math.round(clamp(glitchIntensity) * 4))
-      for (let band = 0; band < bandCount; band++) {
-        const start = Math.floor(Math.random() * rows)
-        const size = 1 + Math.floor(Math.random() * 3)
-        const offset = (Math.random() - 0.5) * fontSize * 12 * clamp(glitchIntensity)
-        for (let row = start; row < Math.min(rows, start + size); row++) glitchBands.set(row, offset)
-      }
-      glitchUntil = now + 70 + 90 * clamp(glitchIntensity)
-      nextGlitchAt = now + 1000 / glitchFrequency
     }
 
     const draw = (now: number) => {
@@ -235,28 +204,16 @@ export function AsciiEffect({
         }
       }
 
-      const reveal = variant === "glitch" && !reduceMotion && revealDuration > 0
-        ? clamp((now - startedAt) / revealDuration)
-        : 1
-
-      updateGlitch(now, rows)
-      if (now > glitchUntil) glitchBands.clear()
-
       context.fillStyle = backgroundColor
       context.fillRect(0, 0, width, height)
       context.textBaseline = "top"
 
       for (let row = 0; row < rows; row++) {
-        const rowOffset = glitchBands.get(row) ?? 0
         for (let column = 0; column < columns; column++) {
-          const dx = column / Math.max(1, columns - 1) - 0.5
-          const dy = row / Math.max(1, rows - 1) - 0.5
-          if (Math.hypot(dx, dy) > reveal * 0.72) continue
-
           let sourceColumn = column
           let sourceRow = row
           let mouseInfluence = 0
-          if (variant === "flow" && !reduceMotion) {
+          if (!reduceMotion) {
             const x = column * cellWidth
             const y = row * cellHeight
             const phase = (x * directionX + y * directionY) * flowFrequency + now * flowSpeed * Math.PI * 0.002
@@ -294,22 +251,21 @@ export function AsciiEffect({
           context.fillStyle = colorMode === "source"
             ? `rgb(${pixels[pixel]}, ${pixels[pixel + 1]}, ${pixels[pixel + 2]})`
             : gradientColor(colors, luminance)
-          context.fillText(character, column * cellWidth - cellWidth + rowOffset, row * cellHeight - cellHeight)
+          context.fillText(character, column * cellWidth - cellWidth, row * cellHeight - cellHeight)
         }
       }
     }
 
     const animate = (now: number) => {
       draw(now)
-      if (!reduceMotion && variant !== "image") frame = requestAnimationFrame(animate)
+      if (!reduceMotion) frame = requestAnimationFrame(animate)
     }
 
     const start = () => {
       if (loaded) return
       loaded = true
-      startedAt = performance.now()
       resize()
-      if (!reduceMotion && variant !== "image") frame = requestAnimationFrame(animate)
+      if (!reduceMotion) frame = requestAnimationFrame(animate)
     }
     image.onload = start
     image.src = imageSrc
@@ -323,11 +279,10 @@ export function AsciiEffect({
       observer.disconnect()
       image.onload = null
     }
-  }, [backgroundColor, brightnessBoost, characterSpacing, chars, colorMode, colors, contrast, dither, ditherStrength, fit, flowDirection, flowFrequency, flowSpeed, flowStrength, fontFamily, fontSize, fontWeight, glitchFrequency, glitchIntensity, imageSrc, invert, lineHeight, mouseRadius, mouseStrength, mouseWaveSpeed, posterize, revealDuration, scale, threshold, variant])
+  }, [backgroundColor, brightnessBoost, characterSpacing, chars, colorMode, colors, contrast, dither, ditherStrength, fit, flowDirection, flowFrequency, flowSpeed, flowStrength, fontFamily, fontSize, fontWeight, imageSrc, invert, lineHeight, mouseRadius, mouseStrength, mouseWaveSpeed, posterize, scale, threshold])
 
   const trackPointer = (event: PointerEvent<HTMLDivElement>) => {
     onPointerMove?.(event)
-    if (variant !== "flow") return
     const rect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
@@ -358,14 +313,6 @@ export function AsciiEffect({
   )
 }
 
-export function AsciiImage(props: AsciiPresetProps) {
-  return <AsciiEffect {...props} variant="image" colors={props.colors ?? IMAGE_COLORS} />
-}
-
-export function AsciiFlow(props: AsciiPresetProps) {
-  return <AsciiEffect {...props} variant="flow" colors={props.colors ?? FLOW_COLORS} />
-}
-
-export function AsciiGlitch(props: AsciiPresetProps) {
-  return <AsciiEffect {...props} variant="glitch" colors={props.colors ?? GLITCH_COLORS} />
+export function AsciiFlow(props: AsciiEffectProps) {
+  return <AsciiEffect {...props} />
 }

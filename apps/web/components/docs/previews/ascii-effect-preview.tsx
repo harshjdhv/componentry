@@ -23,19 +23,10 @@ function PreviewFrame({
   );
 }
 
-export function AsciiImagePreview() {
-  return (
-    <PreviewFrame label="Image">
-      <AsciiEffect variant="image" imageSrc={imageSrc} fontSize={6} scale={1} />
-    </PreviewFrame>
-  );
-}
-
 export function AsciiFlowPreview() {
   return (
     <PreviewFrame label="Flow">
       <AsciiEffect
-        variant="flow"
         imageSrc={imageSrc}
         fontSize={6}
         scale={1}
@@ -48,23 +39,6 @@ export function AsciiFlowPreview() {
   );
 }
 
-export function AsciiGlitchPreview() {
-  return (
-    <PreviewFrame label="Glitch">
-      <AsciiEffect
-        variant="glitch"
-        imageSrc={imageSrc}
-        fontSize={6}
-        scale={1}
-        glitchIntensity={0.8}
-        glitchFrequency={1.8}
-      />
-    </PreviewFrame>
-  );
-}
-
 export function AsciiCatalogPreview() {
-  return (
-    <AsciiEffect variant="flow" imageSrc={imageSrc} fontSize={4.5} scale={1} />
-  );
+  return <AsciiEffect imageSrc={imageSrc} fontSize={4.5} scale={1} />;
 }
