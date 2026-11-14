@@ -1,0 +1,55 @@
+/* Componentry skin for inline DialKit controls in docs previews.
+   Our own card (class "cy-dial") is the container; DialKit renders bare rows inside it. */
+
+/* Solid surfaces, same as the control bar's cells. */
+.cy-dial .dialkit-root {
+  --dial-surface: #1c1c1d;
+  --dial-surface-hover: #222224;
+  --dial-surface-active: #2a2a2d; /* slider fill */
+  --dial-radius: 8px;
+  --dial-row-height: 32px;
+  --dial-row-gap: 4px;
+}
+
+.cy-dial .dialkit-root[data-theme="light"] {
+  --dial-surface: #e8e8ea;
+  --dial-surface-hover: #e2e2e5;
+  --dial-surface-active: #d9d9dd;
+}
+
+/* Strip DialKit's own card, header, copy toolbar and saved versions. */
+.cy-dial .dialkit-panel-inline,
+.cy-dial .dialkit-panel-inner {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.cy-dial .dialkit-panel-header,
+.cy-dial .dialkit-panel-toolbar,
+.cy-dial .dialkit-versions {
+  display: none !important;
+}
+
+/* Rows use the container's rounded-lg, not the round cells. */
+.cy-dial .dialkit-slider,
+.cy-dial .dialkit-labeled-control,
+.cy-dial .dialkit-select-trigger,
+.cy-dial .dialkit-color-control {
+  border-radius: 8px;
+}
+
+.cy-dial .dialkit-root,
+.cy-dial .dialkit-panel {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Values update while dragging; keep digits from jittering. */
+.cy-dial .dialkit-root {
+  font-variant-numeric: tabular-nums;
+}
