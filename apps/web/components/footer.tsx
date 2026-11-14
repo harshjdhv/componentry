@@ -35,7 +35,7 @@ export function Footer() {
       <div className={`mx-auto w-full ${landingGutterClass}`}>
         <LandingContent>
           <div className="flex flex-wrap items-center justify-between gap-4 pb-12 pt-10 sm:pb-16 sm:pt-12">
-            <Link href="/" className="group inline-flex h-8 items-center gap-1.5 rounded-md px-1 transition-colors duration-200 hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring dark:hover:bg-muted/40">
+            <Link href="/" className="group -mx-1 inline-flex h-8 items-center gap-1.5 rounded-md px-1 transition-colors duration-200 hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring dark:hover:bg-muted/40">
               <ComponentryLogomark className="size-5 text-zinc-900 transition-opacity group-hover:opacity-80 dark:text-white" />
               <span className="text-[16px] font-semibold font-display tracking-tight text-zinc-900 dark:text-white">COMPONENTRY</span>
             </Link>

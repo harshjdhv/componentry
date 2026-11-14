@@ -27,10 +27,10 @@ export function BlocksNav() {
       aria-label="Block categories"
       className="border-b border-line bg-background"
     >
-      <div className="mx-auto w-full max-w-[1360px]">
+      <div className="w-full">
         <motion.div
           layoutScroll
-          className="no-scrollbar flex min-h-11 items-center justify-start gap-0.5 overflow-x-auto px-4 py-1.5 md:px-6 lg:justify-center"
+          className="no-scrollbar flex min-h-11 items-center justify-start gap-0.5 overflow-x-auto py-1.5 lg:justify-center"
         >
           {categories.map((category) => (
             <Link

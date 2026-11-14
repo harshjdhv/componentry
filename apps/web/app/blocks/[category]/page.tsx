@@ -43,7 +43,7 @@ export default async function BlocksCategoryPage({
 
   return (
     <>
-      <div className="mx-auto w-full max-w-[1360px]">
+      <div className="w-full">
         <BlocksHeading
           title={`${item.title} blocks.`}
           description={item.description}

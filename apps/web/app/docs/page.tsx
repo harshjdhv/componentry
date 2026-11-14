@@ -6,6 +6,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { components, getFeaturedComponents, isNewComponent, type ComponentCategory, type ComponentMetadata } from "@/registry"
 
+import { landingGutterClass } from "@/components/landing/landing-frame"
 import { SiteHeader } from "@/components/site-header"
 import { DocsScrollEdgeFade } from "@/components/docs-scroll-edge-fade"
 import { cn } from "@/lib/utils"
@@ -312,11 +313,10 @@ export default function DocsPage() {
       <DocsScrollEdgeFade position="bottom" />
 
       {/* ── Top Floating Header ── */}
-      <SiteHeader docsInset />
+      <SiteHeader />
 
-      {/* Docs inset on normal screens; cap width only on 2xl+ */}
-      <main className="relative z-10 px-6 pt-28 pb-32 sm:px-8 lg:px-8 xl:px-10">
-        <div className="mx-auto w-full 2xl:max-w-[1360px]">
+      <main className={cn("relative z-10 pt-28 pb-32", landingGutterClass)}>
+        <div className="w-full">
 
         {/* ── Hero ── */}
         <header className="mb-12 max-w-2xl space-y-2.5">

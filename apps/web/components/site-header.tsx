@@ -12,10 +12,8 @@ import { formatStars, useGithubStars } from "@/hooks/use-github-stars"
 
 interface SiteHeaderProps {
     sidebarToggle?: React.ReactNode
-    /** Kept for existing call sites; the header rail stays consistent across pages. */
+    /** Landing pages use a transparent bottom border on the same rail. */
     landingGutter?: boolean
-    /** Match component docs inset — full bleed, no max-width rail. */
-    docsInset?: boolean
 }
 
 function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -26,7 +24,7 @@ function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
     )
 }
 
-export function SiteHeader({ sidebarToggle, landingGutter, docsInset }: SiteHeaderProps) {
+export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
     const pathname = usePathname()
     const stars = useGithubStars()
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false)
@@ -68,20 +66,8 @@ export function SiteHeader({ sidebarToggle, landingGutter, docsInset }: SiteHead
                     : "border-b border-line bg-white dark:bg-background"
             )}
         >
-            <div
-                className={cn(
-                    "h-14 w-full",
-                    docsInset
-                        ? "px-6 sm:px-8 lg:px-8 xl:px-10"
-                        : landingGutterClass
-                )}
-            >
-                <div
-                    className={cn(
-                        "mx-auto flex h-full w-full items-center",
-                        docsInset ? "2xl:max-w-[1360px]" : "max-w-[1360px]"
-                    )}
-                >
+            <div className={cn("h-14 w-full", landingGutterClass)}>
+                <div className="flex h-full w-full items-center">
                 <div className="flex flex-1 items-center gap-5">
                     {sidebarToggle && (
                         <div className="md:hidden">
@@ -90,7 +76,7 @@ export function SiteHeader({ sidebarToggle, landingGutter, docsInset }: SiteHead
                     )}
                     <Link
                         href="/"
-                        className="group inline-flex h-8 items-center gap-1.5 rounded-md px-1 transition-colors duration-200 hover:bg-muted/60 dark:hover:bg-muted/40"
+                        className="group -mx-1 inline-flex h-8 items-center gap-1.5 rounded-md px-1 transition-colors duration-200 hover:bg-muted/60 dark:hover:bg-muted/40"
                     >
                         <ComponentryLogomark className="size-5 text-zinc-900 dark:text-white transition-opacity group-hover:opacity-80" />
                         <span className="text-[16px] font-semibold font-display tracking-tight text-zinc-900 dark:text-white">COMPONENTRY</span>

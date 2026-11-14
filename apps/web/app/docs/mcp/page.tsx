@@ -1,6 +1,7 @@
 "use client"
 
 import { registryNamespace, registryUrl } from "@/lib/install-command"
+import { landingGutterClass } from "@/components/landing/landing-frame"
 import { SiteHeader } from "@/components/site-header"
 import { DocsScrollEdgeFade } from "@/components/docs-scroll-edge-fade"
 import { CodeInline, Section } from "@/components/component-layout"
@@ -45,7 +46,8 @@ export default function McpDocsPage() {
 
       <SiteHeader />
 
-      <main className="max-w-3xl mx-auto pt-32 pb-32 px-6 sm:px-8 relative z-10">
+      <main className={`${landingGutterClass} relative z-10 pt-32 pb-32`}>
+        <div className="w-full max-w-3xl">
         {/* ── Hero (match /docs) ── */}
         <div className="mb-12">
           <h1 className="inline-block text-3xl font-semibold leading-[1.05] tracking-[-0.04em] text-zinc-900 dark:text-white sm:text-4xl">
@@ -91,6 +93,7 @@ export default function McpDocsPage() {
               <li className="font-mono text-[13px] sm:text-sm">"Add the sticky scroll cards"</li>
             </ul>
           </Section>
+        </div>
         </div>
       </main>
     </div>
