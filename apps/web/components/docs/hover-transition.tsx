@@ -1,9 +1,7 @@
 import React from "react";
 import { DocsPageLayout } from "@/components/docs-page-layout";
-import {
-  HoverTransitionPersonalizePanel,
-  HoverTransitionPlayground,
-} from "@/components/docs/previews/hover-transition-playground";
+import { HoverTransitionPlayground } from "@/components/docs/previews/hover-transition-playground";
+import { LiveCodeBlock } from "@/components/live-code-block";
 import { readComponentSource } from "@/lib/source-code";
 
 const usageCode = `"use client"
@@ -66,13 +64,12 @@ export async function HoverTransitionDocs() {
       title="Hover Transition"
       description="A flexible hover wrapper with eight polished transitions, per-card direction and color controls, custom default and hover content, adjustable timing, and a built-in fallback card."
       preview={<HoverTransitionPlayground />}
-      personalizeContent={<HoverTransitionPersonalizePanel />}
       previewCode=""
       installPackageName="hover-transition"
       installDependencies="clsx tailwind-merge"
       installSourceCode={sourceCode}
       installSourceFilename="components/ui/hover-transition.tsx"
-      usageCode={usageCode}
+      usageCode={<LiveCodeBlock defaultCode={usageCode} />}
       fullWidthPreview
       unstyledPreview
       props={[

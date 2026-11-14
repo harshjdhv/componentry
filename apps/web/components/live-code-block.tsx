@@ -19,8 +19,9 @@ export function LiveCodeBlock({ defaultCode, lang = "tsx" }: LiveCodeBlockProps)
 
     useEffect(() => {
         setIsMounted(true);
-        // Initialize store with default if empty
-        usePlaygroundStore.getState().setCode(spacedDefault);
+        // Seed the default only if a playground hasn't already pushed generated code.
+        const store = usePlaygroundStore.getState();
+        if (!store.code) store.setCode(spacedDefault);
     }, [spacedDefault]);
 
     useEffect(() => {
@@ -47,8 +48,12 @@ export function LiveCodeBlock({ defaultCode, lang = "tsx" }: LiveCodeBlockProps)
                 console.error("Failed to fetch highlighted code", e);
             }
         };
-        fetchHtml();
-        return () => { active = false; };
+        // Wait for the code to settle so dragging a slider doesn't highlight every step.
+        const timer = setTimeout(fetchHtml, 150);
+        return () => {
+            active = false;
+            clearTimeout(timer);
+        };
     }, [displayCode, lang]);
 
     if (!isMounted) {

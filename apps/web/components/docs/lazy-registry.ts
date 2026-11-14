@@ -10,6 +10,10 @@ const docsImportMap: Record<
     | { [key: string]: React.ComponentType<Record<string, unknown>> }
   >
 > = {
+  "heatmap-logo": () =>
+    import("@/components/docs/heatmap-logo").then((m) => ({
+      default: m.HeatmapLogoDocs,
+    })),
   "lens-clock": () =>
     import("@/components/docs/lens-clock").then((m) => ({
       default: m.LensClockDocs,

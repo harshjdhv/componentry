@@ -1,33 +1,35 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useState } from "react";
+import { useDialKitController } from "dialkit";
 import HeroGeometric from "@workspace/ui/components/hero-geometric";
-import { cn } from "@/lib/utils";
 import {
-  HERO_GEOMETRIC_DEFAULT_CONFIG,
-  type HeroGeometricConfig,
-  usePlaygroundStore,
-} from "@/hooks/use-playground-store";
-import {
-  PlaygroundSectionTitle,
-  PlaygroundInput,
-  PlaygroundTextArea,
-  PlaygroundSlider,
-  PlaygroundColorPicker,
-} from "@/components/playground-primitives";
+  DocsPlayground,
+  gradientSwatch,
+  useLiveCode,
+  jsxProp,
+} from "@/components/docs-playground";
 
-const PRESETS: Array<{ name: string; config: HeroGeometricConfig }> = [
-  {
-    name: "Default",
-    config: HERO_GEOMETRIC_DEFAULT_CONFIG,
-  },
+const defaults = {
+  title1: "Elevate",
+  title2: "Your Brand",
+  description:
+    "Scale your product with clarity, precision, and motion-led design.",
+  color1: "#3B82F6",
+  color2: "#F0F9FF",
+  speed: 1,
+};
+type Config = typeof defaults;
+
+const presets: Array<{ name: string; config: Config }> = [
+  { name: "Default", config: defaults },
   {
     name: "Editorial",
     config: {
-      ...HERO_GEOMETRIC_DEFAULT_CONFIG,
       title1: "Shape",
       title2: "Authority",
-      description: "High-contrast geometry with restrained motion and premium editorial rhythm.",
+      description:
+        "High-contrast geometry with restrained motion and premium editorial rhythm.",
       color1: "#0f172a",
       color2: "#e2e8f0",
       speed: 0.8,
@@ -36,10 +38,10 @@ const PRESETS: Array<{ name: string; config: HeroGeometricConfig }> = [
   {
     name: "Warm",
     config: {
-      ...HERO_GEOMETRIC_DEFAULT_CONFIG,
       title1: "Human",
       title2: "Energy",
-      description: "A warm palette with crisp typography for product launches and storytelling pages.",
+      description:
+        "A warm palette with crisp typography for product launches and storytelling pages.",
       color1: "#ea580c",
       color2: "#fff7ed",
       speed: 1,
@@ -48,10 +50,10 @@ const PRESETS: Array<{ name: string; config: HeroGeometricConfig }> = [
   {
     name: "Ice",
     config: {
-      ...HERO_GEOMETRIC_DEFAULT_CONFIG,
       title1: "Glacial",
       title2: "Precision",
-      description: "Cool chroma gradients and subtle turbulence built for enterprise-first visual systems.",
+      description:
+        "Cool chroma gradients and subtle turbulence built for enterprise-first visual systems.",
       color1: "#0c4a6e",
       color2: "#ecfeff",
       speed: 1.25,
@@ -60,10 +62,10 @@ const PRESETS: Array<{ name: string; config: HeroGeometricConfig }> = [
   {
     name: "Kinetic",
     config: {
-      ...HERO_GEOMETRIC_DEFAULT_CONFIG,
       title1: "Motion",
       title2: "Driven",
-      description: "Turn up energy with faster shader flow while preserving legibility and hierarchy.",
+      description:
+        "Turn up energy with faster shader flow while preserving legibility and hierarchy.",
       color1: "#1d4ed8",
       color2: "#dbeafe",
       speed: 2,
@@ -71,192 +73,86 @@ const PRESETS: Array<{ name: string; config: HeroGeometricConfig }> = [
   },
 ];
 
+const PRESETS = presets.map(({ name, config }) => ({
+  name,
+  swatch: gradientSwatch([config.color1, config.color2]),
+}));
 
+const controls = {
+  title1: {
+    type: "text" as const,
+    default: defaults.title1,
+    placeholder: "Primary headline",
+  },
+  title2: {
+    type: "text" as const,
+    default: defaults.title2,
+    placeholder: "Secondary headline",
+  },
+  description: {
+    type: "text" as const,
+    default: defaults.description,
+    placeholder: "Narrative subheadline",
+  },
+  color1: { type: "color" as const, default: defaults.color1 },
+  color2: { type: "color" as const, default: defaults.color2 },
+  speed: [defaults.speed, 0.2, 3, 0.1] as [number, number, number, number],
+};
 
-function generateCode(config: HeroGeometricConfig) {
+function generateCode(config: Config) {
   const props = Object.entries(config)
-    .filter(([, value]) => value !== undefined && value !== null)
-    .map(([key, value]) => {
-      if (key === "title1" || key === "title2" || key === "description" || key.startsWith("color")) {
-        return `${key}="${value}"`;
-      }
-
-      return `${key}={${value}}`;
-    })
+    .map(([key, value]) =>
+      jsxProp(key, value),
+    )
     .join("\n    ");
 
   return `<HeroGeometric \n    ${props}\n/>`;
 }
 
+const sameColor = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
+
 export function HeroGeometricPlayground() {
-  const config = usePlaygroundStore((state) => state.heroGeometricConfig);
-  const renderVersion = usePlaygroundStore((state) => state.heroGeometricRenderVersion);
+  const dial = useDialKitController("Hero Geometric", controls, {
+    id: "hero-geometric",
+  });
+  const config: Config = { ...defaults, ...dial.values };
+  // Replays the entrance animation when a preset is picked.
+  const [renderVersion, setRenderVersion] = useState(0);
 
-  useEffect(() => {
-    const code = generateCode(config);
-    const timeoutId = setTimeout(() => {
-      usePlaygroundStore.getState().setCode(code);
-    }, 250);
+  const preset =
+    presets.find(
+      ({ config: p }) =>
+        p.title1 === config.title1 &&
+        p.title2 === config.title2 &&
+        p.description === config.description &&
+        sameColor(p.color1, config.color1) &&
+        sameColor(p.color2, config.color2) &&
+        p.speed === config.speed,
+    )?.name ?? null;
 
-    return () => clearTimeout(timeoutId);
-  }, [config]);
-
-  return (
-    <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-background">
-      <div className="relative h-full w-full overflow-hidden rounded-none">
-        <HeroGeometric
-          key={renderVersion}
-          {...config}
-          className="h-full w-full !min-h-full"
-          style={{ minHeight: "100%" }}
-        />
-      </div>
-    </div>
-  );
-}
-
-export function HeroGeometricPersonalizePanel() {
-  const config = usePlaygroundStore((state) => state.heroGeometricConfig);
-  const activePreset = usePlaygroundStore((state) => state.activeHeroGeometricPreset);
-  const setConfig = usePlaygroundStore((state) => state.setHeroGeometricConfig);
-  const setActivePreset = usePlaygroundStore((state) => state.setActiveHeroGeometricPreset);
-  const updateConfig = usePlaygroundStore((state) => state.updateHeroGeometricConfig);
-  const resetPreview = usePlaygroundStore((state) => state.resetHeroGeometricPreview);
-  const resetConfig = usePlaygroundStore((state) => state.resetHeroGeometricConfig);
-
-  const selectedPresetConfig = useMemo(
-    () => PRESETS.find((preset) => preset.name === activePreset)?.config,
-    [activePreset],
-  );
-
-  const handleChange = (key: keyof HeroGeometricConfig, value: string | number) => {
-    updateConfig({ [key]: value } as Partial<HeroGeometricConfig>);
-
-    if (activePreset === "Custom") {
-      return;
-    }
-
-    const matchedPreset = PRESETS.find(
-      (preset) => JSON.stringify(preset.config) === JSON.stringify({ ...config, [key]: value }),
-    );
-    setActivePreset(matchedPreset?.name ?? "Custom");
-  };
-
-  const handlePresetChange = (presetName: string) => {
-    const preset = PRESETS.find((item) => item.name === presetName);
-    if (!preset) {
-      return;
-    }
-
-    setConfig({ ...preset.config });
-    setActivePreset(presetName);
-    resetPreview();
-  };
+  useLiveCode(generateCode(config));
 
   return (
-    <div className="h-full overflow-auto bg-[#f3f4f6] dark:bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="space-y-6 px-4 pb-10 pt-20">
-        <header className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tighter text-foreground">Personalize</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground/90">
-            Shape your premium hero with custom typography, palette, and shader tempo.
-          </p>
-        </header>
-
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground/90">
-            Current preset: <span className="font-mono text-foreground">{activePreset}</span>
-          </div>
-          <button
-            type="button"
-            onClick={resetConfig}
-            className="rounded-md border border-border/40 bg-white/50 px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground dark:bg-white/[0.03]"
-          >
-            Reset
-          </button>
-        </div>
-
-        <div>
-          <PlaygroundSectionTitle>Presets</PlaygroundSectionTitle>
-          <div className="grid grid-cols-5 gap-1.5">
-            {PRESETS.map((preset) => {
-              const isActive =
-                activePreset === preset.name ||
-                (activePreset !== "Custom" && selectedPresetConfig && preset.name === activePreset);
-
-              return (
-                <button
-                  key={preset.name}
-                  type="button"
-                  onClick={() => handlePresetChange(preset.name)}
-                  className={cn(
-                    "rounded-md border p-1.5 text-center transition-colors",
-                    isActive
-                      ? "border-zinc-500/70 bg-zinc-100 dark:border-zinc-500/80 dark:bg-zinc-900/70"
-                      : "border-border/70 bg-transparent",
-                  )}
-                >
-                  <div
-                    className="mb-1.5 h-4 rounded-sm border border-white/20"
-                    style={{
-                      background: `linear-gradient(125deg, ${preset.config.color1} 0%, ${preset.config.color2} 100%)`,
-                    }}
-                  />
-                  <span className="block truncate text-[10px] font-mono uppercase tracking-widest text-foreground/90">
-                    {preset.name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div>
-          <PlaygroundSectionTitle>Typography</PlaygroundSectionTitle>
-          <div className="grid grid-cols-2 gap-2.5">
-            <PlaygroundInput
-              value={config.title1}
-              onChange={(e) => handleChange("title1", e.target.value)}
-              placeholder="Primary headline"
-            />
-            <PlaygroundInput
-              value={config.title2}
-              onChange={(e) => handleChange("title2", e.target.value)}
-              placeholder="Secondary headline"
-            />
-          </div>
-          <div className="mt-2.5">
-            <PlaygroundTextArea
-              value={config.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              placeholder="Narrative subheadline"
-            />
-          </div>
-        </div>
-
-        <div>
-          <PlaygroundSectionTitle>Palette</PlaygroundSectionTitle>
-          <div className="grid grid-cols-2 gap-2.5">
-            <PlaygroundColorPicker label="Primary" value={config.color1} onChange={(v) => handleChange("color1", v)} />
-            <PlaygroundColorPicker label="Secondary" value={config.color2} onChange={(v) => handleChange("color2", v)} />
-          </div>
-        </div>
-
-        <div>
-          <PlaygroundSectionTitle>Motion</PlaygroundSectionTitle>
-          <div className="grid grid-cols-1 gap-3">
-            <PlaygroundSlider
-              label="Speed"
-              min={0.2}
-              max={3}
-              step={0.1}
-              value={config.speed}
-              onChange={(v) => handleChange("speed", v)}
-              unit="x"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <DocsPlayground
+      presets={PRESETS}
+      preset={preset}
+      presetsLabel="Preset"
+      minWidth={280}
+      onPresetChange={(name) => {
+        const next = presets.find((p) => p.name === name)?.config;
+        if (next) {
+          dial.setValues({ ...next });
+          setRenderVersion((v) => v + 1);
+        }
+      }}
+      className="overflow-hidden bg-[#f3f4f6] dark:bg-background"
+    >
+      <HeroGeometric
+        key={renderVersion}
+        {...config}
+        className="h-full w-full !min-h-full"
+        style={{ minHeight: "100%" }}
+      />
+    </DocsPlayground>
   );
 }

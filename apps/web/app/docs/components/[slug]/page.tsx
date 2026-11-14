@@ -127,8 +127,8 @@ function DocsPageSkeleton() {
             </div>
 
             {/* Right Column: Sticky Preview Skeleton */}
-            <div className="order-first z-10 flex aspect-[4/5] w-full max-h-[75svh] flex-col bg-white dark:bg-[#121212] lg:sticky lg:top-0 lg:order-last lg:aspect-auto lg:h-full lg:max-h-none lg:w-1/2 lg:max-w-[50%] lg:flex-1 lg:basis-1/2">
-                <div className="relative h-full w-full overflow-hidden bg-white p-3 dark:bg-[#121212] lg:p-0 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5">
+            <div className="order-first z-10 flex aspect-[4/5] w-full max-h-[75svh] flex-col bg-white dark:bg-background lg:sticky lg:top-0 lg:order-last lg:aspect-auto lg:h-full lg:max-h-none lg:w-1/2 lg:max-w-[50%] lg:flex-1 lg:basis-1/2">
+                <div className="relative h-full w-full overflow-hidden bg-white p-3 dark:bg-background lg:p-0 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5">
                     <div className="w-full h-full bg-[#f7f7f7] dark:bg-zinc-800/20 rounded-xl border border-zinc-200 dark:border-zinc-800 animate-pulse" />
                 </div>
             </div>

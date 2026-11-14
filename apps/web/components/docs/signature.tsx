@@ -4,10 +4,7 @@ import { readComponentSource } from "@/lib/source-code"
 import { LiveCodeBlock } from "@/components/live-code-block"
 import { Download } from "lucide-react"
 
-import {
-  SignaturePlayground,
-  SignaturePersonalizePanel,
-} from "@/components/docs/previews/signature-playground"
+import { SignaturePlayground } from "@/components/docs/previews/signature-playground"
 
 const defaultCode = `import { Signature } from "@/components/ui/signature"
 
@@ -39,7 +36,6 @@ export async function SignatureDocs() {
       description="An animated SVG signature effect using Opentype.js and Framer Motion to draw out text as if hand-written."
       
       preview={<SignaturePlayground />}
-      personalizeContent={<SignaturePersonalizePanel />}
       previewCode=""
       
       installPackageName="signature"

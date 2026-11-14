@@ -1,38 +1,36 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useState } from "react";
+import { useDialKitController } from "dialkit";
 import { Signature } from "@workspace/ui/components/signature";
-import { cn } from "@/lib/utils";
 import {
-  SIGNATURE_DEFAULT_CONFIG,
-  type SignatureConfig,
-  usePlaygroundStore,
-} from "@/hooks/use-playground-store";
-import {
-  PlaygroundSectionTitle,
-  PlaygroundInput,
-  PlaygroundSlider,
-  PlaygroundColorPicker,
-} from "@/components/playground-primitives";
+  DocsPlayground,
+  gradientSwatch,
+  useLiveCode,
+  jsxProp,
+} from "@/components/docs-playground";
 
-const PRESETS: Array<{ name: string; config: SignatureConfig }> = [
-  {
-    name: "Default",
-    config: SIGNATURE_DEFAULT_CONFIG,
-  },
+/** An empty color draws in currentColor, so it follows the theme. */
+const defaults = {
+  text: "Componentry",
+  color: "",
+  fontSize: 48,
+  duration: 1.5,
+};
+type Config = typeof defaults;
+
+const presets: Array<{ name: string; swatch: string; config: Config }> = [
+  { name: "Default", swatch: "currentColor", config: defaults },
   {
     name: "John Doe",
-    config: {
-      ...SIGNATURE_DEFAULT_CONFIG,
-      text: "John Doe",
-      color: "#3b82f6",
-      duration: 2,
-    },
+    swatch: gradientSwatch(["#3b82f6"]),
+    config: { ...defaults, text: "John Doe", color: "#3b82f6", duration: 2 },
   },
   {
     name: "Autograph",
+    swatch: gradientSwatch(["#ec4899"]),
     config: {
-      ...SIGNATURE_DEFAULT_CONFIG,
+      ...defaults,
       text: "Jane Smith",
       color: "#ec4899",
       duration: 1.2,
@@ -41,45 +39,68 @@ const PRESETS: Array<{ name: string; config: SignatureConfig }> = [
   },
 ];
 
+const PRESETS = presets.map(({ name, swatch }) => ({ name, swatch }));
 
+type Slider = [number, number, number, number];
+const controls = {
+  text: { type: "text" as const, default: defaults.text, placeholder: "Text to trace" },
+  color: { type: "color" as const, default: defaults.color },
+  fontSize: [defaults.fontSize, 16, 120, 1] as Slider,
+  duration: [defaults.duration, 0.5, 10, 0.1] as Slider,
+  replay: { type: "action" as const, label: "Replay" },
+};
 
-function generateCode(config: SignatureConfig) {
+function code(config: Config) {
   const props = Object.entries(config)
-    .filter(([key, value]) => {
-      if (value === undefined || value === null) return false;
-      if (key === "color" && value === "") return false;
-      return true;
-    })
-    .map(([key, value]) => {
-      if (typeof value === "string") {
-        return `${key}="${value}"`;
-      }
-      return `${key}={${value}}`;
-    })
+    .filter(([key, value]) => !(key === "color" && value === ""))
+    .map(([key, value]) =>
+      jsxProp(key, value),
+    )
     .join("\n  ");
 
   return `import { Signature } from "@/components/ui/signature"\n\n<Signature\n  ${props}\n/>`;
 }
 
-import { useTheme } from "next-themes";
-
 export function SignaturePlayground() {
-  const config = usePlaygroundStore((state) => state.signatureConfig);
-  const renderVersion = usePlaygroundStore(
-    (state) => state.signatureRenderVersion,
-  );
+  // Bumped to remount the signature so its one-shot trace plays again.
+  const [renderVersion, setRenderVersion] = useState(0);
+  const replay = () => setRenderVersion((version) => version + 1);
 
-  useEffect(() => {
-    const code = generateCode(config);
-    const timeoutId = setTimeout(() => {
-      usePlaygroundStore.getState().setCode(code);
-    }, 250);
+  const dial = useDialKitController("Signature", controls, {
+    id: "signature",
+    onAction: (action) => {
+      if (action === "replay") replay();
+    },
+  });
+  const { text, color, fontSize, duration } = { ...defaults, ...dial.values };
+  const config: Config = { text, color, fontSize, duration };
 
-    return () => clearTimeout(timeoutId);
-  }, [config]);
+  const preset =
+    presets.find(
+      ({ config: p }) =>
+        p.text === config.text &&
+        p.color.toLowerCase() === config.color.toLowerCase() &&
+        p.fontSize === config.fontSize &&
+        p.duration === config.duration,
+    )?.name ?? null;
+
+  useLiveCode(code(config));
 
   return (
-    <div className="relative h-full w-full flex items-center justify-center p-8">
+    <DocsPlayground
+      presets={PRESETS}
+      preset={preset}
+      presetsLabel="Preset"
+      minWidth={280}
+      onPresetChange={(name) => {
+        const next = presets.find((p) => p.name === name)?.config;
+        if (next) {
+          dial.setValues(next);
+          replay();
+        }
+      }}
+      className="flex items-center justify-center p-8"
+    >
       <Signature
         key={renderVersion}
         text={config.text}
@@ -87,167 +108,6 @@ export function SignaturePlayground() {
         fontSize={config.fontSize}
         duration={config.duration}
       />
-    </div>
-  );
-}
-
-export function SignaturePersonalizePanel() {
-  const { resolvedTheme } = useTheme();
-
-  const config = usePlaygroundStore((state) => state.signatureConfig);
-  const activePreset = usePlaygroundStore(
-    (state) => state.activeSignaturePreset,
-  );
-  const setConfig = usePlaygroundStore((state) => state.setSignatureConfig);
-  const setActivePreset = usePlaygroundStore(
-    (state) => state.setActiveSignaturePreset,
-  );
-  const updateConfig = usePlaygroundStore(
-    (state) => state.updateSignatureConfig,
-  );
-  const resetPreview = usePlaygroundStore(
-    (state) => state.resetSignaturePreview,
-  );
-  const resetConfig = usePlaygroundStore((state) => state.resetSignatureConfig);
-
-  const selectedPresetConfig = useMemo(
-    () => PRESETS.find((preset) => preset.name === activePreset)?.config,
-    [activePreset],
-  );
-
-  // Compute the default hex visual color to show when the custom color is empty/dynamic
-  const pickerDefaultColor = resolvedTheme === "dark" ? "#ffffff" : "#000000";
-
-  const handleChange = (key: keyof SignatureConfig, value: string | number) => {
-    updateConfig({ [key]: value } as Partial<SignatureConfig>);
-
-    if (activePreset === "Custom") {
-      return;
-    }
-
-    const matchedPreset = PRESETS.find(
-      (preset) =>
-        JSON.stringify(preset.config) ===
-        JSON.stringify({ ...config, [key]: value }),
-    );
-    setActivePreset(matchedPreset?.name ?? "Custom");
-  };
-
-  const handlePresetChange = (presetName: string) => {
-    const preset = PRESETS.find((item) => item.name === presetName);
-    if (!preset) {
-      return;
-    }
-
-    setConfig({ ...preset.config });
-    setActivePreset(presetName);
-    resetPreview();
-  };
-
-  return (
-    <div className="h-full overflow-auto bg-[#f3f4f6] dark:bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="space-y-6 px-4 pb-10 pt-20">
-        <header className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tighter text-foreground">
-            Personalize
-          </h2>
-          <p className="text-sm leading-relaxed text-muted-foreground/90">
-            Customize the signature text, size, color, and trace speed.
-          </p>
-        </header>
-
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground/90">
-            Current preset:{" "}
-            <span className="font-mono text-foreground">{activePreset}</span>
-          </div>
-          <button
-            type="button"
-            onClick={resetConfig}
-            className="rounded-md border border-border/40 bg-white/50 px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground dark:bg-white/[0.03]"
-          >
-            Reset
-          </button>
-        </div>
-
-        <div>
-          <PlaygroundSectionTitle>Presets</PlaygroundSectionTitle>
-          <div className="grid grid-cols-3 gap-1.5">
-            {PRESETS.map((preset) => {
-              const isActive =
-                activePreset === preset.name ||
-                (activePreset !== "Custom" &&
-                  selectedPresetConfig &&
-                  preset.name === activePreset);
-
-              return (
-                <button
-                  key={preset.name}
-                  type="button"
-                  onClick={() => handlePresetChange(preset.name)}
-                  className={cn(
-                    "rounded-md border p-1.5 text-center transition-colors",
-                    isActive
-                      ? "border-zinc-500/70 bg-zinc-100 dark:border-zinc-500/80 dark:bg-zinc-900/70"
-                      : "border-border/70 bg-transparent",
-                  )}
-                >
-                  <span className="block truncate text-[10px] font-mono uppercase tracking-widest text-foreground/90">
-                    {preset.name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div>
-          <PlaygroundSectionTitle>Content</PlaygroundSectionTitle>
-          <div className="grid grid-cols-1 gap-2.5">
-            <PlaygroundInput
-              value={config.text}
-              onChange={(e) => handleChange("text", e.target.value)}
-              placeholder="Text to trace"
-            />
-          </div>
-        </div>
-
-        <div>
-          <PlaygroundSectionTitle>Styling</PlaygroundSectionTitle>
-          <div className="grid grid-cols-1 gap-2.5">
-            <PlaygroundColorPicker
-              label="Color"
-              value={config.color}
-              defaultColor={pickerDefaultColor}
-              onChange={(v) => handleChange("color", v)}
-            />
-          </div>
-        </div>
-
-        <div>
-          <PlaygroundSectionTitle>Parameters</PlaygroundSectionTitle>
-          <div className="grid grid-cols-1 gap-3">
-            <PlaygroundSlider
-              label="Font Size"
-              min={16}
-              max={120}
-              step={1}
-              value={config.fontSize}
-              onChange={(v) => handleChange("fontSize", v)}
-              unit="px"
-            />
-            <PlaygroundSlider
-              label="Duration"
-              min={0.5}
-              max={10}
-              step={0.1}
-              value={config.duration}
-              onChange={(v) => handleChange("duration", v)}
-              unit="s"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    </DocsPlayground>
   );
 }

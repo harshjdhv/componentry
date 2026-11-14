@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { create } from "zustand";
+import { useEffect, useState } from "react";
+import { useDialKitController } from "dialkit";
 import {
   HoverTransition,
   hoverTransitionDirections,
@@ -9,13 +9,7 @@ import {
   type HoverTransitionDirection,
   type HoverTransitionEffect,
 } from "@workspace/ui/components/hover-transition";
-import { usePlaygroundStore } from "@/hooks/use-playground-store";
-import {
-  PlaygroundColorPicker,
-  PlaygroundSectionTitle,
-  PlaygroundSlider,
-} from "@/components/playground-primitives";
-import { cn } from "@/lib/utils";
+import { DocsPlayground, useLiveCode } from "@/components/docs-playground";
 
 const PEOPLE = [
   {
@@ -93,73 +87,52 @@ interface CardConfig {
   color: string;
 }
 
-interface HoverTransitionConfig {
-  selectedCard: PersonId;
-  cards: Record<PersonId, CardConfig>;
-  duration: number;
-  easing: EasingName;
-}
-
-const DEFAULT_CONFIG: HoverTransitionConfig = {
-  selectedCard: "tom",
-  cards: {
-    tom: { effect: "morph", direction: "center", color: "#dfff5f" },
-    andrew: {
-      effect: "diagonal",
-      direction: "top-left",
-      color: "#ff795f",
-    },
-    james: { effect: "strips", direction: "bottom", color: "#7c8cff" },
-    marlen: { effect: "ripple", direction: "center", color: "#ff9bcb" },
-    sophie: { effect: "curtain", direction: "top", color: "#56d6b0" },
-    daniel: { effect: "slide", direction: "left", color: "#ffc857" },
-    amina: {
-      effect: "wipe",
-      direction: "bottom-right",
-      color: "#bba7ff",
-    },
-    liam: {
-      effect: "parallax",
-      direction: "top-right",
-      color: "#62d6e8",
-    },
-  },
-  duration: 0.72,
-  easing: "smooth",
+const DEFAULT_CARDS: Record<PersonId, CardConfig> = {
+  tom: { effect: "morph", direction: "center", color: "#dfff5f" },
+  andrew: { effect: "diagonal", direction: "top-left", color: "#ff795f" },
+  james: { effect: "strips", direction: "bottom", color: "#7c8cff" },
+  marlen: { effect: "ripple", direction: "center", color: "#ff9bcb" },
+  sophie: { effect: "curtain", direction: "top", color: "#56d6b0" },
+  daniel: { effect: "slide", direction: "left", color: "#ffc857" },
+  amina: { effect: "wipe", direction: "bottom-right", color: "#bba7ff" },
+  liam: { effect: "parallax", direction: "top-right", color: "#62d6e8" },
 };
 
-interface HoverTransitionStore {
-  config: HoverTransitionConfig;
-  selectCard: (id: PersonId) => void;
-  updateCard: (id: PersonId, updates: Partial<CardConfig>) => void;
-  updateTiming: (
-    updates: Partial<Pick<HoverTransitionConfig, "duration" | "easing">>,
-  ) => void;
-  resetConfig: () => void;
-}
+/**
+ * DialKit holds the selected card's settings; the other cards keep theirs in
+ * local state. Picking a card (in the select or by clicking it) swaps them.
+ */
+const controls = {
+  card: {
+    type: "select" as const,
+    options: PEOPLE.map((person) => ({ value: person.id, label: person.name })),
+    default: "tom",
+  },
+  color: { type: "color" as const, default: DEFAULT_CARDS.tom.color },
+  effect: {
+    type: "select" as const,
+    options: [...hoverTransitionEffects],
+    default: DEFAULT_CARDS.tom.effect,
+  },
+  direction: {
+    type: "select" as const,
+    options: [...hoverTransitionDirections],
+    default: DEFAULT_CARDS.tom.direction,
+  },
+  duration: [0.72, 0.15, 1.8, 0.05] as [number, number, number, number],
+  easing: {
+    type: "select" as const,
+    options: Object.keys(EASINGS),
+    default: "smooth",
+  },
+};
 
-const useHoverTransitionStore = create<HoverTransitionStore>((set) => ({
-  config: DEFAULT_CONFIG,
-  selectCard: (selectedCard) =>
-    set((state) => ({ config: { ...state.config, selectedCard } })),
-  updateCard: (id, updates) =>
-    set((state) => ({
-      config: {
-        ...state.config,
-        cards: {
-          ...state.config.cards,
-          [id]: { ...state.config.cards[id], ...updates },
-        },
-      },
-    })),
-  updateTiming: (updates) =>
-    set((state) => ({ config: { ...state.config, ...updates } })),
-  resetConfig: () => set({ config: DEFAULT_CONFIG }),
-}));
-
-function generateCode(config: HoverTransitionConfig) {
-  const card = config.cards[config.selectedCard];
-  const person = PEOPLE.find((item) => item.id === config.selectedCard)!;
+function generateCode(
+  selectedCard: PersonId,
+  card: CardConfig,
+  timing: { duration: number; easing: EasingName },
+) {
+  const person = PEOPLE.find((item) => item.id === selectedCard)!;
   const initials = person.name
     .split(" ")
     .map((part) => part[0])
@@ -207,8 +180,8 @@ export default function HoverTransitionDemo() {
     <HoverTransition
       effect="${card.effect}"
       direction="${card.direction}"
-      duration={${config.duration}}
-      easing="${EASINGS[config.easing]}"
+      duration={${timing.duration}}
+      easing="${EASINGS[timing.easing]}"
       defaultComponent={<DefaultCard />}
       hoverComponent={<HoverCard />}
       className="aspect-[4/5] w-full max-w-sm rounded-3xl"
@@ -285,34 +258,57 @@ function PersonDetails({
   );
 }
 
+
 export function HoverTransitionPlayground() {
-  const config = useHoverTransitionStore((state) => state.config);
-  const selectCard = useHoverTransitionStore((state) => state.selectCard);
+  const dial = useDialKitController("Hover Transition", controls, {
+    id: "hover-transition",
+  });
+  const values = dial.values;
+  const selected = values.card as PersonId;
+  const effect = values.effect as HoverTransitionEffect;
+  const direction = values.direction as HoverTransitionDirection;
+  const color = values.color;
+  const timing = {
+    duration: values.duration,
+    easing: values.easing as EasingName,
+  };
+
+  const [cards, setCards] = useState(DEFAULT_CARDS);
+  // The card whose settings DialKit currently holds.
+  const [syncedCard, setSyncedCard] = useState<PersonId>(selected);
+  const live: CardConfig = { effect, direction, color };
+  const shown = { ...cards, [syncedCard]: live };
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      usePlaygroundStore.getState().setCode(generateCode(config));
-    }, 150);
-    return () => window.clearTimeout(timeout);
-  }, [config]);
+    if (selected === syncedCard) return;
+    // Save the outgoing card's settings, then load the new card's into DialKit.
+    setCards((prev) => ({
+      ...prev,
+      [syncedCard]: { effect, direction, color },
+    }));
+    setSyncedCard(selected);
+    dial.setValues(cards[selected]);
+  }, [selected, syncedCard, effect, direction, color, cards, dial]);
+
+  useLiveCode(generateCode(syncedCard, live, timing));
 
   return (
-    <div className="flex h-full min-h-[520px] w-full items-center overflow-hidden py-8 [container-type:size] sm:py-12">
+    <DocsPlayground className="flex min-h-[520px] items-center overflow-hidden py-8 [container-type:size] sm:py-12">
       <div
         className="flex w-full snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain scroll-smooth px-4 py-2 [scroll-padding-inline:1rem] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-4 sm:px-6 sm:[scroll-padding-inline:1.5rem] lg:px-8 lg:[scroll-padding-inline:2rem]"
         aria-label="Team hover transitions"
       >
         {PEOPLE.map((person) => {
-          const card = config.cards[person.id];
+          const card = shown[person.id];
           return (
             <HoverTransition
               key={person.id}
               effect={card.effect}
               direction={card.direction}
-              duration={config.duration}
-              easing={EASINGS[config.easing]}
+              duration={timing.duration}
+              easing={EASINGS[timing.easing]}
               label={`${person.name}, ${person.role}`}
-              onClick={() => selectCard(person.id)}
+              onClick={() => dial.setValues({ card: person.id })}
               defaultComponent={
                 <PortraitCard person={person} effect={card.effect} />
               }
@@ -328,176 +324,6 @@ export function HoverTransitionPlayground() {
           );
         })}
       </div>
-    </div>
-  );
-}
-
-function OptionGrid<T extends string>({
-  value,
-  options,
-  onChange,
-  columns = 2,
-}: {
-  value: T;
-  options: readonly T[];
-  onChange: (value: T) => void;
-  columns?: 2 | 3;
-}) {
-  return (
-    <div
-      className={cn(
-        "grid gap-1.5",
-        columns === 3 ? "grid-cols-3" : "grid-cols-2",
-      )}
-    >
-      {options.map((option) => (
-        <button
-          key={option}
-          type="button"
-          onClick={() => onChange(option)}
-          className={cn(
-            "rounded-md border px-2 py-2 text-[11px] font-medium capitalize transition-colors",
-            value === option
-              ? "border-foreground bg-foreground text-background"
-              : "border-border/70 text-muted-foreground hover:text-foreground",
-          )}
-        >
-          {option.replace("-", " ")}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-export function HoverTransitionPersonalizePanel() {
-  const config = useHoverTransitionStore((state) => state.config);
-  const selectCard = useHoverTransitionStore((state) => state.selectCard);
-  const updateCard = useHoverTransitionStore((state) => state.updateCard);
-  const updateTiming = useHoverTransitionStore((state) => state.updateTiming);
-  const resetConfig = useHoverTransitionStore((state) => state.resetConfig);
-  const selectedPerson = PEOPLE.find(
-    (person) => person.id === config.selectedCard,
-  )!;
-  const selectedCard = config.cards[config.selectedCard];
-
-  return (
-    <div className="h-full overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="space-y-6 px-4 pb-10 pt-20">
-        <header className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tighter text-foreground">
-            Personalize
-          </h2>
-          <p className="text-sm leading-relaxed text-muted-foreground/90">
-            Select a card, then shape its animation and hover color
-            independently.
-          </p>
-        </header>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={resetConfig}
-            className="rounded-md border border-border/40 bg-white/50 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground dark:bg-white/[0.03]"
-          >
-            Reset
-          </button>
-        </div>
-
-        <section>
-          <PlaygroundSectionTitle>Card</PlaygroundSectionTitle>
-          <div className="grid grid-cols-2 gap-1.5">
-            {PEOPLE.map((person) => {
-              const card = config.cards[person.id];
-              const selected = config.selectedCard === person.id;
-              return (
-                <button
-                  key={person.id}
-                  type="button"
-                  onClick={() => selectCard(person.id)}
-                  className={cn(
-                    "flex min-w-0 items-center gap-2 rounded-md border p-2 text-left transition-colors",
-                    selected
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border/70 text-foreground hover:border-foreground/40",
-                  )}
-                >
-                  <span
-                    className="size-3 shrink-0 rounded-full border border-black/10"
-                    style={{ backgroundColor: card.color }}
-                  />
-                  <span className="min-w-0">
-                    <span className="block truncate text-[11px] font-semibold">
-                      {person.name}
-                    </span>
-                    <span
-                      className={cn(
-                        "block truncate font-mono text-[9px] uppercase",
-                        selected
-                          ? "text-background/60"
-                          : "text-muted-foreground",
-                      )}
-                    >
-                      {card.effect}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        <section>
-          <PlaygroundSectionTitle>
-            {selectedPerson.name} · Hover color
-          </PlaygroundSectionTitle>
-          <PlaygroundColorPicker
-            label="Background"
-            value={selectedCard.color}
-            defaultColor="#dfff5f"
-            onChange={(color) => updateCard(config.selectedCard, { color })}
-          />
-        </section>
-
-        <section>
-          <PlaygroundSectionTitle>Effect</PlaygroundSectionTitle>
-          <OptionGrid
-            value={selectedCard.effect}
-            options={hoverTransitionEffects}
-            onChange={(effect) => updateCard(config.selectedCard, { effect })}
-          />
-        </section>
-
-        <section>
-          <PlaygroundSectionTitle>Direction</PlaygroundSectionTitle>
-          <OptionGrid
-            value={selectedCard.direction}
-            options={hoverTransitionDirections}
-            columns={3}
-            onChange={(direction) =>
-              updateCard(config.selectedCard, { direction })
-            }
-          />
-        </section>
-
-        <section className="space-y-3">
-          <PlaygroundSectionTitle>Timing</PlaygroundSectionTitle>
-          <PlaygroundSlider
-            label="Duration"
-            min={0.15}
-            max={1.8}
-            step={0.05}
-            value={config.duration}
-            unit="s"
-            onChange={(duration) => updateTiming({ duration })}
-          />
-          <OptionGrid
-            value={config.easing}
-            options={Object.keys(EASINGS) as EasingName[]}
-            columns={3}
-            onChange={(easing) => updateTiming({ easing })}
-          />
-        </section>
-      </div>
-    </div>
+    </DocsPlayground>
   );
 }

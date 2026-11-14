@@ -1,8 +1,5 @@
 import React from "react"
-import {
-  SplitFlapDisplayPlayground,
-  SplitFlapDisplayPersonalizePanel,
-} from "@/components/docs/previews/split-flap-display-playground"
+import { SplitFlapDisplayPlayground } from "@/components/docs/previews/split-flap-display-playground"
 import { DocsPageLayout } from "@/components/docs-page-layout"
 import { LiveCodeBlock } from "@/components/live-code-block"
 import { readComponentSource } from "@/lib/source-code"
@@ -23,7 +20,6 @@ export async function SplitFlapDisplayDocs() {
       title="Split Flap Display"
       description="A premium split-flap display component inspired by vintage airport departure boards and retro mechanical displays. Features realistic flip animations, staggered character reveals, and configurable indicator strips."
       preview={<SplitFlapDisplayPlayground />}
-      personalizeContent={<SplitFlapDisplayPersonalizePanel />}
       previewCode=""
       installPackageName="split-flap-display"
       installSourceCode={sourceCode}

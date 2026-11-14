@@ -34,6 +34,14 @@ export const featuredComponentSlugs = [
 ] as const;
 
 export const components: Record<string, ComponentMetadata> = {
+  "heatmap-logo": {
+    title: "Heatmap Logo",
+    description:
+      "A logo that glows like hot metal, with heat drifting slowly through the mark.",
+    category: "Visual Effects",
+    slug: "heatmap-logo",
+    addedAt: "2026-10-28",
+  },
   "lens-clock": {
     title: "Lens Clock",
     description:

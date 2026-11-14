@@ -1,8 +1,8 @@
 import React from "react";
 import { DocsPageLayout } from "@/components/docs-page-layout";
+import { LiveCodeBlock } from "@/components/live-code-block";
 import {
   WheelCarouselLandscapePreview,
-  WheelCarouselPersonalizePanel,
   WheelCarouselPreview,
 } from "@/components/docs/previews/wheel-carousel-preview";
 import { readComponentSource } from "@/lib/source-code";
@@ -67,13 +67,12 @@ export async function WheelCarouselDocs() {
       title="Wheel Carousel"
       description="A cinematic, rotating-wheel picker with inertial drag and scroll controls, curved fading labels, and a crossfading image for the active item."
       preview={<WheelCarouselPreview />}
-      personalizeContent={<WheelCarouselPersonalizePanel />}
       previewCode={defaultCode}
       installPackageName="wheel-carousel"
       installDependencies="framer-motion next-themes clsx tailwind-merge"
       installSourceCode={sourceCode}
       installSourceFilename="components/ui/wheel-carousel.tsx"
-      usageCode={usageCode}
+      usageCode={<LiveCodeBlock defaultCode={usageCode} />}
       fullWidthPreview
       examples={[
         {

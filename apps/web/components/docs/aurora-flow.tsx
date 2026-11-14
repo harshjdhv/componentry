@@ -1,9 +1,6 @@
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { LiveCodeBlock } from "@/components/live-code-block";
-import {
-  AuroraFlowPersonalizePanel,
-  AuroraFlowPlayground,
-} from "@/components/docs/previews/aurora-flow-playground";
+import { AuroraFlowPlayground } from "@/components/docs/previews/aurora-flow-playground";
 import { readComponentSource } from "@/lib/source-code";
 
 const basicUsageCode = `import { AuroraFlow } from "@/components/ui/aurora-flow"
@@ -23,7 +20,6 @@ export async function AuroraFlowDocs() {
       title="Aurora Flow"
       description="A procedural atmospheric hero background with layered silk flow, diffused aurora light, subtle interaction, and production-ready presets."
       preview={<AuroraFlowPlayground />}
-      personalizeContent={<AuroraFlowPersonalizePanel />}
       previewCode={basicUsageCode}
       installPackageName="aurora-flow"
       installDependencies="clsx tailwind-merge"

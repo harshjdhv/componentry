@@ -50,7 +50,6 @@ export interface DocsPageLayoutProps {
   unstyledPreview?: boolean
   type?: string
   dependencies?: string[]
-  personalizeContent?: React.ReactNode
   hideDefaultPreviewVariant?: boolean
   installationNote?: React.ReactNode
   usageNote?: React.ReactNode
@@ -76,7 +75,6 @@ export async function DocsPageLayout({
   examples = [],
   props = [],
   fullWidthPreview = false,
-  personalizeContent,
   hideDefaultPreviewVariant = false,
   installationNote,
   usageNote,
@@ -253,7 +251,6 @@ export async function DocsPageLayout({
           {/* Floating Card Container */}
           <DocsPreviewWrapper
             fullWidthPreview={fullWidthPreview}
-            personalizeContent={personalizeContent}
             hideDefaultVariant={hideDefaultPreviewVariant}
             sourceCodeFilename={installSourceCode ? (installSourceFilename || `${installPackageName}.tsx`) : undefined}
             sourceCodeKey={installSourceCode ? installPackageName : undefined}

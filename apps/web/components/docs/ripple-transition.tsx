@@ -1,9 +1,7 @@
 import React from "react";
-import {
-  RippleTransitionPersonalizePanel,
-  RippleTransitionPlayground,
-} from "@/components/docs/previews/ripple-transition-playground";
+import { RippleTransitionPlayground } from "@/components/docs/previews/ripple-transition-playground";
 import { DocsPageLayout } from "@/components/docs-page-layout";
+import { LiveCodeBlock } from "@/components/live-code-block";
 import { readComponentSource } from "@/lib/source-code";
 
 const usageCode = `import { RippleTransition } from "@/components/ui/ripple-transition"
@@ -34,12 +32,11 @@ export async function RippleTransitionDocs() {
       title="Ripple Transition"
       description="A WebGL image transition that sends a noisy refractive wave across nature photos, with chromatic edges, glow, pinch, autoplay, and click-triggered origins."
       preview={<RippleTransitionPlayground />}
-      personalizeContent={<RippleTransitionPersonalizePanel />}
       previewCode=""
       installPackageName="ripple-transition"
       installDependencies="framer-motion clsx tailwind-merge"
       installSourceCode={sourceCode}
-      usageCode={usageCode}
+      usageCode={<LiveCodeBlock defaultCode={usageCode} />}
       fullWidthPreview
       unstyledPreview
       props={[
