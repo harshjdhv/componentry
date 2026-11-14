@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  HeroGeometricPersonalizePanel,
   HeroGeometricPlayground,
 } from "@/components/docs/previews/hero-geometric-playground";
 import { DocsPageLayout } from "@/components/docs-page-layout";
@@ -24,7 +23,6 @@ export async function HeroGeometricDocs() {
       title="Hero Geometric"
       description="A geometric hero section inspired by premium editorial designs, featuring a custom WebGL shader background with Simplex noise for fluid, organic movement and advanced typography."
       preview={<HeroGeometricPlayground />}
-      personalizeContent={<HeroGeometricPersonalizePanel />}
       previewCode=""
       installPackageName="hero-geometric"
       installDependencies="framer-motion @react-three/fiber @react-three/drei three"

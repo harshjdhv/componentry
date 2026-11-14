@@ -3,7 +3,7 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { cn } from "@/lib/utils"
-import { RotateCcw, Search, SlidersHorizontal, Maximize, Minimize, CodeXml, ChevronLeft } from "lucide-react"
+import { RotateCcw, Search, Maximize, Minimize, CodeXml, ChevronLeft } from "lucide-react"
 import { CopyButton } from "@/components/copy-button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { motion, AnimatePresence, useDragControls, type PanInfo } from "framer-motion"
@@ -24,7 +24,6 @@ export interface VariantItem {
 interface DocsPreviewWrapperProps {
   children: React.ReactNode
   fullWidthPreview?: boolean
-  personalizeContent?: React.ReactNode
   sourceCodeFilename?: string
   sourceCodeKey?: string
   variants?: VariantItem[]
@@ -68,14 +67,12 @@ function toPreviewRect(rect: DOMRect | PreviewRect): PreviewRect {
 export function DocsPreviewWrapper({
   children,
   fullWidthPreview,
-  personalizeContent,
   sourceCodeFilename,
   sourceCodeKey,
   variants = [],
   hideDefaultVariant = false,
 }: DocsPreviewWrapperProps) {
   const [key, setKey] = React.useState(0)
-  const [showPersonalize, setShowPersonalize] = React.useState(false)
   const [showSource, setShowSource] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
   const [isExpanded, setIsExpanded] = React.useState(false)
@@ -109,7 +106,6 @@ export function DocsPreviewWrapper({
   }, [])
 
   const handleSourceOpen = React.useCallback(async () => {
-    setShowPersonalize(false)
     if (isExpanded) {
       setIsExpanded(false)
     }
@@ -147,7 +143,6 @@ export function DocsPreviewWrapper({
       const next = !prev
       if (next) {
         setShowSource(false)
-        setShowPersonalize(false)
       }
       return next
     })
@@ -163,7 +158,7 @@ export function DocsPreviewWrapper({
     const onResize = () => cacheSplitPreviewRect()
     window.addEventListener("resize", onResize)
     return () => window.removeEventListener("resize", onResize)
-  }, [isExpanded, cacheSplitPreviewRect, showSource, showPersonalize])
+  }, [isExpanded, cacheSplitPreviewRect, showSource])
 
   React.useEffect(() => {
     const layout = previewRef.current?.closest("[data-docs-layout]")
@@ -255,7 +250,7 @@ export function DocsPreviewWrapper({
       <section
         aria-label="Preview controls"
         className={cn(
-          "z-20 m-3 mb-0 flex shrink-0 self-end select-none lg:fixed lg:right-6 lg:top-6 lg:z-[99] lg:m-0 items-center gap-1 rounded-lg border border-black/[0.06] bg-zinc-100/30 p-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] backdrop-blur-md dark:border-white/[0.05] dark:bg-zinc-950/30 dark:shadow-[0_1px_2px_rgb(0_0_0/0.3)]",
+          "z-20 m-3 mb-0 flex shrink-0 self-end select-none lg:fixed lg:right-6 lg:top-6 lg:z-[99] lg:m-0 items-center gap-1 rounded-lg border border-black/[0.06] bg-[#f1f1f2] p-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] dark:border-white/[0.05] dark:bg-[#131313] dark:shadow-[0_1px_2px_rgb(0_0_0/0.3)]",
           fullWidthPreview ? "absolute right-0 top-0" : "relative"
         )}
       >
@@ -286,25 +281,6 @@ export function DocsPreviewWrapper({
               aria-label="View Source"
             >
               <CodeXml className="size-4" />
-            </button>
-          </PreviewToolbarCell>
-        )}
-
-        {personalizeContent && (
-          <PreviewToolbarCell active={showPersonalize}>
-            <button
-              type="button"
-              onClick={() => {
-                if (isExpanded) {
-                  setIsExpanded(false)
-                }
-                setShowPersonalize(true)
-                setShowSource(false)
-              }}
-              className={previewToolbarIconClass}
-              aria-label="Personalize"
-            >
-              <SlidersHorizontal className="size-4" />
             </button>
           </PreviewToolbarCell>
         )}
@@ -387,56 +363,6 @@ export function DocsPreviewWrapper({
             </TabsList>
           </Tabs>
         </div>
-      )}
-
-      {/* Personalize Drawer Portal */}
-      {mounted && ReactDOM.createPortal(
-        <AnimatePresence>
-          {showPersonalize && personalizeContent && (
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              drag="y"
-              dragConstraints={{ top: 0, bottom: 0 }}
-              dragElastic={{ top: 0, bottom: 0.4 }}
-              onDragEnd={(_: unknown, info: PanInfo) => {
-                if (info.offset.y > 100 || info.velocity.y > 500) {
-                  setShowPersonalize(false)
-                }
-              }}
-              className="fixed bottom-0 left-0 z-50 flex flex-col outline-none h-[80vh] w-full rounded-t-lg border-t border-border/20 bg-transparent shadow-none pointer-events-none lg:top-0 lg:bottom-0 lg:h-screen lg:max-h-screen lg:w-1/2 lg:rounded-none lg:border-none lg:pt-3 lg:pb-3 lg:pl-3 lg:pr-1.5"
-            >
-              <div className="relative h-full bg-white dark:bg-[#171717] lg:rounded-2xl overflow-hidden border border-border/20 shadow-2xl pointer-events-auto">
-                <div className="absolute top-0 left-0 right-0 z-20 pointer-events-none">
-                  <div className="absolute inset-0 h-32 bg-gradient-to-b from-white to-transparent dark:from-[#171717] [mask-image:linear-gradient(to_bottom,black_20%,transparent)]" />
-                  <div className="relative z-10 flex flex-col pointer-events-auto">
-                    <div className="flex items-center justify-center pt-2 pb-1">
-                      <div className="w-10 h-1 rounded-full bg-zinc-900/[0.08] dark:bg-white/[0.08] transition-colors hover:bg-zinc-900/[0.15] dark:hover:bg-white/[0.15]" />
-                    </div>
-
-                    <div className="flex items-center justify-between px-4 py-1">
-                      <button
-                        onClick={() => setShowPersonalize(false)}
-                        className="inline-flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-white focus-visible:outline-none"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                        <span className="text-xs font-mono tracking-wide">Personalize</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="relative h-full min-h-0">
-                  <div className="absolute bottom-0 left-0 right-0 z-10 h-16 bg-gradient-to-t from-white to-transparent dark:from-[#171717] pointer-events-none [mask-image:linear-gradient(to_top,black_30%,transparent)]" />
-                  <div className="h-full">{personalizeContent}</div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
       )}
 
       {/* Source Code Panel Portal */}

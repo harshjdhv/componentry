@@ -55,6 +55,9 @@ export function useLiveCode(code: string) {
   useEffect(() => {
     usePlaygroundStore.getState().setCode(code)
   }, [code])
+
+  // Clear on unmount so the next page's LiveCodeBlock starts from its own default.
+  useEffect(() => () => usePlaygroundStore.getState().setCode(""), [])
 }
 
 /** Quiet surface, after coss: hairline border and a barely-there shadow. */

@@ -1,8 +1,5 @@
 import React from "react";
-import {
-    DitherPrismHeroPersonalizePanel,
-    DitherPrismHeroPlayground,
-} from "@/components/docs/previews/dither-prism-hero-playground";
+import { DitherPrismHeroPlayground } from "@/components/docs/previews/dither-prism-hero-playground";
 import { LiveCodeBlock } from "@/components/live-code-block";
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { readComponentSource } from "@/lib/source-code";
@@ -24,7 +21,6 @@ export async function DitherPrismHeroDocs() {
             title="Dither Prism Hero"
             description="A breathtaking WebGL hero background featuring advanced dithering, prismatic refraction, and holographic iridescence rendered in real-time with GLSL."
             preview={<DitherPrismHeroPlayground />}
-            personalizeContent={<DitherPrismHeroPersonalizePanel />}
             previewCode=""
             installPackageName="dither-prism-hero"
             installDependencies="framer-motion @react-three/fiber three"

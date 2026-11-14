@@ -1,9 +1,6 @@
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { LiveCodeBlock } from "@/components/live-code-block";
-import {
-  TextMorphPersonalizePanel,
-  TextMorphPlayground,
-} from "@/components/docs/previews/text-morph-playground";
+import { TextMorphPlayground } from "@/components/docs/previews/text-morph-playground";
 import { readComponentSource } from "@/lib/source-code";
 
 const basicUsageCode = `import { TextMorph } from "@/components/ui/text-morph"
@@ -23,7 +20,6 @@ export async function TextMorphDocs() {
       title="Text Morph"
       description="A fluid text primitive that blends one value into the next while preserving its visual center and inheriting the surrounding typography."
       preview={<TextMorphPlayground />}
-      personalizeContent={<TextMorphPersonalizePanel />}
       previewCode={basicUsageCode}
       installPackageName="text-morph"
       installDependencies="clsx tailwind-merge"

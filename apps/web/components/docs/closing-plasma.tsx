@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  ClosingPlasmaPersonalizePanel,
-  ClosingPlasmaPlayground,
-} from "@/components/docs/previews/closing-plasma-playground";
+import { ClosingPlasmaPlayground } from "@/components/docs/previews/closing-plasma-playground";
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { LiveCodeBlock } from "@/components/live-code-block";
 import { readComponentSource } from "@/lib/source-code";
@@ -25,7 +22,6 @@ export async function ClosingPlasmaDocs() {
       title="Closing Plasma"
       description="A premium footer-ready plasma background with atmospheric noise and smooth pointer-driven flow."
       preview={<ClosingPlasmaPlayground />}
-      personalizeContent={<ClosingPlasmaPersonalizePanel />}
       previewCode=""
       installPackageName="closing-plasma"
       installSourceCode={sourceCode}

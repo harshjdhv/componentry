@@ -1,17 +1,9 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect } from "react";
-import { create } from "zustand";
+import { useDialKit } from "dialkit";
 import { FlippingWordSwap } from "@workspace/ui/components/flipping-word-swap";
-import { cn } from "@/lib/utils";
-import { usePlaygroundStore } from "@/hooks/use-playground-store";
-import {
-  PlaygroundColorPicker,
-  PlaygroundInput,
-  PlaygroundSectionTitle,
-  PlaygroundSlider,
-} from "@/components/playground-primitives";
+import { DocsPlayground, useLiveCode } from "@/components/docs-playground";
 
 interface FlippingWordSwapConfig {
   word1: string;
@@ -21,38 +13,36 @@ interface FlippingWordSwapConfig {
   word2LightColor: string;
   word2DarkColor: string;
   fontSize: number;
-  fontWeight: 400 | 500 | 600 | 700;
+  fontWeight: number;
   letterSpacing: number;
   duration: number;
   stagger: number;
 }
 
-const DEFAULT_CONFIG: FlippingWordSwapConfig = {
-  word1: "Componentry",
-  word2: "Consistency",
-  word1LightColor: "#18181b",
-  word1DarkColor: "#f5f5f5",
-  word2LightColor: "#18181b",
-  word2DarkColor: "#f5f5f5",
-  fontSize: 48,
-  fontWeight: 700,
-  letterSpacing: -0.025,
-  duration: 400,
-  stagger: 44,
+type Slider = [number, number, number, number];
+const controls = {
+  word1: { type: "text" as const, default: "Componentry", placeholder: "Componentry" },
+  word2: { type: "text" as const, default: "Consistency", placeholder: "Consistency" },
+  duration: [400, 220, 800, 20] as Slider,
+  stagger: [44, 0, 100, 2] as Slider,
+  typography: {
+    fontSize: [48, 44, 128, 2] as Slider,
+    fontWeight: {
+      type: "select" as const,
+      options: ["400", "500", "600", "700"],
+      default: "700",
+    },
+    letterSpacing: [-0.025, -0.08, 0.08, 0.005] as Slider,
+    _collapsed: true,
+  },
+  colors: {
+    word1LightColor: { type: "color" as const, default: "#18181b" },
+    word1DarkColor: { type: "color" as const, default: "#f5f5f5" },
+    word2LightColor: { type: "color" as const, default: "#18181b" },
+    word2DarkColor: { type: "color" as const, default: "#f5f5f5" },
+    _collapsed: true,
+  },
 };
-
-interface FlippingWordSwapStore {
-  config: FlippingWordSwapConfig;
-  updateConfig: (updates: Partial<FlippingWordSwapConfig>) => void;
-  resetConfig: () => void;
-}
-
-const useFlippingWordSwapPlayground = create<FlippingWordSwapStore>((set) => ({
-  config: DEFAULT_CONFIG,
-  updateConfig: (updates) =>
-    set((state) => ({ config: { ...state.config, ...updates } })),
-  resetConfig: () => set({ config: DEFAULT_CONFIG }),
-}));
 
 function generateCode(config: FlippingWordSwapConfig) {
   return `import { FlippingWordSwap } from "@/components/ui/flipping-word-swap"
@@ -76,17 +66,28 @@ function generateCode(config: FlippingWordSwapConfig) {
 }
 
 export function FlippingWordSwapPlayground() {
-  const config = useFlippingWordSwapPlayground((state) => state.config);
+  const values = useDialKit("Flipping Word Swap", controls, {
+    id: "flipping-word-swap",
+  });
+  const config: FlippingWordSwapConfig = {
+    // Single-line words, capped at 24 characters like the old inputs.
+    word1: values.word1.replace(/\n/g, "").slice(0, 24),
+    word2: values.word2.replace(/\n/g, "").slice(0, 24),
+    duration: values.duration,
+    stagger: values.stagger,
+    ...values.typography,
+    fontWeight: Number(values.typography.fontWeight),
+    ...values.colors,
+  };
 
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      usePlaygroundStore.getState().setCode(generateCode(config));
-    }, 120);
-    return () => window.clearTimeout(timeoutId);
-  }, [config]);
+  useLiveCode(generateCode(config));
 
   return (
-    <div className="flex h-full min-h-[440px] w-full items-center justify-center overflow-hidden px-8 py-16">
+    <DocsPlayground
+      label="Customize"
+      minWidth={280}
+      className="flex min-h-[440px] items-center justify-center overflow-hidden px-8 py-16"
+    >
       <FlippingWordSwap
         word1={config.word1}
         word2={config.word2}
@@ -94,177 +95,19 @@ export function FlippingWordSwapPlayground() {
         stagger={config.stagger}
         className="text-[var(--flip-word-light)] dark:text-[var(--flip-word-dark)]"
         toClassName="text-[var(--flip-word-to-light)] dark:text-[var(--flip-word-to-dark)]"
-        style={{
-          "--flip-word-light": config.word1LightColor || "#18181b",
-          "--flip-word-dark": config.word1DarkColor || "#f5f5f5",
-          "--flip-word-to-light": config.word2LightColor || "#18181b",
-          "--flip-word-to-dark": config.word2DarkColor || "#f5f5f5",
-          fontSize: `${config.fontSize}px`,
-          fontWeight: config.fontWeight,
-          lineHeight: 1,
-          letterSpacing: `${config.letterSpacing}em`,
-        } as CSSProperties}
+        style={
+          {
+            "--flip-word-light": config.word1LightColor || "#18181b",
+            "--flip-word-dark": config.word1DarkColor || "#f5f5f5",
+            "--flip-word-to-light": config.word2LightColor || "#18181b",
+            "--flip-word-to-dark": config.word2DarkColor || "#f5f5f5",
+            fontSize: `${config.fontSize}px`,
+            fontWeight: config.fontWeight,
+            lineHeight: 1,
+            letterSpacing: `${config.letterSpacing}em`,
+          } as CSSProperties
+        }
       />
-    </div>
-  );
-}
-
-export function FlippingWordSwapPersonalizePanel() {
-  const config = useFlippingWordSwapPlayground((state) => state.config);
-  const updateConfig = useFlippingWordSwapPlayground(
-    (state) => state.updateConfig,
-  );
-  const resetConfig = useFlippingWordSwapPlayground(
-    (state) => state.resetConfig,
-  );
-
-  return (
-    <div className="h-full overflow-auto bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="space-y-7 px-4 pb-10 pt-20">
-        <header className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tighter text-foreground">
-            Personalize
-          </h2>
-          <p className="text-sm leading-relaxed text-muted-foreground/90">
-            Tune the words, theme-aware colors, typography, and timing in the
-            preview surface.
-          </p>
-        </header>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={resetConfig}
-            className="rounded-md border border-border/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Reset
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          <PlaygroundSectionTitle>Words</PlaygroundSectionTitle>
-          <label className="block space-y-1.5">
-            <span className="text-xs font-semibold text-foreground/90">
-              First word
-            </span>
-            <PlaygroundInput
-              value={config.word1}
-              maxLength={24}
-              onChange={(event) => updateConfig({ word1: event.target.value })}
-            />
-          </label>
-          <label className="block space-y-1.5">
-            <span className="text-xs font-semibold text-foreground/90">
-              Second word
-            </span>
-            <PlaygroundInput
-              value={config.word2}
-              maxLength={24}
-              onChange={(event) => updateConfig({ word2: event.target.value })}
-            />
-          </label>
-        </div>
-
-        <div className="space-y-3">
-          <PlaygroundSectionTitle>Colors</PlaygroundSectionTitle>
-          <PlaygroundColorPicker
-            label="First word · light"
-            value={config.word1LightColor}
-            defaultColor="#18181b"
-            onChange={(word1LightColor) => updateConfig({ word1LightColor })}
-          />
-          <PlaygroundColorPicker
-            label="First word · dark"
-            value={config.word1DarkColor}
-            defaultColor="#f5f5f5"
-            onChange={(word1DarkColor) => updateConfig({ word1DarkColor })}
-          />
-          <PlaygroundColorPicker
-            label="Second word · light"
-            value={config.word2LightColor}
-            defaultColor="#18181b"
-            onChange={(word2LightColor) => updateConfig({ word2LightColor })}
-          />
-          <PlaygroundColorPicker
-            label="Second word · dark"
-            value={config.word2DarkColor}
-            defaultColor="#f5f5f5"
-            onChange={(word2DarkColor) => updateConfig({ word2DarkColor })}
-          />
-        </div>
-
-        <div className="space-y-3">
-          <PlaygroundSectionTitle>Typography</PlaygroundSectionTitle>
-          <PlaygroundSlider
-            label="Font size"
-            min={44}
-            max={128}
-            step={2}
-            value={config.fontSize}
-            unit="px"
-            onChange={(fontSize) => updateConfig({ fontSize })}
-          />
-          <PlaygroundSlider
-            label="Letter spacing"
-            min={-0.08}
-            max={0.08}
-            step={0.005}
-            value={config.letterSpacing}
-            unit="em"
-            onChange={(letterSpacing) => updateConfig({ letterSpacing })}
-          />
-
-          <div>
-            <div className="mb-1.5 flex items-center justify-between">
-              <span className="text-xs font-semibold text-foreground/90">
-                Font weight
-              </span>
-              <span className="font-mono text-xs text-muted-foreground">
-                {config.fontWeight}
-              </span>
-            </div>
-            <div className="grid grid-cols-4 gap-1.5">
-              {([400, 500, 600, 700] as const).map((fontWeight) => (
-                <button
-                  key={fontWeight}
-                  type="button"
-                  onClick={() => updateConfig({ fontWeight })}
-                  className={cn(
-                    "rounded-md border px-2 py-2 font-mono text-[10px] transition-colors",
-                    config.fontWeight === fontWeight
-                      ? "border-foreground/25 text-foreground shadow-sm"
-                      : "border-border/70 text-muted-foreground",
-                  )}
-                >
-                  {fontWeight}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <PlaygroundSectionTitle>Motion</PlaygroundSectionTitle>
-          <PlaygroundSlider
-            label="Flip duration"
-            min={220}
-            max={800}
-            step={20}
-            value={config.duration}
-            unit="ms"
-            onChange={(duration) => updateConfig({ duration })}
-          />
-          <PlaygroundSlider
-            label="Character stagger"
-            min={0}
-            max={100}
-            step={2}
-            value={config.stagger}
-            unit="ms"
-            onChange={(stagger) => updateConfig({ stagger })}
-          />
-        </div>
-      </div>
-    </div>
+    </DocsPlayground>
   );
 }

@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  InfiniteImageFieldPersonalizePanel,
   InfiniteImageFieldPlayground,
 } from "@/components/docs/previews/infinite-image-field-playground";
 import { DocsPageLayout } from "@/components/docs-page-layout";
@@ -20,7 +19,6 @@ export async function InfiniteImageFieldDocs() {
       title="Infinite Image Field"
       description="An endless, cursor-driven photo canvas. Images tile infinitely in all directions — move your cursor to pan the field, and it glides fluidly toward where you point."
       preview={<InfiniteImageFieldPlayground />}
-      personalizeContent={<InfiniteImageFieldPersonalizePanel />}
       previewCode=""
       installPackageName="infinite-image-field"
       installDependencies="clsx tailwind-merge"

@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  WebGLLiquidPersonalizePanel,
-  WebGLLiquidPlayground,
-} from "@/components/docs/previews/webgl-liquid-playground";
+import { WebGLLiquidPlayground } from "@/components/docs/previews/webgl-liquid-playground";
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { LiveCodeBlock } from "@/components/live-code-block";
 import { readComponentSource } from "@/lib/source-code";
@@ -24,7 +21,6 @@ export async function WebGLLiquidDocs() {
       title="WebGL Liquid"
       description="A premium liquid hero background powered by raw WebGL shaders, with configurable palette, grain, reveal timing, and flow behavior."
       preview={<WebGLLiquidPlayground />}
-      personalizeContent={<WebGLLiquidPersonalizePanel />}
       previewCode=""
       installPackageName="webgl-liquid"
       installSourceCode={sourceCode}

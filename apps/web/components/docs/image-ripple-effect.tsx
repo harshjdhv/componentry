@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  ImageRippleEffectPersonalizePanel,
-  ImageRippleEffectPlayground,
-} from "@/components/docs/previews/image-ripple-effect-playground";
+import { ImageRippleEffectPlayground } from "@/components/docs/previews/image-ripple-effect-playground";
 import { DocsPageLayout } from "@/components/docs-page-layout";
 import { LiveCodeBlock } from "@/components/live-code-block";
 import { readComponentSource } from "@/lib/source-code";
@@ -49,7 +46,6 @@ export async function ImageRippleEffectDocs() {
       title="Image Ripple Effect"
       description="A WebGL image ripple component powered by React Three Fiber. Cursor movement paints displacement waves that refract image cards in real time."
       preview={<ImageRippleEffectPlayground />}
-      personalizeContent={<ImageRippleEffectPersonalizePanel />}
       previewCode=""
       installPackageName="image-ripple-effect"
       installDependencies="three @types/three @react-three/fiber @react-three/drei clsx tailwind-merge"

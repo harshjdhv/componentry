@@ -1,8 +1,5 @@
 import { DocsPageLayout } from "@/components/docs-page-layout";
-import {
-  FlippingWordSwapPersonalizePanel,
-  FlippingWordSwapPlayground,
-} from "@/components/docs/previews/flipping-word-swap-playground";
+import { FlippingWordSwapPlayground } from "@/components/docs/previews/flipping-word-swap-playground";
 import { LiveCodeBlock } from "@/components/live-code-block";
 import { readComponentSource } from "@/lib/source-code";
 
@@ -35,7 +32,6 @@ export async function FlippingWordSwapDocs() {
       title="Flipping Word Swap"
       description="A clean character-by-character word swap that flips the next word smoothly into place on hover, focus, or tap."
       preview={<FlippingWordSwapPlayground />}
-      personalizeContent={<FlippingWordSwapPersonalizePanel />}
       previewCode={defaultCode}
       installPackageName="flipping-word-swap"
       installDependencies="gsap clsx tailwind-merge"

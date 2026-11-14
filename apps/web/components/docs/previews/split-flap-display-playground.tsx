@@ -1,29 +1,33 @@
 "use client";
 
-import { useEffect } from "react";
+import { useDialKitController } from "dialkit";
 import { SplitFlapDisplay } from "@workspace/ui/components/split-flap-display";
-import { cn } from "@/lib/utils";
 import {
-  SPLIT_FLAP_DISPLAY_DEFAULT_CONFIG,
-  type SplitFlapDisplayConfig,
-  usePlaygroundStore,
-} from "@/hooks/use-playground-store";
-import {
-  PlaygroundSectionTitle,
-  PlaygroundInput,
-  PlaygroundSlider,
-  PlaygroundColorPicker,
-} from "@/components/playground-primitives";
+  DocsPlayground,
+  gradientSwatch,
+  useLiveCode,
+} from "@/components/docs-playground";
 
-const PRESETS: Array<{ name: string; config: SplitFlapDisplayConfig }> = [
-  {
-    name: "Default",
-    config: SPLIT_FLAP_DISPLAY_DEFAULT_CONFIG,
-  },
+type Size = "sm" | "md" | "lg";
+const SIZES: Size[] = ["sm", "md", "lg"];
+
+const DEFAULTS = {
+  text: "COMPONENTRY",
+  columns: 11,
+  size: "md" as Size,
+  accentColor: "#22c55e",
+  showIndicators: true,
+  staggerDelay: 30,
+  flipSpeed: 35,
+};
+type Config = typeof DEFAULTS;
+
+const PRESET_CONFIGS: Array<{ name: string; config: Config }> = [
+  { name: "Default", config: DEFAULTS },
   {
     name: "Airport",
     config: {
-      ...SPLIT_FLAP_DISPLAY_DEFAULT_CONFIG,
+      ...DEFAULTS,
       text: "FLIGHT 404",
       columns: 12,
       size: "lg",
@@ -36,7 +40,7 @@ const PRESETS: Array<{ name: string; config: SplitFlapDisplayConfig }> = [
   {
     name: "Compact",
     config: {
-      ...SPLIT_FLAP_DISPLAY_DEFAULT_CONFIG,
+      ...DEFAULTS,
       text: "GATE B42",
       columns: 10,
       size: "sm",
@@ -49,7 +53,7 @@ const PRESETS: Array<{ name: string; config: SplitFlapDisplayConfig }> = [
   {
     name: "Gold",
     config: {
-      ...SPLIT_FLAP_DISPLAY_DEFAULT_CONFIG,
+      ...DEFAULTS,
       text: "PREMIUM",
       columns: 10,
       size: "lg",
@@ -62,7 +66,7 @@ const PRESETS: Array<{ name: string; config: SplitFlapDisplayConfig }> = [
   {
     name: "Minimal",
     config: {
-      ...SPLIT_FLAP_DISPLAY_DEFAULT_CONFIG,
+      ...DEFAULTS,
       text: "HELLO WORLD",
       columns: 14,
       size: "md",
@@ -74,9 +78,23 @@ const PRESETS: Array<{ name: string; config: SplitFlapDisplayConfig }> = [
   },
 ];
 
+const PRESETS = PRESET_CONFIGS.map(({ name, config }) => ({
+  name,
+  swatch: gradientSwatch(["#111", config.accentColor]),
+}));
 
+type Slider = [number, number, number, number];
+const controls = {
+  text: { type: "text" as const, default: DEFAULTS.text, placeholder: "Display text" },
+  columns: [DEFAULTS.columns, 4, 20, 1] as Slider,
+  size: { type: "select" as const, options: SIZES, default: DEFAULTS.size },
+  showIndicators: DEFAULTS.showIndicators,
+  accentColor: { type: "color" as const, default: DEFAULTS.accentColor },
+  staggerDelay: [DEFAULTS.staggerDelay, 5, 80, 5] as Slider,
+  flipSpeed: [DEFAULTS.flipSpeed, 15, 80, 5] as Slider,
+};
 
-function generateCode(config: SplitFlapDisplayConfig) {
+function generateCode(config: Config) {
   const lines: string[] = [];
   lines.push(`import { SplitFlapDisplay } from "@/components/ui/split-flap-display"`);
   lines.push(``);
@@ -92,223 +110,50 @@ function generateCode(config: SplitFlapDisplayConfig) {
   return lines.join("\n");
 }
 
-/* ─── Playground Preview ───────────────────────────────── */
+const sameConfig = (a: Config, b: Config) =>
+  (Object.keys(a) as Array<keyof Config>).every((key) => {
+    const x = a[key];
+    const y = b[key];
+    return typeof x === "string" && typeof y === "string"
+      ? x.toLowerCase() === y.toLowerCase()
+      : x === y;
+  });
 
 export function SplitFlapDisplayPlayground() {
-  const config = usePlaygroundStore((s) => s.splitFlapDisplayConfig);
-  const renderVersion = usePlaygroundStore((s) => s.splitFlapDisplayRenderVersion);
-
-  useEffect(() => {
-    const code = generateCode(config);
-    const t = setTimeout(() => {
-      usePlaygroundStore.getState().setCode(code);
-    }, 250);
-    return () => clearTimeout(t);
-  }, [config]);
-
-  return (
-    <div className="relative flex h-full w-full items-center justify-center bg-black p-10">
-      <SplitFlapDisplay
-        key={renderVersion}
-        text={config.text}
-        columns={config.columns}
-        size={config.size}
-        accentColor={config.accentColor}
-        showIndicators={config.showIndicators}
-        staggerDelay={config.staggerDelay}
-        flipSpeed={config.flipSpeed}
-      />
-    </div>
-  );
-}
-
-/* ─── Personalize Panel ────────────────────────────────── */
-
-export function SplitFlapDisplayPersonalizePanel() {
-  const config = usePlaygroundStore((s) => s.splitFlapDisplayConfig);
-  const activePreset = usePlaygroundStore((s) => s.activeSplitFlapDisplayPreset);
-  const setConfig = usePlaygroundStore((s) => s.setSplitFlapDisplayConfig);
-  const setActivePreset = usePlaygroundStore((s) => s.setActiveSplitFlapDisplayPreset);
-  const updateConfig = usePlaygroundStore((s) => s.updateSplitFlapDisplayConfig);
-  const resetPreview = usePlaygroundStore((s) => s.resetSplitFlapDisplayPreview);
-  const resetConfig = usePlaygroundStore((s) => s.resetSplitFlapDisplayConfig);
-
-  const handleChange = (key: keyof SplitFlapDisplayConfig, value: string | number | boolean) => {
-    updateConfig({ [key]: value } as Partial<SplitFlapDisplayConfig>);
-    resetPreview();
-
-    if (activePreset === "Custom") return;
-
-    const matchedPreset = PRESETS.find(
-      (preset) => JSON.stringify(preset.config) === JSON.stringify({ ...config, [key]: value }),
-    );
-    setActivePreset(matchedPreset?.name ?? "Custom");
+  const dial = useDialKitController("Split Flap Display", controls, {
+    id: "split-flap-display",
+  });
+  const values = dial.values;
+  const config: Config = {
+    // The board only has uppercase flaps.
+    text: values.text.toUpperCase(),
+    columns: values.columns,
+    size: (SIZES as string[]).includes(values.size) ? (values.size as Size) : DEFAULTS.size,
+    accentColor: values.accentColor.toLowerCase(),
+    showIndicators: values.showIndicators,
+    staggerDelay: values.staggerDelay,
+    flipSpeed: values.flipSpeed,
   };
 
-  const handlePresetChange = (presetName: string) => {
-    const preset = PRESETS.find((item) => item.name === presetName);
-    if (!preset) return;
-    setConfig({ ...preset.config });
-    setActivePreset(presetName);
-    resetPreview();
-  };
+  const preset =
+    PRESET_CONFIGS.find((item) => sameConfig(item.config, config))?.name ?? null;
+
+  useLiveCode(generateCode(config));
 
   return (
-    <div className="h-full overflow-auto bg-[#f3f4f6] dark:bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="space-y-6 px-4 pb-10 pt-20">
-        <header className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tighter text-foreground">Personalize</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground/90">
-            Customize your split-flap board with text, sizing, speed, and accent colors.
-          </p>
-        </header>
-
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground/90">
-            Current preset: <span className="font-mono text-foreground">{activePreset}</span>
-          </div>
-          <button
-            type="button"
-            onClick={resetConfig}
-            className="rounded-md border border-border/40 bg-white/50 px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground dark:bg-white/[0.03]"
-          >
-            Reset
-          </button>
-        </div>
-
-        {/* Presets */}
-        <div>
-          <PlaygroundSectionTitle>Presets</PlaygroundSectionTitle>
-          <div className="grid grid-cols-5 gap-1.5">
-            {PRESETS.map((preset) => {
-              const isActive = activePreset === preset.name;
-              return (
-                <button
-                  key={preset.name}
-                  type="button"
-                  onClick={() => handlePresetChange(preset.name)}
-                  className={cn(
-                    "rounded-md border p-1.5 text-center transition-colors",
-                    isActive
-                      ? "border-zinc-500/70 bg-zinc-100 dark:border-zinc-500/80 dark:bg-zinc-900/70"
-                      : "border-border/70 bg-transparent",
-                  )}
-                >
-                  <div
-                    className="mb-1.5 h-4 rounded-sm border border-white/20"
-                    style={{
-                      background: `linear-gradient(125deg, #111 0%, ${preset.config.accentColor} 100%)`,
-                    }}
-                  />
-                  <span className="block truncate text-[10px] font-mono uppercase tracking-widest text-foreground/90">
-                    {preset.name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div>
-          <PlaygroundSectionTitle>Content</PlaygroundSectionTitle>
-          <div className="space-y-2.5">
-            <PlaygroundInput
-              value={config.text}
-              onChange={(e) => handleChange("text", e.target.value.toUpperCase())}
-              placeholder="Display text"
-            />
-          </div>
-        </div>
-
-        {/* Layout */}
-        <div>
-          <PlaygroundSectionTitle>Layout</PlaygroundSectionTitle>
-          <div className="space-y-3">
-            <PlaygroundSlider
-              label="Columns"
-              min={4}
-              max={20}
-              step={1}
-              value={config.columns}
-              onChange={(v) => handleChange("columns", v)}
-            />
-            <div>
-              <span className="mb-2 block text-sm text-foreground/90">Size</span>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["sm", "md", "lg"] as const).map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => handleChange("size", s)}
-                    className={cn(
-                      "rounded-md border px-3 py-2 text-xs font-mono uppercase tracking-widest transition-colors",
-                      config.size === s
-                        ? "border-zinc-500/70 bg-zinc-100 text-foreground dark:border-zinc-500/80 dark:bg-zinc-900/70"
-                        : "border-border/70 bg-transparent text-muted-foreground",
-                    )}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-foreground/90">Show Indicators</span>
-              <button
-                type="button"
-                onClick={() => handleChange("showIndicators", !config.showIndicators)}
-                className={cn(
-                  "relative h-6 w-11 rounded-full transition-colors",
-                  config.showIndicators ? "bg-green-500" : "bg-zinc-300 dark:bg-zinc-700",
-                )}
-              >
-                <span
-                  className={cn(
-                    "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
-                    config.showIndicators && "translate-x-5",
-                  )}
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Style */}
-        <div>
-          <PlaygroundSectionTitle>Style</PlaygroundSectionTitle>
-          <PlaygroundColorPicker
-            label="Accent Color"
-            value={config.accentColor}
-            onChange={(v) => handleChange("accentColor", v)}
-          />
-        </div>
-
-        {/* Animation */}
-        <div>
-          <PlaygroundSectionTitle>Animation</PlaygroundSectionTitle>
-          <div className="grid grid-cols-1 gap-3">
-            <PlaygroundSlider
-              label="Stagger Delay"
-              min={5}
-              max={80}
-              step={5}
-              value={config.staggerDelay}
-              onChange={(v) => handleChange("staggerDelay", v)}
-              unit="ms"
-            />
-            <PlaygroundSlider
-              label="Flip Speed"
-              min={15}
-              max={80}
-              step={5}
-              value={config.flipSpeed}
-              onChange={(v) => handleChange("flipSpeed", v)}
-              unit="ms"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <DocsPlayground
+      presets={PRESETS}
+      preset={preset}
+      presetsLabel="Preset"
+      minWidth={280}
+      onPresetChange={(name) => {
+        const next = PRESET_CONFIGS.find((item) => item.name === name)?.config;
+        if (next) dial.setValues(next);
+      }}
+      className="flex items-center justify-center bg-black p-10"
+    >
+      {/* Remount on every change so the board replays its flip-in, as before. */}
+      <SplitFlapDisplay key={JSON.stringify(config)} {...config} />
+    </DocsPlayground>
   );
 }

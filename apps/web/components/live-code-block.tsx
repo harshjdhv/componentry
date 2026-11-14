@@ -19,8 +19,9 @@ export function LiveCodeBlock({ defaultCode, lang = "tsx" }: LiveCodeBlockProps)
 
     useEffect(() => {
         setIsMounted(true);
-        // Initialize store with default if empty
-        usePlaygroundStore.getState().setCode(spacedDefault);
+        // Seed the default only if a playground hasn't already pushed generated code.
+        const store = usePlaygroundStore.getState();
+        if (!store.code) store.setCode(spacedDefault);
     }, [spacedDefault]);
 
     useEffect(() => {
