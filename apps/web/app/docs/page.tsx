@@ -149,63 +149,19 @@ function ComponentCard({
         onMouseLeave={stopPreview}
         onFocus={startPreview}
         onBlur={stopPreview}
-        className="group relative flex flex-col rounded-2xl border border-border bg-white dark:bg-zinc-900/50 overflow-hidden transition-all duration-300 shadow-card hover:-translate-y-0.5 hover:border-input hover:shadow-card-hover"
+        className="group relative flex flex-col rounded-2xl border border-border bg-white dark:bg-zinc-900/50 overflow-hidden transition-[border-color,box-shadow] duration-300 hover:border-input hover:shadow-card-hover"
       >
-        {/* ── Expandable hover info (upper side) ── */}
-        <motion.div
-          initial={false}
-          animate={{
-            height: isHovered ? 32 : 0,
-            opacity: isHovered ? 1 : 0,
-          }}
-          transition={{
-            duration: 0.5,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="overflow-hidden"
-        >
-          <div className="px-4 pb-1 pt-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-zinc-400">{component.category}</span>
-              <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-                View component
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  className="transition-transform duration-200 group-hover:translate-x-0.5"
-                >
-                  <path
-                    d="M5 2L9 6L5 10"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ── Preview area (Floating) ── */}
+        {/* ── Preview area ── */}
         <div className="p-1.5">
-          <motion.div 
-            initial={false}
-            animate={{ height: isHovered ? 228 : 260 }}
-            transition={{
-              duration: 0.5,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+          <div
             className={cn(
-              "relative w-full rounded-xl transition-colors border border-dashed border-border shadow-surface-inset overflow-hidden",
+              "relative h-[260px] w-full rounded-xl border border-dashed border-border shadow-surface-inset overflow-hidden",
               component.slug === "text-morph" ||
                 component.slug === "flipping-word-swap"
                 ? "bg-background"
                 : component.slug === "spectral-ribbon"
                   ? "bg-black"
-                : "bg-zinc-50 dark:bg-zinc-900/80 group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/80",
+                : "bg-zinc-50 dark:bg-zinc-900/80",
             )}
           >
             {!videoOnly && component.category === "ASCII Effects" && (
@@ -265,13 +221,13 @@ function ComponentCard({
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ${isVideoReady && isHovered ? "opacity-100" : "opacity-0"}`}
               />
             )}
-          </motion.div>
+          </div>
         </div>
 
         {/* ── Info area ── */}
         <div className="flex flex-col gap-1 px-4 pb-4 pt-2">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-[15px] font-medium tracking-[-0.01em] text-zinc-900 transition-colors group-hover:text-zinc-700 dark:text-zinc-100 dark:group-hover:text-zinc-300">
+            <h3 className="text-[15px] font-medium tracking-[-0.01em] text-zinc-900 dark:text-zinc-100">
               {component.title}
             </h3>
             {isNewComponent(component) && (
@@ -321,10 +277,10 @@ export default function DocsPage() {
         {/* ── Hero ── */}
         <header className="mb-12 max-w-2xl space-y-2.5">
           <h1 className="text-[28px] font-medium leading-[1.1] tracking-[-0.035em] text-zinc-900 sm:text-[32px] dark:text-zinc-50">
-            Crafted Components.
+            Browse the collection.
           </h1>
           <p className="max-w-xl text-pretty text-[15px] font-normal leading-6 tracking-[-0.01em] text-zinc-500 sm:text-[16px] sm:leading-7 dark:text-zinc-400">
-            A growing collection of animated primitives for React.
+            Every component ships as editable source. Hover a preview to see it in motion, then copy it or install from the CLI.
           </p>
         </header>
 
@@ -332,7 +288,7 @@ export default function DocsPage() {
         {featured.length > 0 && (
           <section id="featured" className="mb-20 scroll-mt-32">
             <div className="mb-6 flex items-center justify-between gap-4">
-              <h2 className="text-[13px] font-medium uppercase leading-5 tracking-[0.06em] text-zinc-500 dark:text-zinc-400">
+              <h2 className="text-[20px] font-medium leading-7 tracking-[-0.02em] text-zinc-900 dark:text-zinc-50">
                 Featured
               </h2>
             </div>
@@ -355,7 +311,7 @@ export default function DocsPage() {
             return (
               <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-32">
                 <div className="mb-6 flex items-center justify-between gap-4">
-                  <h2 className="text-[13px] font-medium uppercase leading-5 tracking-[0.06em] text-zinc-500 dark:text-zinc-400">
+                  <h2 className="text-[20px] font-medium leading-7 tracking-[-0.02em] text-zinc-900 dark:text-zinc-50">
                     {category}
                   </h2>
                 </div>
