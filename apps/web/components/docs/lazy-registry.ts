@@ -18,10 +18,6 @@ const docsImportMap: Record<
     import("@/components/docs/lens-clock").then((m) => ({
       default: m.LensClockDocs,
     })),
-  "grain-gradient": () =>
-    import("@/components/docs/grain-gradient").then((m) => ({
-      default: m.GrainGradientDocs,
-    })),
   "annotated-text": () =>
     import("@/components/docs/annotated-text").then((m) => ({
       default: m.AnnotatedTextDocs,

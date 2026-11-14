@@ -210,10 +210,6 @@
       "type": "registry:ui"
     },
     {
-      "name": "grain-gradient",
-      "type": "registry:ui"
-    },
-    {
       "name": "spectral-ribbon",
       "type": "registry:ui"
     },

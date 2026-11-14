@@ -51,14 +51,6 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/lensclock.webm",
   },
-  "grain-gradient": {
-    title: "Grain Gradient",
-    description:
-      "A breathing color field with flowing shadows, customizable film grain, and soft atmospheric light.",
-    category: "Hero Backgrounds",
-    slug: "grain-gradient",
-    addedAt: "2026-09-18",
-  },
   "annotated-text": {
     title: "Annotated Text",
     description:

@@ -93,11 +93,6 @@ export const componentCollections: ComponentCollection[] = [
         "slug": "animated-gradient",
         "heading": "A moving gradient",
         "reason": "Use a gradient-led treatment when a section needs color and movement without a recognizable scene."
-      },
-      {
-        "slug": "grain-gradient",
-        "heading": "A textured color field",
-        "reason": "A breathing field of color with film grain and soft shadows. Use the controls to tune texture to the surrounding page."
       }
     ],
     "question": "How should I check a background before shipping?",
