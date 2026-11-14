@@ -23,8 +23,8 @@ from pathlib import Path
 # ===========================================================================
 # EDIT THESE VARIABLES FOR EACH UPLOAD
 # ===========================================================================
-VIDEO_FILENAME = "infinteimagefield.mov"
-COMPONENT_SLUG = "infinite-image-field"
+VIDEO_FILENAME = "result.mp4"
+COMPONENT_SLUG = "heatmap-logo"
 # ===========================================================================
 
 # ---------------------------------------------------------------------------
