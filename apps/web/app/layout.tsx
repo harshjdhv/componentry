@@ -13,6 +13,8 @@ import { Providers } from "@/components/providers";
 import { JsonLd } from "@/components/seo/json-ld";
 import { RouteScrollbarController } from "@/components/route-scrollbar-controller";
 import { absoluteUrl, siteConfig } from "@/lib/site";
+import { getGithubStars } from "@/lib/github-stars";
+import { GithubStarsProvider } from "@/hooks/use-github-stars";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -161,11 +163,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>): React.JSX.Element {
+}>): Promise<React.JSX.Element> {
+  const githubStars = await getGithubStars();
+
   return (
     <html
       lang="en"
@@ -184,7 +188,9 @@ export default function RootLayout({
       >
         <div className="isolate relative flex min-h-svh flex-col">
           <RouteScrollbarController />
-          <Providers>{children}</Providers>
+          <Providers>
+            <GithubStarsProvider stars={githubStars}>{children}</GithubStarsProvider>
+          </Providers>
         </div>
         <SpeedInsights />
         <Script
