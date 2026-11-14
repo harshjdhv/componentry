@@ -11,7 +11,7 @@ export const metadata = pageMetadata({
 export default function BlocksPage() {
   return (
     <section className="relative flex min-h-[calc(100svh-3.5rem)] flex-col overflow-hidden">
-      <div className="relative flex flex-1 items-center justify-center px-4 py-20 sm:px-8 sm:py-28">
+      <div className="relative flex flex-1 items-center justify-center py-20 sm:py-28">
         <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
           <h1 className="text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-foreground sm:text-5xl md:text-6xl">
             200+ blocks coming soon.

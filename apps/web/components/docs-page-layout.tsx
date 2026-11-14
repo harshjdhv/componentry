@@ -17,6 +17,11 @@ import { DocsScrollEdgeFade } from "@/components/docs-scroll-edge-fade"
 import { ChevronRight } from "lucide-react"
 import { ComponentGuidance } from "@/components/component-guidance"
 import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld"
+import {
+  landingGutterLeftClass,
+  landingGutterLeftOffsetClass,
+} from "@/components/landing/landing-frame"
+import { cn } from "@/lib/utils"
 
 export interface PropItem {
   name: string
@@ -122,7 +127,7 @@ export async function DocsPageLayout({
     >
       <BreadcrumbJsonLd items={[{ name: "Docs", path: "/docs" }, { name: title, path: `/docs/components/${installPackageName}` }]} />
       {/* Minimal Navigation Cluster — optically align icon glyph with heading left edge */}
-      <div className="group/docs-navigation pointer-events-none absolute left-6 top-3 z-50 flex items-center gap-2 sm:left-8 lg:absolute lg:left-8 lg:top-6 xl:left-10">
+      <div className={cn("group/docs-navigation pointer-events-none absolute top-3 z-50 flex items-center gap-2 lg:absolute lg:top-6", landingGutterLeftOffsetClass)}>
         <div className="pointer-events-auto -ml-2 shrink-0">
           <FloatingDocsSidebarLazy />
         </div>
@@ -158,7 +163,7 @@ export async function DocsPageLayout({
 
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {/* Full-bleed within the column — no centered max-width gutter on large screens */}
-          <div className="w-full space-y-14 px-6 pt-14 pb-40 sm:px-8 lg:space-y-16 lg:px-8 lg:pt-40 lg:pb-40 xl:px-10">
+          <div className={cn("w-full space-y-14 pt-14 pb-40 pr-6 sm:pr-8 lg:space-y-16 lg:pt-40 lg:pb-40 lg:pr-8", landingGutterLeftClass)}>
 
             {/* Header Section */}
             <header>

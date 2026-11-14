@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { landingGutterClass } from "@/components/landing/landing-frame"
 import { SiteHeader } from "@/components/site-header"
 import { Footer } from "@/components/footer"
 
@@ -9,7 +10,8 @@ export default function TermsOfServicePage() {
     <div className="min-h-screen w-full bg-white dark:bg-background text-zinc-900 dark:text-zinc-100 flex flex-col">
       <SiteHeader />
       
-      <main className="flex-grow w-full max-w-3xl mx-auto px-6 py-32 md:py-40">
+      <main className={`flex-grow w-full py-32 md:py-40 ${landingGutterClass}`}>
+        <div className="w-full max-w-3xl">
         <h1 className="text-3xl md:text-5xl font-semibold tracking-tight mb-4">Terms of Service</h1>
         <p className="text-zinc-500 dark:text-zinc-400 mb-12">Last updated: June 20, 2026</p>
 
@@ -75,6 +77,7 @@ export default function TermsOfServicePage() {
               If you have any questions about these Terms of Service, please contact us at hello@componentry.fun or via Twitter/X at @harshjdhv.
             </p>
           </section>
+        </div>
         </div>
       </main>
 

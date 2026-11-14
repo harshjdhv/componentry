@@ -49,7 +49,7 @@ export default async function BlockDetailPage({
 
   return (
     <>
-      <section className="screen-line-bottom px-4 py-3">
+      <section className="screen-line-bottom py-3">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href={`/blocks/${category}`}
