@@ -6,6 +6,7 @@ import {
   DocsPlayground,
   gradientSwatch,
   useLiveCode,
+  jsxProp,
 } from "@/components/docs-playground";
 
 type Size = "sm" | "md" | "lg";
@@ -99,7 +100,7 @@ function generateCode(config: Config) {
   lines.push(`import { SplitFlapDisplay } from "@/components/ui/split-flap-display"`);
   lines.push(``);
   lines.push(`<SplitFlapDisplay`);
-  lines.push(`  text="${config.text}"`);
+  lines.push(`  ${jsxProp("text", config.text)}`);
   lines.push(`  columns={${config.columns}}`);
   lines.push(`  size="${config.size}"`);
   if (config.accentColor !== "#22c55e") lines.push(`  accentColor="${config.accentColor}"`);

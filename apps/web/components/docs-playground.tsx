@@ -14,7 +14,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { motion, useDragControls } from "framer-motion"
 import { ChevronUp, GripVertical } from "lucide-react"
 import { useTheme } from "next-themes"
-import { DialRoot } from "dialkit"
+import { DialRoot, DialStore, type ControlMeta } from "dialkit"
 import "dialkit/styles.css"
 import "./docs-playground.css"
 import { cn } from "@/lib/utils"
@@ -48,6 +48,72 @@ interface DocsPlaygroundProps {
 /** Diagonal swatch through a color ramp, e.g. a palette's stops. */
 export function gradientSwatch(colors: readonly string[]) {
   return colors.length === 1 ? colors[0]! : `linear-gradient(135deg, ${colors.join(", ")})`
+}
+
+/**
+ * One JSX prop for generated code. Strings with quotes or line breaks become
+ * `{"..."}` expressions, since JSX attribute strings can't escape them.
+ */
+export function jsxProp(key: string, value: string | number | boolean) {
+  if (typeof value !== "string") return `${key}={${value}}`
+  return /["\n]/.test(value) ? `${key}={${JSON.stringify(value)}}` : `${key}="${value}"`
+}
+
+const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i
+let probe: CanvasRenderingContext2D | null = null
+
+/** Any CSS color (rgb, hsl, oklch, display-p3…) to #rrggbb, or #rrggbbaa when translucent. */
+function toHex(color: string) {
+  probe ??= document.createElement("canvas").getContext("2d", { willReadFrequently: true })
+  if (!probe) return null
+  probe.clearRect(0, 0, 1, 1)
+  probe.fillStyle = "#000"
+  probe.fillStyle = color
+  probe.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = probe.getImageData(0, 0, 1, 1).data
+  const hex = (n: number) => n.toString(16).padStart(2, "0")
+  return `#${hex(r!)}${hex(g!)}${hex(b!)}${a === 255 ? "" : hex(a!)}`
+}
+
+function colorPaths(controls: ControlMeta[]): string[] {
+  return controls.flatMap((c) =>
+    c.type === "color" ? [c.path] : c.type === "folder" ? colorPaths(c.children ?? []) : [],
+  )
+}
+
+/**
+ * DialKit's color picker can switch to rgb/hsl/oklch/p3, but the components and
+ * generated code expect hex. Rewrite any non-hex color value back to hex.
+ */
+function useHexColors() {
+  useEffect(() => {
+    const normalize = (panelId: string) => {
+      const panel = DialStore.getPanel(panelId)
+      if (!panel) return
+      for (const path of colorPaths(panel.controls)) {
+        const value = DialStore.getValue(panelId, path)
+        if (typeof value !== "string" || value === "" || HEX.test(value)) continue
+        const hex = toHex(value)
+        if (hex) DialStore.updateValue(panelId, path, hex)
+      }
+    }
+
+    // Value changes notify per panel; the global listener only tracks panels coming and going.
+    let unsubscribers: Array<() => void> = []
+    const watchPanels = () => {
+      unsubscribers.forEach((off) => off())
+      unsubscribers = DialStore.getPanels("panel").map((panel) => {
+        normalize(panel.id)
+        return DialStore.subscribe(panel.id, () => normalize(panel.id))
+      })
+    }
+    watchPanels()
+    const offGlobal = DialStore.subscribeGlobal(watchPanels)
+    return () => {
+      offGlobal()
+      unsubscribers.forEach((off) => off())
+    }
+  }, [])
 }
 
 /** Push generated code to the Usage section's <LiveCodeBlock>. */
@@ -93,6 +159,7 @@ export function DocsPlayground({
   const [open, setOpen] = useState(false)
   const hasPresets = Boolean(presets?.length)
   const toggle = () => setOpen((value) => !value)
+  useHexColors()
 
   return (
     <div ref={stageRef} className={cn("relative h-full w-full", className)}>

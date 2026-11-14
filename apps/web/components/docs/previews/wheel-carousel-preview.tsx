@@ -13,8 +13,6 @@ import {
   useLiveCode,
 } from "@/components/docs-playground";
 
-type PaletteMode = Exclude<WheelCarouselMode, "system">;
-
 interface CustomPalette {
   background: string;
   panelColor: string;
@@ -40,7 +38,9 @@ const useWheelCarouselPreview = create<{
   customPalette: defaultCustomPalette,
 }));
 
-const modes: Array<{ name: string; value: PaletteMode; colors: string[] }> = [
+const modes: Array<{ name: string; value: WheelCarouselMode; colors: string[] }> = [
+  // Follows the site theme: half light, half dark.
+  { name: "System", value: "system", colors: ["#ffffff 50%", "#18181b 50%"] },
   { name: "Light", value: "light", colors: ["#ffffff", "#d4d4d4"] },
   { name: "Dark", value: "dark", colors: ["#3f3f46", "#000000"] },
   {
@@ -77,7 +77,17 @@ function samePalette(a: CustomPalette, b: CustomPalette) {
 }
 
 function generateCode(mode: WheelCarouselMode, palette: CustomPalette) {
-  const props = ["items={projects}"];
+  // Same geometry as the preview, so pasted code looks like what you tuned.
+  const props = [
+    "items={projects}",
+    "contentWidth={760}",
+    "radius={260}",
+    "spacing={13}",
+    "visibleItems={6}",
+    "photoRadius={14}",
+    "edgeFade",
+    "edgeFadeSize={22}",
+  ];
   if (mode !== "system") props.push(`mode="${mode}"`);
   if (mode === "custom") {
     for (const key of paletteKeys) props.push(`${key}="${palette[key]}"`);

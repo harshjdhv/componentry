@@ -7,6 +7,7 @@ import {
   DocsPlayground,
   gradientSwatch,
   useLiveCode,
+  jsxProp,
 } from "@/components/docs-playground";
 
 /** An empty color draws in currentColor, so it follows the theme. */
@@ -53,7 +54,7 @@ function code(config: Config) {
   const props = Object.entries(config)
     .filter(([key, value]) => !(key === "color" && value === ""))
     .map(([key, value]) =>
-      typeof value === "string" ? `${key}="${value}"` : `${key}={${value}}`,
+      jsxProp(key, value),
     )
     .join("\n  ");
 

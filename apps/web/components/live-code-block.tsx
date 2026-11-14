@@ -48,8 +48,12 @@ export function LiveCodeBlock({ defaultCode, lang = "tsx" }: LiveCodeBlockProps)
                 console.error("Failed to fetch highlighted code", e);
             }
         };
-        fetchHtml();
-        return () => { active = false; };
+        // Wait for the code to settle so dragging a slider doesn't highlight every step.
+        const timer = setTimeout(fetchHtml, 150);
+        return () => {
+            active = false;
+            clearTimeout(timer);
+        };
     }, [displayCode, lang]);
 
     if (!isMounted) {

@@ -7,6 +7,7 @@ import {
   DocsPlayground,
   gradientSwatch,
   useLiveCode,
+  jsxProp,
 } from "@/components/docs-playground";
 
 const DEFAULTS = {
@@ -117,7 +118,7 @@ function generateCode(config: Config) {
     .filter(([, value]) => value !== undefined && value !== null)
     .map(([key, value]) => {
       if (typeof value === "string") {
-        return `${key}="${value}"`;
+        return jsxProp(key, value);
       }
       if (typeof value === "boolean") {
         return value ? `${key}` : `${key}={false}`;

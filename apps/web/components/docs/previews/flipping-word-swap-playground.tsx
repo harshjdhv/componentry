@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import { useDialKit } from "dialkit";
 import { FlippingWordSwap } from "@workspace/ui/components/flipping-word-swap";
-import { DocsPlayground, useLiveCode } from "@/components/docs-playground";
+import { DocsPlayground, useLiveCode, jsxProp } from "@/components/docs-playground";
 
 interface FlippingWordSwapConfig {
   word1: string;
@@ -49,8 +49,8 @@ function generateCode(config: FlippingWordSwapConfig) {
 
 <div className="flex min-h-[400px] items-center justify-center">
   <FlippingWordSwap
-    word1=${JSON.stringify(config.word1)}
-    word2=${JSON.stringify(config.word2)}
+    ${jsxProp("word1", config.word1)}
+    ${jsxProp("word2", config.word2)}
     duration={${config.duration}}
     stagger={${config.stagger}}
     className="text-[${config.word1LightColor}] dark:text-[${config.word1DarkColor}]"
