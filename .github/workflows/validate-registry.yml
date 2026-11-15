@@ -12,8 +12,16 @@ concurrency:
   group: library-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Tip: set TURBO_TOKEN + TURBO_TEAM repo secrets (Vercel remote cache) and
+# turbo will reuse build/lint/typecheck outputs across runs, making most of
+# these jobs near-instant on repeat pushes.
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
 jobs:
-  validate:
+  checks:
+    name: Registry checks, tests & lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -27,13 +35,42 @@ jobs:
       - run: pnpm registry:check
       - run: pnpm test
       - run: pnpm lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web exec next typegen
       - run: pnpm typecheck
+
+  build:
+    name: Build
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
 
   consumer:
+    name: Consumer smoke test
+    needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -43,7 +80,11 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:registry:install
         env:
