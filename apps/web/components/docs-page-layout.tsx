@@ -8,6 +8,7 @@ import { DocsPropsTable } from "@/components/docs-props-table"
 import { DocsFooterSection } from "@/components/docs-footer-section"
 import { ComponentPagination } from "@/components/component-pagination"
 import { Section } from "@/components/component-layout"
+import { components } from "@/registry"
 import { DocsPreviewWrapper, type VariantItem } from "@/components/docs-preview-wrapper"
 import { highlightCode } from "@/lib/shiki"
 import { splitImportAndUsage, stripImportFromCode, joinImportAndUsage } from "@/lib/split-import"
@@ -120,6 +121,9 @@ export async function DocsPageLayout({
     variantCodes = examples.map((ex) => stripImportFromCode(ex.code || ""))
   }
 
+  // Category of the current component, used as the middle breadcrumb crumb
+  const category = components[installPackageName]?.category
+
   return (
     <div
       data-docs-layout
@@ -131,18 +135,35 @@ export async function DocsPageLayout({
         <div className="pointer-events-auto -ml-2 shrink-0">
           <FloatingDocsSidebarLazy />
         </div>
-        <div className="inline-flex min-h-8 min-w-0 items-center gap-2 text-[15px] font-normal tracking-[-0.02em] leading-normal text-black/45 pointer-events-auto dark:text-white/45 group-has-[[data-sidebar-open=true]]/docs-navigation:invisible">
+        <div className="inline-flex min-h-8 min-w-0 items-center gap-1.5 text-sm font-normal tracking-[-0.01em] leading-normal text-black/50 pointer-events-auto dark:text-white/50 group-has-[[data-sidebar-open=true]]/docs-navigation:invisible">
           <Link
             href="/docs"
-            className="shrink-0 font-normal transition-colors hover:text-black/70 dark:hover:text-white/70"
+            className="relative shrink-0 font-normal transition-colors after:absolute after:-inset-x-1.5 after:-inset-y-2.5 after:content-[''] hover:text-black/90 dark:hover:text-white/90"
           >
             Docs
           </Link>
           <ChevronRight
-            className="size-3.5 shrink-0 text-black/30 dark:text-white/30"
+            className="size-3 shrink-0 text-black/35 dark:text-white/35"
             aria-hidden="true"
           />
-          <span className="max-w-[130px] truncate font-medium text-black/60 sm:max-w-[220px] dark:text-white/60">
+          {category && (
+            <>
+              <Link
+                href={`/docs#${category.toLowerCase().replace(/\s+/g, "-")}`}
+                className="relative shrink-0 font-normal transition-colors after:absolute after:-inset-x-1.5 after:-inset-y-2.5 after:content-[''] hover:text-black/90 dark:hover:text-white/90"
+              >
+                {category}
+              </Link>
+              <ChevronRight
+                className="size-3 shrink-0 text-black/35 dark:text-white/35"
+                aria-hidden="true"
+              />
+            </>
+          )}
+          <span
+            aria-current="page"
+            className="min-w-0 truncate font-medium tracking-[-0.01em] text-black/85 dark:text-white/85"
+          >
             {title}
           </span>
         </div>

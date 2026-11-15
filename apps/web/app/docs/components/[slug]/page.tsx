@@ -100,25 +100,25 @@ function DocsPageSkeleton() {
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[150px] select-none bg-[linear-gradient(to_bottom,transparent,#ffffff)] backdrop-blur-[4px] [mask-image:linear-gradient(to_top,#000_50%,transparent)] [-webkit-mask-image:linear-gradient(to_top,#000_50%,transparent)] dark:bg-[linear-gradient(to_bottom,transparent,var(--background))]" />
 
                 <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    <div className="w-full animate-pulse space-y-20 pt-32 pb-40 pr-6 sm:pr-8 lg:pt-48 lg:pr-8 pl-[max(1.5rem,calc((100vw-1360px)/2))]">
+                    <div className="w-full animate-pulse space-y-14 pb-40 pr-6 sm:pr-8 lg:space-y-16 lg:pt-40 lg:pr-8 pl-[max(1.5rem,calc((100vw-1360px)/2))]">
 
                         {/* Header Section */}
                         <div className="space-y-10">
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <div className="h-12 w-3/4 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-                                <div className="h-6 w-full bg-zinc-200 dark:bg-zinc-800/50 rounded-lg" />
-                                <div className="h-6 w-2/3 bg-zinc-200 dark:bg-zinc-800/50 rounded-lg" />
+                                <div className="h-8 w-full bg-zinc-200 dark:bg-zinc-800/50 rounded-lg" />
+                                <div className="h-8 w-2/3 bg-zinc-200 dark:bg-zinc-800/50 rounded-lg" />
                             </div>
                         </div>
 
                         {/* Installation Section */}
-                        <div className="space-y-6">
+                        <div className="space-y-6 pt-8">
                             <div className="h-8 w-32 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
                             <div className="h-16 w-full bg-zinc-200 dark:bg-zinc-800/30 rounded-xl" />
                         </div>
 
                         {/* Usage Section */}
-                        <div className="space-y-6">
+                        <div className="space-y-6 pt-8">
                             <div className="h-8 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
                             <div className="h-48 w-full bg-zinc-200 dark:bg-zinc-800/30 rounded-xl border border-zinc-200 dark:border-zinc-800" />
                         </div>
