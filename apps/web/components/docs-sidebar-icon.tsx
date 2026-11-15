@@ -4,8 +4,10 @@ import { motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
+// Solid rounded square, rx=4 (original mark was ~8 — squared off to match the UI).
+// The sidebar panel is knocked out with evenodd fill, so no background-color coupling.
 const OUTER =
-  "M11 3H13C16.7712 3 18.6569 3 19.8284 4.17157C21 5.34315 21 7.22876 21 11V13C21 16.7712 21 18.6569 19.8284 19.8284C18.6569 21 16.7712 21 13 21H11C7.2288 21 5.3431 21 4.1716 19.8284C3 18.6569 3 16.7712 3 13V11C3 7.22876 3 5.34315 4.1716 4.17157C5.3431 3 7.2288 3 11 3Z"
+  "M7 3H17C19.2091 3 21 4.7909 21 7V17C21 19.2091 19.2091 21 17 21H7C4.7909 21 3 19.2091 3 17V7C3 4.7909 4.7909 3 7 3Z"
 
 const PANEL_CLOSED =
   "M10 5.5 C10 4.793 10 4.439 9.780 4.220 C9.560 4 9.207 4 8.5 4 H8.5 C6.379 4 5.318 4 4.659 4.659 C4 5.318 4 6.379 4 8.5 V15.5 C4 17.621 4 18.682 4.659 19.341 C5.318 20 6.379 20 8.5 20 H8.5 C9.207 20 9.561 20 9.780 19.780 C10 19.561 10 19.207 10 18.5 V5.5 Z"
@@ -15,15 +17,10 @@ const PANEL_OPEN =
 
 interface DocsSidebarIconProps {
   isOpen: boolean
-  strokeWidth?: number
   className?: string
 }
 
-export function DocsSidebarIcon({
-  isOpen,
-  strokeWidth = 1.5,
-  className,
-}: DocsSidebarIconProps) {
+export function DocsSidebarIcon({ isOpen, className }: DocsSidebarIconProps) {
   return (
     <svg
       width="24"
@@ -34,18 +31,12 @@ export function DocsSidebarIcon({
       className={cn("size-5 shrink-0", className)}
       aria-hidden
     >
-      <path
-        d={OUTER}
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
       <motion.path
-        d={isOpen ? PANEL_OPEN : PANEL_CLOSED}
-        animate={{ d: isOpen ? PANEL_OPEN : PANEL_CLOSED }}
-        style={{ fill: "var(--background)" }}
+        fill="currentColor"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        initial={false}
+        animate={{ d: `${OUTER} ${isOpen ? PANEL_OPEN : PANEL_CLOSED}` }}
         transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
       />
     </svg>
