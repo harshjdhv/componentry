@@ -21,6 +21,7 @@ import type {
   FileTree,
   HighlightedBlockFile,
 } from "@/lib/blocks/types";
+import posthog from "posthog-js";
 import { cn } from "@/lib/utils";
 
 type View = "preview" | "code";
@@ -109,10 +110,12 @@ function CopyIconButton({
   text,
   label,
   className,
+  onCopied,
 }: {
   text: string;
   label: string;
   className?: string;
+  onCopied?: () => void;
 }) {
   const [copied, setCopied] = React.useState(false);
 
@@ -127,6 +130,7 @@ function CopyIconButton({
       )}
       onClick={async () => {
         await copyText(text);
+        onCopied?.();
         setCopied(true);
         window.setTimeout(() => setCopied(false), 1400);
       }}
@@ -136,7 +140,7 @@ function CopyIconButton({
   );
 }
 
-function CopyCommandButton({ command }: { command: string }) {
+function CopyCommandButton({ command, blockName }: { command: string; blockName: string }) {
   const [copied, setCopied] = React.useState(false);
   const registryItem = command.replace("npx shadcn@latest add ", "");
 
@@ -146,6 +150,7 @@ function CopyCommandButton({ command }: { command: string }) {
       className="inline-flex h-8 w-fit items-center gap-1.5 rounded-md border border-line bg-background px-2 font-mono text-[0.8125rem] font-normal text-foreground transition hover:bg-muted"
       onClick={async () => {
         await copyText(command);
+        posthog.capture("block_install_command_copied", { block_name: blockName });
         setCopied(true);
         window.setTimeout(() => setCopied(false), 1400);
       }}
@@ -257,7 +262,7 @@ export function BlockViewer({
 
               <div className="mx-1 hidden h-4 w-px bg-line lg:block" />
 
-              <CopyCommandButton command={installCommand} />
+              <CopyCommandButton command={installCommand} blockName={item.name} />
             </div>
           </div>
         </div>
@@ -327,6 +332,12 @@ export function BlockViewer({
                     text={file.content ?? ""}
                     label="Copy file"
                     className="absolute right-1.5 size-7 text-zinc-500 hover:bg-black/[0.05] hover:text-zinc-900 dark:hover:bg-white/[0.08] dark:hover:text-zinc-200"
+                    onCopied={() =>
+                      posthog.capture("block_file_copied", {
+                        block_name: item.name,
+                        file_extension: file.target.split(".").at(-1) ?? "unknown",
+                      })
+                    }
                   />
                 </figcaption>
 
