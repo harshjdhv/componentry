@@ -46,7 +46,7 @@ export function CustomWorkCta() {
             <div className="flex items-end gap-3 border-b border-zinc-200 pb-6 dark:border-white/[0.1]">
               <a
                 href={`mailto:${emailAddress}?subject=Custom%20design%20work`}
-                onClick={() => posthog.capture("custom_work_contact_started")}
+                onClick={() => posthog.capture("custom_work_contact_started", { contact_method: "email" })}
                 className={`group min-w-0 flex-1 rounded-sm pb-2 ${focusClass}`}
               >
                 <span className="mb-3 block text-sm text-zinc-500 dark:text-zinc-400">Tell me about your project</span>
@@ -84,6 +84,7 @@ export function CustomWorkCta() {
               href="https://x.com/harshjdhv"
               target="_blank"
               rel="noreferrer"
+              onClick={() => posthog.capture("custom_work_contact_started", { contact_method: "x" })}
               className={`group flex min-h-20 items-center justify-between gap-4 rounded-sm py-5 ${focusClass}`}
             >
               <span className="text-sm text-zinc-500 dark:text-zinc-400">Or start a conversation on X</span>

@@ -249,6 +249,11 @@ export default function SponsorsPage() {
                       href={sponsorHref}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() =>
+                        posthog.capture("sponsor_checkout_started", {
+                          sponsorship_tier: slot.name.toLowerCase(),
+                        })
+                      }
                       className={slot.boardClassName}
                     >
                       {content}

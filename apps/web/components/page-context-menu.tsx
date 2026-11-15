@@ -4,6 +4,7 @@ import * as React from "react"
 import { Check, ChevronDown, Copy } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AI_ASSISTANTS } from "@/config/ai"
+import posthog from "posthog-js"
 
 interface PageContextMenuProps {
   content: string
@@ -89,6 +90,7 @@ export function PageContextMenu({ content, className }: PageContextMenuProps) {
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content)
+    posthog.capture("docs_markdown_copied")
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -102,6 +104,7 @@ export function PageContextMenu({ content, className }: PageContextMenuProps) {
     const prompt = getPrompt(url)
 
     await navigator.clipboard.writeText(content)
+    posthog.capture("docs_ai_assistant_opened", { assistant_id: assistant.id })
     window.open(assistant.url(prompt), "_blank", "noopener,noreferrer")
     setIsOpen(false)
   }
