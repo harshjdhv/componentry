@@ -218,10 +218,6 @@ const docsImportMap: Record<
     import("@/components/docs/signature").then((m) => ({
       default: m.SignatureDocs,
     })),
-  "split-flap-display": () =>
-    import("@/components/docs/split-flap-display").then((m) => ({
-      default: m.SplitFlapDisplayDocs,
-    })),
   "eye-tracking": () =>
     import("@/components/docs/eye-tracking").then((m) => ({
       default: m.EyeTrackingDocs,
