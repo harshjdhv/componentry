@@ -58,12 +58,12 @@ export function NotFoundView() {
             <Link
               key={l.href}
               href={l.href}
-              className="group flex h-8 items-center gap-1.5 rounded-lg bg-zinc-100 pr-3 pl-2.5 text-[13px] font-medium text-zinc-700 transition-[background-color,color,transform] duration-150 ease-out hover:bg-zinc-200 hover:text-zinc-950 active:scale-[0.97] dark:bg-[#1a1a1a] dark:text-zinc-300 dark:hover:bg-[#222] dark:hover:text-zinc-50"
+              className="flex h-8 items-center gap-1.5 rounded-lg bg-zinc-100 pr-3 pl-2.5 text-[13px] font-medium text-zinc-700 transition-[background-color,color,transform] duration-150 ease-out hover:bg-zinc-200 hover:text-zinc-950 active:scale-[0.97] dark:bg-[#1a1a1a] dark:text-zinc-300 dark:hover:bg-[#222] dark:hover:text-zinc-50"
             >
               <l.Icon
                 aria-hidden
                 strokeWidth={1.75}
-                className="size-3.5 text-zinc-400 transition-colors duration-150 ease-out group-hover:text-zinc-700 dark:text-zinc-500 dark:group-hover:text-zinc-300"
+                className="size-3.5"
               />
               {l.label}
             </Link>
