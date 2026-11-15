@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { Heatmap } from "@paper-design/shaders-react";
 import { cn } from "@workspace/ui/lib/utils";
 
-const EMBER = [
-  "#1a0b0b",
-  "#4a1716",
-  "#8f2f2b",
-  "#d4615a",
-  "#ef8b87",
-  "#ffd2c4",
-  "#fff6f1",
+const ICE = [
+  "#050b1a",
+  "#0f2550",
+  "#1f4fa8",
+  "#4f8ef0",
+  "#9cc8ff",
+  "#e2f0ff",
+  "#ffffff",
 ];
 
 /**
@@ -41,9 +41,9 @@ export interface HeatmapLogoProps {
 /** A logo that glows like hot metal, with heat drifting slowly through it. */
 export function HeatmapLogo({
   image,
-  colors = EMBER,
+  colors = ICE,
   background = "#00000000",
-  glow = 0.3,
+  glow = 0,
   className,
 }: HeatmapLogoProps) {
   const reduceMotion = usePrefersReducedMotion();

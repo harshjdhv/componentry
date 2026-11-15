@@ -37,7 +37,7 @@ export async function HeatmapLogoDocs() {
         {
           name: "colors",
           type: "string[]",
-          description: "Heat ramp from coolest to hottest, as hex colors. Defaults to an ember ramp.",
+          description: "Heat ramp from coolest to hottest, as hex colors. Defaults to an icy blue ramp.",
         },
         {
           name: "background",
@@ -47,7 +47,7 @@ export async function HeatmapLogoDocs() {
         {
           name: "glow",
           type: "number",
-          description: "Strength of the halo around the logo, 0 to 1. Defaults to 0.3.",
+          description: "Strength of the halo around the logo, 0 to 1. Defaults to 0.",
         },
         {
           name: "className",

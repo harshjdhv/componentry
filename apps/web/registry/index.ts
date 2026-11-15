@@ -24,7 +24,7 @@ export function isNewComponent(component: ComponentMetadata): boolean {
 
 /** Curated showroom order for /docs — strongest video-preview pieces first. */
 export const featuredComponentSlugs = [
-  "spectral-ribbon",
+  "heatmap-logo",
   "image-ripple-effect",
   "liquid-glass-carousel",
   "newsletter-bookshelf",
