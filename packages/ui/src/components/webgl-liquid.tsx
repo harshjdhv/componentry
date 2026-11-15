@@ -349,7 +349,7 @@ export function WebGLLiquid({
   const fallbackContent = (
     <div
       className={cn(
-        "relative flex min-h-screen w-full items-center overflow-hidden bg-[#02040b] text-white",
+        "relative min-h-screen w-full overflow-hidden bg-[#02040b]",
         className,
       )}
       style={{ containerType: "size", ...style }}
@@ -368,7 +368,7 @@ export function WebGLLiquid({
       <div
         ref={hostRef}
         className={cn(
-          "relative flex min-h-screen w-full items-center overflow-hidden bg-[#02040b] text-white",
+          "relative min-h-screen w-full overflow-hidden bg-[#02040b]",
           className,
         )}
         style={{ containerType: "size", ...style }}

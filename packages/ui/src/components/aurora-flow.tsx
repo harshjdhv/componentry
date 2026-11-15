@@ -220,7 +220,6 @@ export interface AuroraFlowProps extends React.HTMLAttributes<HTMLDivElement> {
   vignette?: boolean;
   vignetteStrength?: number;
   borderRadius?: React.CSSProperties["borderRadius"];
-  children?: React.ReactNode;
 }
 
 function clamp(value: number, minimum: number, maximum: number) {
@@ -290,7 +289,6 @@ export function AuroraFlow({
   borderRadius = 0,
   className,
   style,
-  children,
   ...props
 }: AuroraFlowProps) {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -664,7 +662,6 @@ export function AuroraFlow({
         className="absolute inset-0"
         style={staticBackground}
       />
-      {children && <div className="relative z-10 size-full">{children}</div>}
     </div>
   );
 
@@ -691,7 +688,6 @@ export function AuroraFlow({
             className="pointer-events-none absolute inset-0 size-full"
           />
         )}
-        {children && <div className="relative z-10 size-full">{children}</div>}
       </div>
     </WebGLErrorBoundary>
   );

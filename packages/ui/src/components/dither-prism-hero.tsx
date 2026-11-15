@@ -550,7 +550,7 @@ export default function DitherPrismHero({
     return (
         <div
             className={cn(
-                "relative w-full min-h-screen flex flex-col items-center overflow-hidden text-gray-900",
+                "relative w-full min-h-screen overflow-hidden",
                 className
             )}
             style={{ containerType: "size", ...style }}

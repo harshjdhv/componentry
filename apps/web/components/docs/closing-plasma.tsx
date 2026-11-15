@@ -114,11 +114,6 @@ export async function ClosingPlasmaDocs() {
           description: "Light palette highlight tone.",
         },
         {
-          name: "children",
-          type: "ReactNode",
-          description: "Optional overlay content rendered above the plasma layer.",
-        },
-        {
           name: "className",
           type: "string",
           description: "Additional CSS classes for the root container.",

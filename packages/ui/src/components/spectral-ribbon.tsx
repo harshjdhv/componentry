@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 
 export interface SpectralRibbonProps {
@@ -14,7 +14,6 @@ export interface SpectralRibbonProps {
   grain?: number;
   className?: string;
   style?: CSSProperties;
-  children?: ReactNode;
 }
 
 const vertex = `attribute vec2 a_position;
@@ -159,7 +158,6 @@ export function SpectralRibbon({
   grain = 0.45,
   className,
   style,
-  children,
 }: SpectralRibbonProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const updateRef = useRef<(() => void) | null>(null);
@@ -338,9 +336,6 @@ export function SpectralRibbon({
         className="pointer-events-none absolute inset-0 block size-full"
         style={{ opacity: 0 }}
       />
-      {children ? (
-        <div className="relative z-10 h-full min-h-0 w-full">{children}</div>
-      ) : null}
     </div>
   );
 }

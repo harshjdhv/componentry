@@ -157,7 +157,6 @@ export interface ClosingPlasmaProps extends React.HTMLAttributes<HTMLDivElement>
   lightColorA?: string;
   lightColorB?: string;
   lightColorC?: string;
-  children?: React.ReactNode;
 }
 
 export function ClosingPlasma({
@@ -177,7 +176,6 @@ export function ClosingPlasma({
   lightColorB = LIGHT_B,
   lightColorC = LIGHT_C,
   className,
-  children,
   style,
   ...props
 }: ClosingPlasmaProps) {
@@ -427,7 +425,6 @@ export function ClosingPlasma({
         className="absolute inset-0 h-full w-full"
         style={{ width: "100%", height: "100%", display: "block" }}
       />
-      {children && <div className="relative z-10 h-full w-full">{children}</div>}
     </div>
   );
 }

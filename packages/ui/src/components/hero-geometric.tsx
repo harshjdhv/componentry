@@ -195,14 +195,15 @@ export default function HeroGeometric({
     color2 = "#F0F9FF", // Default pale blue
     speed = 1,
     className,
+    style,
     ...props
 }: HeroGeometricProps) {
     return (
         <div
-            className={cn("relative w-full min-h-screen flex flex-col items-center overflow-hidden bg-white text-black", className)}
+            className={cn("relative w-full min-h-screen overflow-hidden bg-white", className)}
             style={{
                 containerType: "size",
-                ...props.style
+                ...style
             }}
             {...props}
         >

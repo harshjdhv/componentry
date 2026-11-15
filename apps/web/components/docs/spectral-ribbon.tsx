@@ -26,11 +26,6 @@ export async function SpectralRibbonDocs() {
       unstyledPreview
       props={[
         {
-          name: "children",
-          type: "ReactNode",
-          description: "Content composed over the ribbon.",
-        },
-        {
           name: "speed",
           type: "number",
           default: "1",

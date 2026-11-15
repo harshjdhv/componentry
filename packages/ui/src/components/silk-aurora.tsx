@@ -405,7 +405,7 @@ export function SilkAurora({
   const fallbackContent = (
     <div
       className={cn(
-        "relative flex min-h-screen w-full items-center overflow-hidden bg-[#050507] text-white",
+        "relative min-h-screen w-full overflow-hidden bg-[#050507]",
         className,
       )}
       style={{ containerType: "size", ...style }}
@@ -424,7 +424,7 @@ export function SilkAurora({
       <div
         ref={containerRef}
         className={cn(
-          "relative flex min-h-screen w-full items-center overflow-hidden bg-[#050507] text-white",
+          "relative min-h-screen w-full overflow-hidden bg-[#050507]",
           className,
         )}
         style={{ containerType: "size", ...style }}
