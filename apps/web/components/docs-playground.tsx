@@ -165,7 +165,7 @@ const LAUNCHER =
 
 /** Swatch with a hairline edge; the chosen one gets the site focus ring. */
 const SWATCH =
-  "size-8 shrink-0 rounded-lg [background:var(--swatch)] shadow-[inset_0_0_0_1px_rgb(0_0_0/0.1)] transition-[scale,box-shadow] duration-150 ease-out supports-[corner-shape:squircle]:rounded-[12px] supports-[corner-shape:squircle]:[corner-shape:squircle] active:scale-[0.96] aria-checked:ring-2 aria-checked:ring-ring aria-checked:ring-offset-1 aria-checked:ring-offset-[#f1f1f2] dark:aria-checked:ring-offset-[#131313] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400"
+  "size-8 shrink-0 rounded-lg [background:var(--swatch)] shadow-[inset_0_0_0_1px_rgb(0_0_0/0.1)] transition-[scale,box-shadow] duration-150 ease-out supports-[corner-shape:squircle]:rounded-[12px] supports-[corner-shape:squircle]:[corner-shape:squircle] active:scale-[0.96] aria-checked:ring-1 aria-checked:ring-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400"
 
 /**
  * Plain icon button: same icon color as the preview toolbar, no fill. Kept narrow
