@@ -29,6 +29,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@next/env':
+        specifier: 16.0.10
+        version: 16.0.10
       '@opentelemetry/api-logs':
         specifier: ^0.223.0
         version: 0.223.0

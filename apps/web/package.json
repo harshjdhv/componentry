@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@next/env": "16.0.10",
     "@opentelemetry/api-logs": "^0.223.0",
     "@opentelemetry/exporter-logs-otlp-http": "^0.301.2",
     "@opentelemetry/resources": "^3.1.1",
