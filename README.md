@@ -92,9 +92,9 @@ pnpm dev
 
 ### Environment variables
 
-All env vars live in a single root `.env` file (gitignored). The repo already
-includes `apps/web/.env.local` as a symlink to it, so Next.js picks up the same
-values automatically — no extra setup needed.
+All env vars live in a single root `.env` file (gitignored).
+`apps/web/next.config.mjs` loads it with Next's own env loader, so the web app
+picks up the same values automatically. No symlink or extra setup is needed.
 
 After cloning, copy the template and fill in what you need:
 
