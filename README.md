@@ -90,6 +90,31 @@ pnpm install
 pnpm dev
 ```
 
+### Environment variables
+
+All env vars live in a single root `.env` file (gitignored). The repo already
+includes `apps/web/.env.local` as a symlink to it, so Next.js picks up the same
+values automatically — no extra setup needed.
+
+After cloning, copy the template and fill in what you need:
+
+```bash
+cp .env.example .env
+```
+
+Nothing here is required to run the app: with no keys, everything degrades
+gracefully — analytics stays off, registry namespace falls back to
+`@componentry`, and the R2 upload scripts just tell you which var is missing.
+
+| Variable | Used for |
+|---|---|
+| `R2_*` | Cloudflare R2 uploads for component preview videos (scripts) |
+| `NEXT_PUBLIC_POSTHOG_*` | PostHog analytics |
+| `NEXT_PUBLIC_APP_URL` | Base URL of the registry |
+| `NEXT_PUBLIC_REGISTRY_NAMESPACE` | Namespace in install commands |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console meta tag |
+| `TURBO_TOKEN`, `TURBO_TEAM` | Turborepo remote cache |
+
 ### Project Structure
 
 ```
