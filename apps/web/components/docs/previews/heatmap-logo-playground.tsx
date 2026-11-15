@@ -17,7 +17,7 @@ const PALETTES = {
 } as const
 type PaletteName = keyof typeof PALETTES
 
-const DEFAULTS = { palette: "Ember" as PaletteName, glow: 0.3 }
+const DEFAULTS = { palette: "Ice" as PaletteName, glow: 0 }
 
 const config = {
   glow: [DEFAULTS.glow, 0, 1, 0.01] as [number, number, number, number],

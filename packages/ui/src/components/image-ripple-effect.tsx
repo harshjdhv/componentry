@@ -2,7 +2,7 @@
 /* eslint react/no-unknown-property: ["error", { "ignore": ["args", "vertexShader", "fragmentShader", "transparent", "uniforms"] }] */
 "use client";
 
-import { OrthographicCamera, useFBO, useTexture } from "@react-three/drei";
+import { useFBO, useTexture } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { cn } from "@workspace/ui/lib/utils";
 import * as React from "react";
@@ -97,56 +97,8 @@ export interface ImageRippleEffectProps
   children?: React.ReactNode;
 }
 
-type ViewportDimensions = {
-  width: number;
-  height: number;
-  pixelRatio: number;
-};
-
-function useContainerDimensions(
-  ref: React.RefObject<HTMLElement | null>,
-): ViewportDimensions {
-  const [dimensions, setDimensions] = React.useState<ViewportDimensions>({
-    width: 0,
-    height: 0,
-    pixelRatio: 1,
-  });
-
-  React.useEffect(() => {
-    const element = ref.current;
-    if (!element) {
-      return;
-    }
-
-    const updateSize = () => {
-      const rect = element.getBoundingClientRect();
-      setDimensions({
-        width: Math.round(rect.width),
-        height: Math.round(rect.height),
-        pixelRatio:
-          typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 2) : 1,
-      });
-    };
-
-    updateSize();
-    const observer = new ResizeObserver(updateSize);
-    observer.observe(element);
-    window.addEventListener("resize", updateSize);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", updateSize);
-    };
-  }, [ref]);
-
-  return dimensions;
-}
-
 interface RippleSceneProps {
-  width: number;
-  height: number;
-  pixelRatio: number;
-  pointerRef: React.MutableRefObject<{ x: number; y: number }>;
+  pointerRef: React.MutableRefObject<PointerState>;
   images: RippleImageItem[];
   brushTextureUrl: string;
   distortionStrength: number;
@@ -156,12 +108,12 @@ interface RippleSceneProps {
   waveFadeMultiplier: number;
   waveGrowth: number;
   waveSpawnThreshold: number;
+  onReady: () => void;
 }
 
+type PointerState = { x: number; y: number; active: boolean };
+
 function RippleScene({
-  width,
-  height,
-  pixelRatio,
   pointerRef,
   images,
   brushTextureUrl,
@@ -172,55 +124,45 @@ function RippleScene({
   waveFadeMultiplier,
   waveGrowth,
   waveSpawnThreshold,
+  onReady,
 }: RippleSceneProps) {
-  const { viewport } = useThree();
-  const { gl, camera } = useThree();
+  // Everything is sized from R3F's own measurement so the camera frustum,
+  // FBOs and the output plane always agree — no frame where they disagree.
+  const gl = useThree((state) => state.gl);
+  const camera = useThree((state) => state.camera);
+  const size = useThree((state) => state.size);
+  const { width, height } = size;
 
   const brushTexture = useTexture(brushTextureUrl);
-  const imageTextures = useTexture(images.map((item) => item.src));
+  const imageSources = React.useMemo(() => images.map((item) => item.src), [images]);
+  const imageTextures = useTexture(imageSources);
   const rippleScene = React.useMemo(() => new THREE.Scene(), []);
   const imageScene = React.useMemo(() => new THREE.Scene(), []);
 
   const waveMeshesRef = React.useRef<THREE.Mesh[]>([]);
-  const prevMouseRef = React.useRef({ x: 0, y: 0 });
+  const prevPointerRef = React.useRef<{ x: number; y: number } | null>(null);
   const currentWaveRef = React.useRef(0);
+  const framesRenderedRef = React.useRef(0);
+  const drawingBufferSize = React.useMemo(() => new THREE.Vector2(), []);
 
-  const uniformsRef = React.useRef({
-    uDisplacement: { value: null as THREE.Texture | null },
-    uTexture: { value: null as THREE.Texture | null },
-    winResolution: { value: new THREE.Vector2(1, 1) },
-    uStrength: { value: distortionStrength },
-  });
-
-  const fboBase = useFBO(Math.max(width, 1), Math.max(height, 1), {
-    depthBuffer: false,
-    stencilBuffer: false,
-  });
-  const fboTexture = useFBO(Math.max(width, 1), Math.max(height, 1), {
-    depthBuffer: false,
-    stencilBuffer: false,
-  });
-
-  const imageCamera = React.useMemo(
-    () =>
-      new THREE.OrthographicCamera(
-        viewport.width / -2,
-        viewport.width / 2,
-        viewport.height / 2,
-        viewport.height / -2,
-        -1000,
-        1000,
-      ),
-    [viewport.height, viewport.width],
+  const uniforms = React.useMemo(
+    () => ({
+      uDisplacement: { value: null as THREE.Texture | null },
+      uTexture: { value: null as THREE.Texture | null },
+      winResolution: { value: new THREE.Vector2(1, 1) },
+      uStrength: { value: distortionStrength },
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
-  React.useEffect(() => {
-    imageCamera.position.z = 2;
-  }, [imageCamera]);
+  // Full drawing-buffer resolution (size * dpr), tracked automatically by drei.
+  const fboBase = useFBO({ depthBuffer: false, stencilBuffer: false });
+  const fboTexture = useFBO({ depthBuffer: false, stencilBuffer: false });
 
   React.useEffect(() => {
-    uniformsRef.current.uStrength.value = distortionStrength;
-  }, [distortionStrength]);
+    uniforms.uStrength.value = distortionStrength;
+  }, [distortionStrength, uniforms]);
 
   React.useEffect(() => {
     brushTexture.minFilter = THREE.LinearFilter;
@@ -229,23 +171,14 @@ function RippleScene({
   }, [brushTexture]);
 
   React.useEffect(() => {
-    waveMeshesRef.current.forEach((mesh) => {
-      rippleScene.remove(mesh);
-      mesh.geometry.dispose();
-      if (Array.isArray(mesh.material)) {
-        mesh.material.forEach((material) => material.dispose());
-      } else {
-        mesh.material.dispose();
-      }
-    });
-
     const meshes: THREE.Mesh[] = [];
+    const geometry = new THREE.PlaneGeometry(waveSize, waveSize, 1, 1);
     for (let i = 0; i < waveCount; i += 1) {
-      const geometry = new THREE.PlaneGeometry(waveSize, waveSize, 1, 1);
       const material = new THREE.MeshBasicMaterial({
         transparent: true,
         map: brushTexture,
         depthWrite: false,
+        opacity: 0,
       });
       const mesh = new THREE.Mesh(geometry, material);
       mesh.visible = false;
@@ -260,22 +193,14 @@ function RippleScene({
     return () => {
       meshes.forEach((mesh) => {
         rippleScene.remove(mesh);
-        mesh.geometry.dispose();
-        if (Array.isArray(mesh.material)) {
-          mesh.material.forEach((material) => material.dispose());
-        } else {
-          mesh.material.dispose();
-        }
+        (mesh.material as THREE.Material).dispose();
       });
+      geometry.dispose();
+      waveMeshesRef.current = [];
     };
   }, [brushTexture, rippleScene, waveCount, waveSize]);
 
   React.useEffect(() => {
-    while (imageScene.children.length > 0) {
-      imageScene.remove(imageScene.children[0] as THREE.Object3D);
-    }
-
-    imageScene.add(imageCamera);
     const geometry = new THREE.PlaneGeometry(1, 1);
     const group = new THREE.Group();
 
@@ -288,58 +213,57 @@ function RippleScene({
       texture.magFilter = THREE.LinearFilter;
       texture.needsUpdate = true;
 
-      const mesh = new THREE.Mesh(
-        geometry,
-        new THREE.MeshBasicMaterial({ map: texture }),
-      );
-      mesh.position.x = (item.x ?? (index - (images.length - 1) / 2) * 0.25) * viewport.width;
-      mesh.position.y = (item.y ?? 0) * viewport.height;
+      const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ map: texture }));
+      mesh.position.x = (item.x ?? (index - (images.length - 1) / 2) * 0.25) * width;
+      mesh.position.y = (item.y ?? 0) * height;
       mesh.position.z = 1;
-      mesh.scale.x = viewport.width * (item.widthScale ?? 0.22);
-      mesh.scale.y = viewport.width * (item.heightScale ?? 0.28);
+      mesh.scale.x = width * (item.widthScale ?? 0.22);
+      mesh.scale.y = width * (item.heightScale ?? 0.28);
       group.add(mesh);
     });
 
     imageScene.add(group);
 
     return () => {
-      geometry.dispose();
-      group.children.forEach((child) => {
-        const mesh = child as THREE.Mesh;
-        mesh.geometry?.dispose?.();
-        if (Array.isArray(mesh.material)) {
-          mesh.material.forEach((material) => material.dispose());
-        } else {
-          mesh.material?.dispose?.();
-        }
-      });
       imageScene.remove(group);
+      group.children.forEach((child) => {
+        ((child as THREE.Mesh).material as THREE.Material).dispose();
+      });
+      geometry.dispose();
     };
-  }, [imageCamera, imageScene, imageTextures, images, viewport.height, viewport.width]);
+  }, [imageScene, imageTextures, images, width, height]);
 
   useFrame(() => {
-    const x = pointerRef.current.x - width / 2;
-    const y = -pointerRef.current.y + height / 2;
-    const prev = prevMouseRef.current;
-    const moved =
-      Math.abs(x - prev.x) > waveSpawnThreshold ||
-      Math.abs(y - prev.y) > waveSpawnThreshold;
+    const pointer = pointerRef.current;
 
-    if (moved && waveMeshesRef.current.length > 0) {
-      const waveIndex = currentWaveRef.current % waveMeshesRef.current.length;
-      const mesh = waveMeshesRef.current[waveIndex];
-      if (mesh) {
-        mesh.position.x = x;
-        mesh.position.y = y;
-        mesh.visible = true;
-        mesh.scale.set(1.75, 1.75, 1);
-        mesh.rotation.z = Math.random() * Math.PI;
-        const material = mesh.material as THREE.MeshBasicMaterial;
-        material.opacity = 1;
+    if (pointer.active) {
+      const x = pointer.x - width / 2;
+      const y = -pointer.y + height / 2;
+      const prev = prevPointerRef.current;
+      // The first sample after the pointer enters only seeds the previous
+      // position — otherwise a wave would spawn from a stale/origin point.
+      const moved =
+        prev !== null &&
+        (Math.abs(x - prev.x) > waveSpawnThreshold ||
+          Math.abs(y - prev.y) > waveSpawnThreshold);
+
+      if (moved && waveMeshesRef.current.length > 0) {
+        const waveIndex = currentWaveRef.current % waveMeshesRef.current.length;
+        const mesh = waveMeshesRef.current[waveIndex];
+        if (mesh) {
+          mesh.position.x = x;
+          mesh.position.y = y;
+          mesh.visible = true;
+          mesh.scale.set(1.75, 1.75, 1);
+          mesh.rotation.z = Math.random() * Math.PI;
+          (mesh.material as THREE.MeshBasicMaterial).opacity = 1;
+        }
+        currentWaveRef.current = (waveIndex + 1) % waveMeshesRef.current.length;
       }
-      currentWaveRef.current = (waveIndex + 1) % waveMeshesRef.current.length;
+      prevPointerRef.current = { x, y };
+    } else {
+      prevPointerRef.current = null;
     }
-    prevMouseRef.current = { x, y };
 
     waveMeshesRef.current.forEach((mesh) => {
       if (!mesh.visible) {
@@ -355,11 +279,10 @@ function RippleScene({
       }
     });
 
-    uniformsRef.current.uTexture.value = fboTexture.texture;
-    uniformsRef.current.uDisplacement.value = fboBase.texture;
-    uniformsRef.current.winResolution.value
-      .set(width, height)
-      .multiplyScalar(pixelRatio);
+    gl.getDrawingBufferSize(drawingBufferSize);
+    uniforms.winResolution.value.copy(drawingBufferSize);
+    uniforms.uTexture.value = fboTexture.texture;
+    uniforms.uDisplacement.value = fboBase.texture;
 
     gl.setRenderTarget(fboBase);
     gl.clear();
@@ -367,9 +290,19 @@ function RippleScene({
 
     gl.setRenderTarget(fboTexture);
     gl.clear();
-    gl.render(imageScene, imageCamera);
+    // The default camera is a pixel-space orthographic camera (zoom = 1),
+    // so both passes share its projection.
+    gl.render(imageScene, camera);
 
     gl.setRenderTarget(null);
+
+    // Reveal the canvas only after real frames have been drawn to screen.
+    if (framesRenderedRef.current < 2) {
+      framesRenderedRef.current += 1;
+      if (framesRenderedRef.current === 2) {
+        onReady();
+      }
+    }
   });
 
   return (
@@ -379,7 +312,7 @@ function RippleScene({
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         transparent
-        uniforms={uniformsRef.current}
+        uniforms={uniforms}
       />
     </mesh>
   );
@@ -400,10 +333,17 @@ export function ImageRippleEffect({
   ...props
 }: ImageRippleEffectProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const { width, height, pixelRatio } = useContainerDimensions(containerRef);
-  const pointerRef = React.useRef({ x: 0, y: 0 });
+  const pointerRef = React.useRef<PointerState>({ x: 0, y: 0, active: false });
+  const [ready, setReady] = React.useState(false);
+  const handleReady = React.useCallback(() => setReady(true), []);
 
-  const handlePointerMove = React.useCallback(
+  // Callers commonly pass inline arrays (`images={[...]}`); key on content so
+  // the scene isn't rebuilt on every parent render.
+  const imagesKey = JSON.stringify(images);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableImages = React.useMemo(() => images, [imagesKey]);
+
+  const updatePointer = React.useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) {
@@ -412,45 +352,45 @@ export function ImageRippleEffect({
       pointerRef.current = {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
+        active: true,
       };
     },
     [],
   );
 
-  const frustumSize = height;
-  const aspect = width > 0 && height > 0 ? width / height : 1;
+  const handlePointerLeave = React.useCallback(() => {
+    pointerRef.current = { ...pointerRef.current, active: false };
+  }, []);
 
   return (
     <div
       ref={containerRef}
-      onPointerMove={handlePointerMove}
+      onPointerEnter={updatePointer}
+      onPointerMove={updatePointer}
+      onPointerLeave={handlePointerLeave}
       className={cn(
         "relative h-[560px] w-full overflow-hidden text-white",
         className,
       )}
       {...props}
     >
-      {width > 0 && height > 0 && (
-        <WebGLErrorBoundary fallback={<WebGLFallback className="absolute inset-0 h-full w-full" />}>
-          <Canvas>
-            <OrthographicCamera
-              makeDefault
-              args={[
-                (frustumSize * aspect) / -2,
-                (frustumSize * aspect) / 2,
-                frustumSize / 2,
-                frustumSize / -2,
-                -1000,
-                1000,
-              ]}
-              position={[0, 0, 2]}
-            />
+      <WebGLErrorBoundary fallback={<WebGLFallback className="absolute inset-0 h-full w-full" />}>
+        <Canvas
+          orthographic
+          camera={{ position: [0, 0, 2], zoom: 1, near: -1000, far: 1000 }}
+          dpr={[1, 2]}
+          style={{ position: "absolute", inset: 0 }}
+          className={cn(
+            "transition-opacity duration-500 ease-out motion-reduce:transition-none",
+            ready ? "opacity-100" : "opacity-0",
+          )}
+        >
+          {/* Local boundary: without it, texture loading suspends the Canvas and
+              bubbles up to the page's nearest Suspense boundary (R3F v9). */}
+          <React.Suspense fallback={null}>
             <RippleScene
-              width={width}
-              height={height}
-              pixelRatio={pixelRatio}
               pointerRef={pointerRef}
-              images={images}
+              images={stableImages}
               brushTextureUrl={brushTextureUrl}
               distortionStrength={distortionStrength}
               waveCount={waveCount}
@@ -459,10 +399,11 @@ export function ImageRippleEffect({
               waveFadeMultiplier={waveFadeMultiplier}
               waveGrowth={waveGrowth}
               waveSpawnThreshold={waveSpawnThreshold}
+              onReady={handleReady}
             />
-          </Canvas>
-        </WebGLErrorBoundary>
-      )}
+          </React.Suspense>
+        </Canvas>
+      </WebGLErrorBoundary>
       {children ? (
         <div className="pointer-events-none absolute inset-0 z-10">{children}</div>
       ) : null}

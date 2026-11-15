@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useDialKitController } from "dialkit";
 import { ImageRippleEffect } from "@workspace/ui/components/image-ripple-effect";
 import {
@@ -10,13 +10,85 @@ import {
   usePresetSelect,
 } from "@/components/docs-playground";
 
-const IMAGE = {
-  src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=1400",
-  x: 0,
-  y: 0,
-  widthScale: 0.34,
-  heightScale: 0.42,
-};
+const photo = (id: string) =>
+  `https://images.unsplash.com/photo-${id}?w=800&h=1000&q=85&auto=format&fit=crop`;
+
+// Turquoise water set: aerial shoreline – Moraine Lake – Lago di Braies.
+// The left photo is mirrored so its surf faces the centre card.
+const STRIP_SOURCES = [
+  `${photo("1505142468610-359e7d316be0")}&flip=h`,
+  photo("1493246507139-91e8fad9978e"),
+  photo("1501785888041-af3ef285b470"),
+];
+
+// Representative layout for the copyable snippet (fractions of the stage width).
+const WIDE_IMAGES = [
+  { src: `${photo("1505142468610-359e7d316be0")}&flip=h`, x: -0.5, y: 0, widthScale: 0.46, heightScale: 0.575 },
+  { src: photo("1493246507139-91e8fad9978e"), x: 0, y: 0, widthScale: 0.46, heightScale: 0.575 },
+  { src: photo("1501785888041-af3ef285b470"), x: 0.5, y: 0, widthScale: 0.46, heightScale: 0.575 },
+];
+
+// Narrow stages get the hero card alone, large enough for the ripple to read.
+const NARROW_IMAGES = [
+  { src: photo("1493246507139-91e8fad9978e"), x: 0, y: 0, widthScale: 0.7, heightScale: 0.875 },
+];
+
+// The component sizes cards as fractions of the stage *width*, so a fixed
+// fraction balloons in fullscreen. Size cards from the stage height instead
+// (capped by width) and convert back, so the strip looks the same at any size;
+// on narrow stages the side cards simply bleed off the edges.
+const CARD_HEIGHT_OF_STAGE = 0.5;
+const CARD_HEIGHT_OF_WIDTH_MAX = 0.575;
+const CARD_ASPECT = 0.8; // width / height, matches the 800x1000 crops
+const CARD_GAP_OF_WIDTH = 0.087;
+
+function stripLayout(width: number, height: number) {
+  const cardHeight = Math.min(height * CARD_HEIGHT_OF_STAGE, width * CARD_HEIGHT_OF_WIDTH_MAX);
+  const cardWidth = cardHeight * CARD_ASPECT;
+  const step = cardWidth * (1 + CARD_GAP_OF_WIDTH);
+  return STRIP_SOURCES.map((src, index) => ({
+    src,
+    x: ((index - 1) * step) / width,
+    y: 0,
+    widthScale: cardWidth / width,
+    heightScale: cardHeight / width,
+  }));
+}
+
+function useElementSize<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (!entry) return;
+      const width = Math.round(entry.contentRect.width);
+      const height = Math.round(entry.contentRect.height);
+      setSize((prev) =>
+        prev.width === width && prev.height === height ? prev : { width, height },
+      );
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, size] as const;
+}
+
+const WIDE_QUERY = "(min-width: 768px)";
+
+function useIsWide() {
+  return useSyncExternalStore(
+    (onChange) => {
+      const query = window.matchMedia(WIDE_QUERY);
+      query.addEventListener("change", onChange);
+      return () => query.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia(WIDE_QUERY).matches,
+    () => true,
+  );
+}
+
 const BRUSH_TEXTURE_URL = "/brush.png";
 
 const defaults = {
@@ -87,13 +159,10 @@ function code(config: Config) {
   return `import { ImageRippleEffect } from "@/components/ui/image-ripple-effect"
 
 const images = [
-  {
-    src: "${IMAGE.src}",
-    x: ${IMAGE.x},
-    y: ${IMAGE.y},
-    widthScale: ${IMAGE.widthScale},
-    heightScale: ${IMAGE.heightScale},
-  },
+${WIDE_IMAGES.map(
+  (image) =>
+    `  { src: "${image.src}", x: ${image.x}, y: ${image.y}, widthScale: ${image.widthScale}, heightScale: ${image.heightScale} },`,
+).join("\n")}
 ]
 
 <ImageRippleEffect
@@ -110,6 +179,8 @@ const images = [
 }
 
 export function ImageRippleEffectPlayground() {
+  const isWide = useIsWide();
+  const [stageRef, stage] = useElementSize<HTMLDivElement>();
   const dial = useDialKitController("Image Ripple Effect", controls, {
     id: "image-ripple-effect",
   });
@@ -143,13 +214,17 @@ export function ImageRippleEffectPlayground() {
 
   return (
     <DocsPlayground>
-      <ImageRippleEffect
-        key={renderVersion}
-        className="h-full w-full !min-h-full"
-        brushTextureUrl={BRUSH_TEXTURE_URL}
-        images={[IMAGE]}
-        {...config}
-      />
+      <div ref={stageRef} className="relative h-full w-full">
+        {stage.width > 0 && stage.height > 0 ? (
+          <ImageRippleEffect
+            key={renderVersion}
+            className="h-full w-full !min-h-full"
+            brushTextureUrl={BRUSH_TEXTURE_URL}
+            images={isWide ? stripLayout(stage.width, stage.height) : NARROW_IMAGES}
+            {...config}
+          />
+        ) : null}
+      </div>
     </DocsPlayground>
   );
 }
