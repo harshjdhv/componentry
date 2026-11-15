@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@workspace/ui/lib/utils"
 
 interface ContributionDay {
-    color: string
     contributionCount: number
     contributionLevel: "NONE" | "FIRST_QUARTILE" | "SECOND_QUARTILE" | "THIRD_QUARTILE" | "FOURTH_QUARTILE"
     date: string
@@ -16,14 +15,56 @@ interface GithubContributionData {
     totalContributions: number
 }
 
+const LEVEL_NAMES = [
+    "NONE",
+    "FIRST_QUARTILE",
+    "SECOND_QUARTILE",
+    "THIRD_QUARTILE",
+    "FOURTH_QUARTILE",
+] as const
+
+function getWeekday(date: string) {
+    return new Date(`${date}T00:00:00Z`).getUTCDay()
+}
+
+// Normalizes the flat `{ date, count, level }` entries from the contributions
+// API into weeks of 7 days (Sunday-started), matching GitHub's calendar layout.
+function normalizeContributions(
+    days: Array<{ date: string; count: number; level: number }>,
+    total: number | undefined,
+): GithubContributionData {
+    const contributions: ContributionDay[][] = []
+    let currentWeek: ContributionDay[] = []
+
+    for (const day of days) {
+        if (currentWeek.length && getWeekday(day.date) === 0) {
+            contributions.push(currentWeek)
+            currentWeek = []
+        }
+        currentWeek.push({
+            date: day.date,
+            contributionCount: day.count ?? 0,
+            contributionLevel: LEVEL_NAMES[day.level] ?? "NONE",
+        })
+    }
+    if (currentWeek.length) {
+        contributions.push(currentWeek)
+    }
+
+    const totalContributions =
+        typeof total === "number" && Number.isFinite(total)
+            ? total
+            : days.reduce((sum, day) => sum + (day.count ?? 0), 0)
+
+    return { contributions, totalContributions }
+}
+
 interface GithubCalendarProps {
     username: string
-    variant?: "default" | "city-lights" | "minimal"
     shape?: "square" | "rounded" | "circle" | "squircle"
-    glowIntensity?: number
     className?: string
     showTotal?: boolean
-    colorSchema?: "green" | "blue" | "purple" | "orange" | "gray"
+    colorSchema?: "green" | "gray"
 }
 
 // Color schemas for custom styling
@@ -41,27 +82,6 @@ const colorSchemas = {
         level2: "bg-emerald-300 dark:bg-emerald-700",
         level3: "bg-emerald-400 dark:bg-emerald-500",
         level4: "bg-emerald-500 dark:bg-emerald-400",
-    },
-    blue: {
-        level0: "bg-zinc-100 dark:bg-zinc-900",
-        level1: "bg-blue-200 dark:bg-blue-900",
-        level2: "bg-blue-300 dark:bg-blue-700",
-        level3: "bg-blue-400 dark:bg-blue-500",
-        level4: "bg-blue-500 dark:bg-blue-400",
-    },
-    purple: {
-        level0: "bg-zinc-100 dark:bg-zinc-900",
-        level1: "bg-purple-200 dark:bg-purple-900",
-        level2: "bg-purple-300 dark:bg-purple-700",
-        level3: "bg-purple-400 dark:bg-purple-500",
-        level4: "bg-purple-500 dark:bg-purple-400",
-    },
-    orange: {
-        level0: "bg-zinc-100 dark:bg-zinc-900",
-        level1: "bg-orange-200 dark:bg-orange-900",
-        level2: "bg-orange-300 dark:bg-orange-700",
-        level3: "bg-orange-400 dark:bg-orange-500",
-        level4: "bg-orange-500 dark:bg-orange-400",
     },
 }
 
@@ -98,9 +118,7 @@ function getShapeClass(shape: string) {
 
 export function GithubCalendar({
     username,
-    variant = "default",
     shape = "rounded",
-    glowIntensity = 5,
     className,
     showTotal = true,
     colorSchema = "green",
@@ -108,6 +126,7 @@ export function GithubCalendar({
     const [data, setData] = React.useState<GithubContributionData | null>(null)
     const [loading, setLoading] = React.useState(true)
     const [error, setError] = React.useState<string | null>(null)
+    const [retryCount, setRetryCount] = React.useState(0)
     const [hoveredDate, setHoveredDate] = React.useState<string | null>(null)
     const [hoveredCount, setHoveredCount] = React.useState<number | null>(null)
     const [mousePos, setMousePos] = React.useState({ x: 0, y: 0 })
@@ -116,16 +135,26 @@ export function GithubCalendar({
         const fetchData = async () => {
             try {
                 setLoading(true)
+                setError(null)
                 const response = await fetch(
-                    `https://github-contributions-api.deno.dev/${username}.json`
+                    `https://github-contributions-api.jogruber.de/v4/${username}?y=last`
                 )
                 if (!response.ok) {
-                    throw new Error("Failed to fetch GitHub data")
+                    throw new Error(`the data service responded with status ${response.status}`)
                 }
                 const jsonData = await response.json()
-                setData(jsonData)
+                if (!jsonData || !Array.isArray(jsonData.contributions)) {
+                    throw new Error("the data service returned an unexpected response")
+                }
+                setData(normalizeContributions(jsonData.contributions, jsonData.total?.lastYear))
             } catch (err) {
-                setError(err instanceof Error ? err.message : "An error occurred")
+                if (err instanceof TypeError) {
+                    // fetch() throws a bare "Failed to fetch" on DNS or network
+                    // failures — surface something more helpful instead.
+                    setError("couldn't reach the GitHub contributions data service")
+                } else {
+                    setError(err instanceof Error ? `couldn't load contributions: ${err.message}` : "couldn't load contributions")
+                }
             } finally {
                 setLoading(false)
             }
@@ -134,12 +163,24 @@ export function GithubCalendar({
         if (username) {
             fetchData()
         }
-    }, [username])
+    }, [username, retryCount])
 
     if (error) {
         return (
-            <div className={cn("p-4 rounded-lg border border-red-200 bg-red-50 text-red-500 text-sm", className)}>
-                Error: {error}
+            <div className={cn(
+                "flex flex-col items-start gap-2 p-4 rounded-lg border border-red-200 bg-red-50 text-red-500 text-sm",
+                "dark:border-red-900 dark:bg-red-950/40 dark:text-red-400",
+                className,
+            )}>
+                <span>
+                    Couldn&apos;t load the contribution calendar for <span className="font-semibold">@{username}</span> — {error}.
+                </span>
+                <button
+                    onClick={() => setRetryCount((count) => count + 1)}
+                    className="px-3 py-1.5 rounded-md border border-red-200 dark:border-red-900 text-xs font-medium hover:bg-red-100 dark:hover:bg-red-950 transition-colors"
+                >
+                    Retry
+                </button>
             </div>
         )
     }
@@ -199,8 +240,6 @@ export function GithubCalendar({
                 {weeks.map((week, weekIndex) => (
                     <div key={weekIndex} className="flex flex-col gap-[3px] w-[14px]">
                         {week.map((day, dayIndex) => {
-                            const isGlowing = variant === "city-lights" && day.contributionCount > 0;
-                            const isMinimal = variant === "minimal";
                             const shapeClass = getShapeClass(shape);
 
                             return (
@@ -227,21 +266,8 @@ export function GithubCalendar({
                                     className={cn(
                                         "w-full aspect-square transition-colors duration-200",
                                         getLevelClass(day.contributionLevel, colorSchema),
-                                        isGlowing && "z-10",
                                         shapeClass,
-                                        isMinimal && "rounded-full scale-75",
                                     )}
-                                    style={
-                                        isGlowing ? {
-                                            boxShadow: day.contributionLevel !== "NONE"
-                                                ? `0 0 ${day.contributionCount > 3 ? `${glowIntensity * 1.5}px` : `${glowIntensity}px`} ${colorSchema === 'green' ? '#10b981' :
-                                                    colorSchema === 'blue' ? '#3b82f6' :
-                                                        colorSchema === 'purple' ? '#a855f7' :
-                                                            '#f97316'
-                                                }`
-                                                : 'none'
-                                        } : undefined
-                                    }
                                 />
                             )
                         })}

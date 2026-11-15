@@ -11,14 +11,6 @@ const grayscaleCode = `import { GithubCalendar } from "@/components/ui/github-ca
 
 <GithubCalendar username="harshjdhv" colorSchema="gray" />`;
 
-const minimalCode = `import { GithubCalendar } from "@/components/ui/github-calendar"
-
-<GithubCalendar username="harshjdhv" variant="minimal" colorSchema="blue" />`;
-
-const colorSchemaCode = `import { GithubCalendar } from "@/components/ui/github-calendar"
-
-<GithubCalendar username="harshjdhv" colorSchema="orange" />`;
-
 export async function GithubCalendarDocs() {
   const sourceCode =
     (await readComponentSource("github-calendar")) ||
@@ -27,7 +19,7 @@ export async function GithubCalendarDocs() {
   return (
     <DocsPageLayout
       title="Github Calendar"
-      description="A premium, customizable visualization of GitHub contribution graphs with multiple color schemes and display variants."
+      description="A GitHub-style contribution calendar heatmap with a grayscale color scheme option."
       preview={
         <div className="flex items-center justify-center w-full p-4 md:p-8 overflow-hidden">
           <div className="scale-[0.55] md:scale-[0.7] origin-center">
@@ -52,36 +44,6 @@ export async function GithubCalendarDocs() {
           ),
           code: grayscaleCode,
         },
-        {
-          title: "Minimal Variant",
-          preview: (
-            <div className="flex items-center justify-center w-full p-4 md:p-8 overflow-hidden">
-              <div className="scale-[0.55] md:scale-[0.7] origin-center">
-                <GithubCalendar
-                  username="harshjdhv"
-                  variant="minimal"
-                  colorSchema="blue"
-                />
-              </div>
-            </div>
-          ),
-          code: minimalCode,
-        },
-        {
-          title: "Orange Color Schema",
-          preview: (
-            <div className="flex items-center justify-center w-full p-4 md:p-8 overflow-hidden">
-              <div className="scale-[0.55] md:scale-[0.7] origin-center">
-                <GithubCalendar
-                  username="harshjdhv"
-                  colorSchema="orange"
-                  showTotal={false}
-                />
-              </div>
-            </div>
-          ),
-          code: colorSchemaCode,
-        },
       ]}
       props={[
         {
@@ -91,14 +53,8 @@ export async function GithubCalendarDocs() {
             "The GitHub username to fetch contributions for. (Required)",
         },
         {
-          name: "variant",
-          type: '"default" | "city-lights" | "minimal"',
-          default: '"default"',
-          description: "The visual style variant of the calendar.",
-        },
-        {
           name: "colorSchema",
-          type: '"green" | "blue" | "purple" | "orange" | "gray"',
+          type: '"green" | "gray"',
           default: '"green"',
           description: "The color scheme for the contribution cells.",
         },
