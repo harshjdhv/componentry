@@ -332,16 +332,6 @@ export const components: Record<string, ComponentMetadata> = {
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/newsletterbookshelf.webm",
   },
 
-  "split-flap-display": {
-    title: "Split Flap Display",
-    description:
-      "A premium split-flap display component inspired by vintage departure boards.",
-    category: "Components",
-    slug: "split-flap-display",
-    addedAt: "2026-03-27",
-    previewVideo:
-      "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/component-animations/splitflapdisplay.webm",
-  },
   "eye-tracking": {
     title: "Eye Tracking",
     description:
