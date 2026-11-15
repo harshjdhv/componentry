@@ -11,10 +11,6 @@ import {
 } from "@/components/docs-playground";
 
 const DEFAULTS = {
-  title: "Fluid Motion",
-  subtitle: "Premium Presence",
-  description:
-    "A cinematic liquid field tuned for modern hero sections with polished depth and restrained motion.",
   colorDeep: "#04050b",
   colorMid: "#134d93",
   colorHighlight: "#8cecff",
@@ -34,8 +30,6 @@ const PRESET_CONFIGS: Array<{ name: string; config: Config }> = [
     name: "Midnight",
     config: {
       ...DEFAULTS,
-      title: "Midnight Drift",
-      subtitle: "Depth by Design",
       colorDeep: "#02040b",
       colorMid: "#11315e",
       colorHighlight: "#67d5ff",
@@ -48,8 +42,6 @@ const PRESET_CONFIGS: Array<{ name: string; config: Config }> = [
     name: "Aurora",
     config: {
       ...DEFAULTS,
-      title: "Aurora Pulse",
-      subtitle: "Luminous Gradient",
       colorDeep: "#070519",
       colorMid: "#3954d9",
       colorHighlight: "#7dffe5",
@@ -62,8 +54,6 @@ const PRESET_CONFIGS: Array<{ name: string; config: Config }> = [
     name: "Rose Gold",
     config: {
       ...DEFAULTS,
-      title: "Rose Current",
-      subtitle: "Luxury Atmosphere",
       colorDeep: "#1a0a12",
       colorMid: "#7f2f5d",
       colorHighlight: "#ffd9b5",
@@ -76,8 +66,6 @@ const PRESET_CONFIGS: Array<{ name: string; config: Config }> = [
     name: "Kinetic",
     config: {
       ...DEFAULTS,
-      title: "Kinetic Wave",
-      subtitle: "Momentum Forward",
       colorDeep: "#040506",
       colorMid: "#146684",
       colorHighlight: "#c6ffff",
@@ -96,9 +84,6 @@ const PRESETS = PRESET_CONFIGS.map(({ name, config }) => ({
 
 type Slider = [number, number, number, number];
 const controls = {
-  title: { type: "text" as const, default: DEFAULTS.title, placeholder: "Headline line one" },
-  subtitle: { type: "text" as const, default: DEFAULTS.subtitle, placeholder: "Headline line two" },
-  description: { type: "text" as const, default: DEFAULTS.description, placeholder: "Support text" },
   colorDeep: { type: "color" as const, default: DEFAULTS.colorDeep },
   colorMid: { type: "color" as const, default: DEFAULTS.colorMid },
   colorHighlight: { type: "color" as const, default: DEFAULTS.colorHighlight },
@@ -146,9 +131,6 @@ export function WebGLLiquidPlayground() {
   const values = dial.values;
   // Same key order as the component props, so the generated code reads naturally.
   const config: Config = {
-    title: values.title,
-    subtitle: values.subtitle,
-    description: values.description,
     colorDeep: values.colorDeep,
     colorMid: values.colorMid,
     colorHighlight: values.colorHighlight,

@@ -120,9 +120,6 @@ function hexToRgb01(hex: string): [number, number, number] {
 }
 
 export interface WebGLLiquidProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: string;
-  subtitle?: string;
-  description?: string;
   colorDeep?: string;
   colorMid?: string;
   colorHighlight?: string;
@@ -134,16 +131,9 @@ export interface WebGLLiquidProps extends React.HTMLAttributes<HTMLDivElement> {
   reveal?: boolean;
   delayMs?: number;
   revealDuration?: number;
-  children?: React.ReactNode;
 }
 
-const LIQUID_HEADLINE_CLASS =
-  "pb-[0.08em] text-[11cqi] md:text-[7cqi] lg:text-[5.5cqi] leading-[0.92] tracking-[-0.03em] font-semibold text-white";
-
 export function WebGLLiquid({
-  title = "Fluid Motion",
-  subtitle = "Premium Presence",
-  description = "A cinematic liquid field tuned for modern hero sections with polished depth and restrained motion.",
   colorDeep = FALLBACK_DEEP,
   colorMid = FALLBACK_MID,
   colorHighlight = FALLBACK_HIGHLIGHT,
@@ -156,7 +146,6 @@ export function WebGLLiquid({
   delayMs = 0,
   revealDuration = 1.2,
   className,
-  children,
   style,
   ...props
 }: WebGLLiquidProps) {
@@ -367,24 +356,6 @@ export function WebGLLiquid({
       {...props}
     >
       <WebGLFallback className="absolute inset-0 h-full w-full" />
-      {(title || subtitle || description || children) && (
-        <div className="relative z-10 mx-auto w-full max-w-[1240px] px-6 py-20 md:px-10 md:py-28">
-          <div className="max-w-[760px]">
-            {title && <h1 className={LIQUID_HEADLINE_CLASS}>{title}</h1>}
-            {subtitle && (
-              <h2 className="mt-2 text-[11cqi] md:text-[7cqi] lg:text-[5.5cqi] leading-[0.9] tracking-[-0.03em] font-bold text-white/95">
-                {subtitle}
-              </h2>
-            )}
-            {description && (
-              <p className="mt-6 max-w-[620px] text-base leading-relaxed text-white/75 md:text-xl">
-                {description}
-              </p>
-            )}
-            {children && <div className="mt-10">{children}</div>}
-          </div>
-        </div>
-      )}
     </div>
   );
 
@@ -412,25 +383,6 @@ export function WebGLLiquid({
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 via-black/15 to-transparent" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_65%_40%,rgba(255,255,255,0.16),transparent_45%)]" />
-
-        {(title || subtitle || description || children) && (
-          <div className="relative z-10 mx-auto w-full max-w-[1240px] px-6 py-20 md:px-10 md:py-28">
-            <div className="max-w-[760px]">
-              {title && <h1 className={LIQUID_HEADLINE_CLASS}>{title}</h1>}
-              {subtitle && (
-                <h2 className="mt-2 text-[11cqi] md:text-[7cqi] lg:text-[5.5cqi] leading-[0.9] tracking-[-0.03em] font-bold text-white/95">
-                  {subtitle}
-                </h2>
-              )}
-              {description && (
-                <p className="mt-6 max-w-[620px] text-base leading-relaxed text-white/75 md:text-xl">
-                  {description}
-                </p>
-              )}
-              {children && <div className="mt-10">{children}</div>}
-            </div>
-          </div>
-        )}
       </div>
     </WebGLErrorBoundary>
   );

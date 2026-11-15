@@ -39,14 +39,6 @@ export function AnimatedGradientPlayground() {
           className="!min-h-full"
           style={{ minHeight: "100%" }}
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4 text-center">
-          <h2 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
-            Animated
-          </h2>
-          <h2 className="text-5xl md:text-7xl font-serif italic tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/40 drop-shadow-[0_4px_24px_rgba(0,0,0,0.4)] mt-2 pb-2 pr-4">
-            Gradient
-          </h2>
-        </div>
       </div>
     </DocsPlayground>
   );

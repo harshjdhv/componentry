@@ -4,7 +4,6 @@
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame, ThreeElements } from "@react-three/fiber";
 import * as THREE from "three";
-import { motion } from "framer-motion";
 
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -186,21 +185,12 @@ const GradientPlane = ({
 // --- Main Component ---
 
 interface HeroGeometricProps extends React.ComponentPropsWithoutRef<"div"> {
-    title1?: string;
-    title2?: string;
-    description?: string;
     color1?: string;
     color2?: string;
     speed?: number;
 }
 
-const HERO_HEADLINE_CLASS =
-    "pb-[0.08em] text-[12cqi] md:text-[8cqi] lg:text-[6cqi] leading-[0.96] tracking-tighter font-bold text-zinc-900";
-
 export default function HeroGeometric({
-    title1,
-    title2,
-    description,
     color1 = "#3B82F6", // Default soft blue
     color2 = "#F0F9FF", // Default pale blue
     speed = 1,
@@ -217,7 +207,7 @@ export default function HeroGeometric({
             {...props}
         >
             {/* Background Shader */}
-            <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
+            <div aria-hidden="true" className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
                 <Canvas
                     camera={{ position: [0, 0, 1] }}
                     dpr={[1, 1]}
@@ -229,55 +219,6 @@ export default function HeroGeometric({
                     <GradientPlane color1={color1} color2={color2} speed={speed} />
                 </Canvas>
             </div>
-
-            {/* Content */}
-            {(title1 || title2 || description) && (
-                <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center pt-8 pb-8 md:pt-20 md:pb-20">
-                    <div className="w-full max-w-[1200px] px-6 flex flex-col items-center">
-                        {/* Headline */}
-                        <div className="flex flex-col items-center text-center gap-2 md:gap-4 mb-8 md:mb-12">
-                            {title1 && (
-                                <div className="overflow-hidden">
-                                    <motion.h1
-                                        initial={{ y: "100%", opacity: 0 }}
-                                        animate={{ y: "0%", opacity: 1 }}
-                                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                                        className={HERO_HEADLINE_CLASS}
-                                    >
-                                        {title1}
-                                    </motion.h1>
-                                </div>
-                            )}
-                            {title2 && (
-                                <div className="overflow-hidden">
-                                    <motion.h1
-                                        initial={{ y: "100%", opacity: 0 }}
-                                        animate={{ y: "0%", opacity: 1 }}
-                                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
-                                        className={HERO_HEADLINE_CLASS}
-                                    >
-                                        {title2}
-                                    </motion.h1>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Subheadline */}
-                        {description && (
-                            <div className="max-w-[480px] text-center mb-8">
-                                <motion.p
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-                                    className="text-lg md:text-[1.35rem] leading-relaxed text-neutral-600 font-normal"
-                                >
-                                    {description}
-                                </motion.p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
