@@ -4,7 +4,6 @@
 import { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame, ThreeElements, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { motion } from "framer-motion";
 
 import { cn } from "@workspace/ui/lib/utils";
 import { WebGLErrorBoundary, WebGLFallback } from "@workspace/ui/components/webgl-error-boundary";
@@ -505,10 +504,6 @@ const FloatingParticles = ({
 // Main Component Props
 // ═══════════════════════════════════════════════════════════════════════════════
 interface DitherPrismHeroProps extends React.HTMLAttributes<HTMLDivElement> {
-    /** First line of headline */
-    title1?: string;
-    /** Second line of headline */
-    title2?: string;
     /** Primary color (deep/dark) */
     color1?: string;
     /** Secondary color (mid) */
@@ -527,19 +522,12 @@ interface DitherPrismHeroProps extends React.HTMLAttributes<HTMLDivElement> {
     showParticles?: boolean;
     /** Particle color */
     particleColor?: string;
-    /** Children to render on top */
-    children?: React.ReactNode;
 }
-
-const HERO_HEADLINE_CLASS =
-    "pb-[0.08em] text-[12cqi] md:text-[8cqi] lg:text-[6cqi] leading-[0.96] tracking-tighter font-bold text-transparent bg-clip-text bg-gradient-to-b from-zinc-900 via-zinc-500 to-zinc-800";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Main Export Component
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function DitherPrismHero({
-    title1,
-    title2,
     color1 = "#0f0f23",
     color2 = "#6366f1",
     color3 = "#ec4899",
@@ -550,7 +538,6 @@ export default function DitherPrismHero({
     showParticles = true,
     particleColor = "#ffffff",
     className,
-    children,
     style,
     ...props
 }: DitherPrismHeroProps) {
@@ -563,7 +550,7 @@ export default function DitherPrismHero({
     return (
         <div
             className={cn(
-                "relative w-full min-h-screen flex flex-col items-center overflow-hidden text-gray-900",
+                "relative w-full min-h-screen overflow-hidden",
                 className
             )}
             style={{ containerType: "size", ...style }}
@@ -571,7 +558,7 @@ export default function DitherPrismHero({
         >
             {/* WebGL Background */}
             {mounted && (
-                <div className="absolute top-0 left-0 w-full h-full z-0">
+                <div aria-hidden="true" className="absolute top-0 left-0 w-full h-full z-0">
                     <WebGLErrorBoundary fallback={<WebGLFallback className="absolute inset-0 h-full w-full" />}>
                         <Canvas
                             camera={{ position: [0, 0, 1] }}
@@ -595,64 +582,6 @@ export default function DitherPrismHero({
                             )}
                         </Canvas>
                     </WebGLErrorBoundary>
-                </div>
-            )}
-
-            {/* Content Overlay */}
-            {(title1 || title2 || children) && (
-                <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center pt-8 pb-8 md:pt-20 md:pb-20">
-                    <div className="w-full max-w-[1200px] px-6 flex flex-col items-center">
-                        {/* Headline */}
-                        {(title1 || title2) && (
-                            <div className="flex flex-col items-center text-center gap-2 md:gap-4 mb-8 md:mb-12">
-                                {title1 && (
-                                    <div className="overflow-hidden">
-                                        <motion.h1
-                                            initial={{ y: "100%", opacity: 0 }}
-                                            animate={{ y: "0%", opacity: 1 }}
-                                            transition={{
-                                                duration: 1,
-                                                ease: [0.16, 1, 0.3, 1],
-                                                delay: 0.2,
-                                            }}
-                                            className={HERO_HEADLINE_CLASS}
-                                        >
-                                            <span>
-                                                {title1}
-                                            </span>
-                                        </motion.h1>
-                                    </div>
-                                )}
-                                {title2 && (
-                                    <div className="overflow-hidden">
-                                        <motion.h1
-                                            initial={{ y: "100%", opacity: 0 }}
-                                            animate={{ y: "0%", opacity: 1 }}
-                                            transition={{
-                                                duration: 1,
-                                                ease: [0.16, 1, 0.3, 1],
-                                                delay: 0.35,
-                                            }}
-                                            className={HERO_HEADLINE_CLASS}
-                                        >
-                                            {title2}
-                                        </motion.h1>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Custom Children */}
-                        {children && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
-                            >
-                                {children}
-                            </motion.div>
-                        )}
-                    </div>
                 </div>
             )}
         </div>

@@ -233,12 +233,6 @@ export async function AuroraFlowDocs() {
           type: "CSSProperties",
           description: "Additional inline styles for the root container.",
         },
-        {
-          name: "children",
-          type: "ReactNode",
-          description:
-            "Optional content rendered above the atmospheric canvas.",
-        },
       ]}
     />
   );

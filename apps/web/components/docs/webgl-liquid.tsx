@@ -7,8 +7,8 @@ import { readComponentSource } from "@/lib/source-code";
 const basicUsageCode = `import { WebGLLiquid } from "@/components/ui/webgl-liquid"
 
 <WebGLLiquid
-  title="Fluid Motion"
-  subtitle="Premium Presence"
+  colorDeep="#04050b"
+  colorMid="#134d93"
 />`;
 
 export async function WebGLLiquidDocs() {
@@ -28,23 +28,6 @@ export async function WebGLLiquidDocs() {
       fullWidthPreview={true}
       unstyledPreview={true}
       props={[
-        {
-          name: "title",
-          type: "string",
-          default: '"Fluid Motion"',
-          description: "Primary headline line.",
-        },
-        {
-          name: "subtitle",
-          type: "string",
-          default: '"Premium Presence"',
-          description: "Secondary headline line.",
-        },
-        {
-          name: "description",
-          type: "string",
-          description: "Supporting hero copy below the title.",
-        },
         {
           name: "colorDeep",
           type: "string",
@@ -110,11 +93,6 @@ export async function WebGLLiquidDocs() {
           type: "number",
           default: "1.2",
           description: "Duration of the reveal wipe in seconds.",
-        },
-        {
-          name: "children",
-          type: "ReactNode",
-          description: "Custom content rendered above the liquid background.",
         },
         {
           name: "className",

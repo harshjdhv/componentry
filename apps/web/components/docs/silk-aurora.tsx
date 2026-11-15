@@ -6,17 +6,13 @@ import { readComponentSource } from "@/lib/source-code";
 const basicUsageCode = `import { SilkAurora } from "@/components/ui/silk-aurora"
 
 <SilkAurora
-  title="Silk Aurora"
-  subtitle="Premium Atmosphere"
-  description="A satin-dark WebGL background with aurora ribbons, pearlescent highlights, fine grain, and cursor-driven depth."
+  baseColor="#050507"
+  midColor="#14151d"
 />`;
 
 const champagneCode = `import { SilkAurora } from "@/components/ui/silk-aurora"
 
 <SilkAurora
-  title="Maison Lumiere"
-  subtitle="Private Preview"
-  description="Quiet motion, warm sheen, and a velvet base for refined product launches."
   baseColor="#060505"
   midColor="#19130f"
   sheenColor="#ffe2a9"
@@ -28,9 +24,6 @@ const champagneCode = `import { SilkAurora } from "@/components/ui/silk-aurora"
 const editorialCode = `import { SilkAurora } from "@/components/ui/silk-aurora"
 
 <SilkAurora
-  title="Nocturne Index"
-  subtitle="Editorial Systems"
-  description="A cooler metallic palette for dashboards, media covers, and cinematic editorial moments."
   baseColor="#030407"
   midColor="#101827"
   sheenColor="#d6e8ff"
@@ -51,9 +44,6 @@ export async function SilkAuroraDocs() {
       preview={
         <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-background">
           <SilkAurora
-            title="Silk Aurora"
-            subtitle="Premium Atmosphere"
-            description="Polished motion for luxury product heroes, editorial launches, and high-end SaaS moments."
             className="h-full w-full min-h-0"
           />
         </div>
@@ -70,9 +60,6 @@ export async function SilkAuroraDocs() {
           preview: (
             <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-background">
               <SilkAurora
-                title="Maison Lumiere"
-                subtitle="Private Preview"
-                description="Quiet motion, warm sheen, and a velvet base for refined product launches."
                 baseColor="#060505"
                 midColor="#19130f"
                 sheenColor="#ffe2a9"
@@ -91,9 +78,6 @@ export async function SilkAuroraDocs() {
           preview: (
             <div className="relative h-full w-full bg-[#f3f4f6] dark:bg-background">
               <SilkAurora
-                title="Nocturne Index"
-                subtitle="Editorial Systems"
-                description="A cooler metallic palette for dashboards, media covers, and cinematic editorial moments."
                 baseColor="#030407"
                 midColor="#101827"
                 sheenColor="#d6e8ff"
@@ -109,23 +93,6 @@ export async function SilkAuroraDocs() {
         },
       ]}
       props={[
-        {
-          name: "title",
-          type: "string",
-          default: '"Silk Aurora"',
-          description: "Primary hero headline rendered above the background.",
-        },
-        {
-          name: "subtitle",
-          type: "string",
-          default: '"Premium Atmosphere"',
-          description: "Small uppercase label rendered above the title.",
-        },
-        {
-          name: "description",
-          type: "string",
-          description: "Supporting copy rendered below the title.",
-        },
         {
           name: "baseColor",
           type: "string",
@@ -185,11 +152,6 @@ export async function SilkAuroraDocs() {
           type: "boolean",
           default: "true",
           description: "Enables pointer movement response.",
-        },
-        {
-          name: "children",
-          type: "ReactNode",
-          description: "Custom content rendered above the background.",
         },
         {
           name: "className",

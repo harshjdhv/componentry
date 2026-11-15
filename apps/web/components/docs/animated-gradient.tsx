@@ -1,6 +1,7 @@
 import React from "react";
-import { AnimatedGradientPreview } from "@/components/docs/previews/animated-gradient-preview";
+import { AnimatedGradientPlayground } from "@/components/docs/previews/animated-gradient-playground";
 import { DocsPageLayout } from "@/components/docs-page-layout";
+import { LiveCodeBlock } from "@/components/live-code-block";
 import { readComponentSource } from "@/lib/source-code";
 
 const importCode = `import { AnimatedGradient } from "@/components/ui/animated-gradient"`;
@@ -15,47 +16,15 @@ export async function AnimatedGradientDocs() {
         <DocsPageLayout
             title="Animated Gradient"
             description="A beautiful, animated, and customizable WebGL gradient with noise capabilities."
-            preview={<AnimatedGradientPreview />}
-            previewCode={defaultCode}
+            preview={<AnimatedGradientPlayground />}
+            previewCode=""
             installPackageName="animated-gradient"
             installDependencies=""
             installSourceCode={sourceCode}
             importCode={importCode}
-            usageCode={defaultCode}
+            usageCode={<LiveCodeBlock defaultCode={defaultCode} />}
             fullWidthPreview={true}
-            hideDefaultPreviewVariant={true}
-            examples={[
-                {
-                    title: "Aurora",
-                    preview: <AnimatedGradientPreview config={{ preset: "Aurora" }} />,
-                    code: `<AnimatedGradient config={{ preset: "Aurora" }} />`,
-                    fullWidth: true
-                },
-                {
-                    title: "Oceanic",
-                    preview: <AnimatedGradientPreview config={{ preset: "Oceanic" }} />,
-                    code: `<AnimatedGradient config={{ preset: "Oceanic" }} />`,
-                    fullWidth: true
-                },
-                {
-                    title: "Amber",
-                    preview: <AnimatedGradientPreview config={{ preset: "Amber" }} />,
-                    code: `<AnimatedGradient config={{ preset: "Amber" }} />`,
-                    fullWidth: true
-                },
-                {
-                    title: "Toxic",
-                    preview: <AnimatedGradientPreview config={{ preset: "Toxic" }} />,
-                    code: `<AnimatedGradient config={{ preset: "Toxic" }} />`,
-                    fullWidth: true
-                },
-                {
-                    title: "Ghost",
-                    preview: <AnimatedGradientPreview config={{ preset: "Ghost" }} />,
-                    code: `<AnimatedGradient config={{ preset: "Ghost" }} />`,
-                    fullWidth: true
-                },
-            ]}
+            unstyledPreview={true}
             props={[
                 {
                     name: "config",

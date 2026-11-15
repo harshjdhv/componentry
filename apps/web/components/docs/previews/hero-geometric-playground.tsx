@@ -11,10 +11,6 @@ import {
 } from "@/components/docs-playground";
 
 const defaults = {
-  title1: "Elevate",
-  title2: "Your Brand",
-  description:
-    "Scale your product with clarity, precision, and motion-led design.",
   color1: "#3B82F6",
   color2: "#F0F9FF",
   speed: 1,
@@ -26,10 +22,6 @@ const presets: Array<{ name: string; config: Config }> = [
   {
     name: "Editorial",
     config: {
-      title1: "Shape",
-      title2: "Authority",
-      description:
-        "High-contrast geometry with restrained motion and premium editorial rhythm.",
       color1: "#0f172a",
       color2: "#e2e8f0",
       speed: 0.8,
@@ -38,10 +30,6 @@ const presets: Array<{ name: string; config: Config }> = [
   {
     name: "Warm",
     config: {
-      title1: "Human",
-      title2: "Energy",
-      description:
-        "A warm palette with crisp typography for product launches and storytelling pages.",
       color1: "#ea580c",
       color2: "#fff7ed",
       speed: 1,
@@ -50,10 +38,6 @@ const presets: Array<{ name: string; config: Config }> = [
   {
     name: "Ice",
     config: {
-      title1: "Glacial",
-      title2: "Precision",
-      description:
-        "Cool chroma gradients and subtle turbulence built for enterprise-first visual systems.",
       color1: "#0c4a6e",
       color2: "#ecfeff",
       speed: 1.25,
@@ -62,10 +46,6 @@ const presets: Array<{ name: string; config: Config }> = [
   {
     name: "Kinetic",
     config: {
-      title1: "Motion",
-      title2: "Driven",
-      description:
-        "Turn up energy with faster shader flow while preserving legibility and hierarchy.",
       color1: "#1d4ed8",
       color2: "#dbeafe",
       speed: 2,
@@ -79,21 +59,6 @@ const PRESETS = presets.map(({ name, config }) => ({
 }));
 
 const controls = {
-  title1: {
-    type: "text" as const,
-    default: defaults.title1,
-    placeholder: "Primary headline",
-  },
-  title2: {
-    type: "text" as const,
-    default: defaults.title2,
-    placeholder: "Secondary headline",
-  },
-  description: {
-    type: "text" as const,
-    default: defaults.description,
-    placeholder: "Narrative subheadline",
-  },
   color1: { type: "color" as const, default: defaults.color1 },
   color2: { type: "color" as const, default: defaults.color2 },
   speed: [defaults.speed, 0.2, 3, 0.1] as [number, number, number, number],
@@ -116,15 +81,12 @@ export function HeroGeometricPlayground() {
     id: "hero-geometric",
   });
   const config: Config = { ...defaults, ...dial.values };
-  // Replays the entrance animation when a preset is picked.
+  // Remounts the shader when a preset is picked.
   const [renderVersion, setRenderVersion] = useState(0);
 
   const preset =
     presets.find(
       ({ config: p }) =>
-        p.title1 === config.title1 &&
-        p.title2 === config.title2 &&
-        p.description === config.description &&
         sameColor(p.color1, config.color1) &&
         sameColor(p.color2, config.color2) &&
         p.speed === config.speed,

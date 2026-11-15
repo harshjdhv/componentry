@@ -7,8 +7,8 @@ import { readComponentSource } from "@/lib/source-code";
 const basicUsageCode = `import { DitherPrismHero } from "@/components/ui/dither-prism-hero"
 
 <DitherPrismHero 
-    title1="Experience" 
-    title2="The Future"
+    color1="#0f0f23" 
+    color2="#6366f1"
 />`;
 
 export async function DitherPrismHeroDocs() {
@@ -23,22 +23,12 @@ export async function DitherPrismHeroDocs() {
             preview={<DitherPrismHeroPlayground />}
             previewCode=""
             installPackageName="dither-prism-hero"
-            installDependencies="framer-motion @react-three/fiber three"
+            installDependencies="@react-three/fiber three"
             installSourceCode={sourceCode}
             usageCode={<LiveCodeBlock defaultCode={basicUsageCode} />}
             fullWidthPreview={true}
             unstyledPreview={true}
             props={[
-                {
-                    name: "title1",
-                    type: "string",
-                    description: "First line of the main metallic headline.",
-                },
-                {
-                    name: "title2",
-                    type: "string",
-                    description: "Second line of the main metallic headline.",
-                },
                 {
                     name: "color1",
                     type: "string",
@@ -92,11 +82,6 @@ export async function DitherPrismHeroDocs() {
                     type: "string",
                     default: '"#ffffff"',
                     description: "Color of the floating particles.",
-                },
-                {
-                    name: "children",
-                    type: "ReactNode",
-                    description: "Custom content to render on top of the background (e.g., buttons, forms).",
                 },
                 {
                     name: "className",

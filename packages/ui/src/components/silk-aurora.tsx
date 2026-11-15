@@ -135,9 +135,6 @@ function hexToRgb01(hex: string, fallback: string): [number, number, number] {
 }
 
 export interface SilkAuroraProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: string;
-  subtitle?: string;
-  description?: string;
   baseColor?: string;
   midColor?: string;
   sheenColor?: string;
@@ -148,16 +145,9 @@ export interface SilkAuroraProps extends React.HTMLAttributes<HTMLDivElement> {
   vignette?: number;
   mouseInfluence?: number;
   interactive?: boolean;
-  children?: React.ReactNode;
 }
 
-const HEADLINE_CLASS =
-  "max-w-[820px] text-[13cqi] font-semibold leading-[0.86] tracking-normal text-white md:text-[8cqi] lg:text-[6.4cqi]";
-
 export function SilkAurora({
-  title,
-  subtitle,
-  description,
   baseColor = DEFAULT_BASE,
   midColor = DEFAULT_MID,
   sheenColor = DEFAULT_SHEEN,
@@ -169,7 +159,6 @@ export function SilkAurora({
   mouseInfluence = 1,
   interactive = true,
   className,
-  children,
   style,
   ...props
 }: SilkAuroraProps) {
@@ -416,31 +405,13 @@ export function SilkAurora({
   const fallbackContent = (
     <div
       className={cn(
-        "relative flex min-h-screen w-full items-center overflow-hidden bg-[#050507] text-white",
+        "relative min-h-screen w-full overflow-hidden bg-[#050507]",
         className,
       )}
       style={{ containerType: "size", ...style }}
       {...props}
     >
       <WebGLFallback className="absolute inset-0 h-full w-full" />
-      {(title || subtitle || description || children) && (
-        <div className="relative z-10 mx-auto w-full max-w-[1240px] px-6 py-20 md:px-10 md:py-28">
-          <div className="max-w-[760px]">
-            {subtitle && (
-              <p className="mb-5 text-xs font-medium uppercase tracking-[0.24em] text-white/50">
-                {subtitle}
-              </p>
-            )}
-            {title && <h1 className={HEADLINE_CLASS}>{title}</h1>}
-            {description && (
-              <p className="mt-7 max-w-[620px] text-base leading-relaxed text-white/68 md:text-xl">
-                {description}
-              </p>
-            )}
-            {children && <div className="mt-10">{children}</div>}
-          </div>
-        </div>
-      )}
     </div>
   );
 
@@ -453,7 +424,7 @@ export function SilkAurora({
       <div
         ref={containerRef}
         className={cn(
-          "relative flex min-h-screen w-full items-center overflow-hidden bg-[#050507] text-white",
+          "relative min-h-screen w-full overflow-hidden bg-[#050507]",
           className,
         )}
         style={{ containerType: "size", ...style }}
@@ -468,25 +439,6 @@ export function SilkAurora({
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_72%_34%,rgba(255,255,255,0.16),transparent_24%),radial-gradient(circle_at_18%_74%,rgba(110,214,201,0.13),transparent_30%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.46),rgba(0,0,0,0.14)_42%,rgba(0,0,0,0.42))]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
-
-        {(title || subtitle || description || children) && (
-          <div className="relative z-10 mx-auto w-full max-w-[1240px] px-6 py-20 md:px-10 md:py-28">
-            <div className="max-w-[760px]">
-              {subtitle && (
-                <p className="mb-5 text-xs font-medium uppercase tracking-[0.24em] text-white/50">
-                  {subtitle}
-                </p>
-              )}
-              {title && <h1 className={HEADLINE_CLASS}>{title}</h1>}
-              {description && (
-                <p className="mt-7 max-w-[620px] text-base leading-relaxed text-white/68 md:text-xl">
-                  {description}
-                </p>
-              )}
-              {children && <div className="mt-10">{children}</div>}
-            </div>
-          </div>
-        )}
       </div>
     </WebGLErrorBoundary>
   );
