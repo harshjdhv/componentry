@@ -27,7 +27,6 @@ export async function HeatmapLogoDocs() {
       installDependencies="@paper-design/shaders-react"
       installSourceCode={sourceCode ?? "// Unable to load source code"}
       usageCode={<LiveCodeBlock defaultCode={usageCode} />}
-      usageNote="Use a solid, single-color logo; the shader reads its silhouette, so a transparent PNG or SVG works best. The background is transparent by default, so the glow blends into whatever sits behind it. The animation stops when reduced motion is on."
       props={[
         {
           name: "image",
