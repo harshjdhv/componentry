@@ -118,6 +118,10 @@ const docsImportMap: Record<
     import("@/components/docs/liquid-chrome").then((m) => ({
       default: m.LiquidChromeDocs,
     })),
+  "flux-field": () =>
+    import("@/components/docs/flux-field").then((m) => ({
+      default: m.FluxFieldDocs,
+    })),
   "dither-gradient": () =>
     import("@/components/docs/dither-gradient").then((m) => ({
       default: m.DitherGradientDocs,

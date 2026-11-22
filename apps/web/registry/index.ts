@@ -436,6 +436,14 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/liquidchrome.webm",
   },
+  "flux-field": {
+    title: "Flux Field",
+    description:
+      "The flux lines of a magnetic dipole drawn as fine glowing contours between two drifting poles.",
+    category: "Hero Backgrounds",
+    slug: "flux-field",
+    addedAt: "2026-11-23",
+  },
   // Visual Effects
   "ascii-effect": {
     title: "ASCII Effect",
