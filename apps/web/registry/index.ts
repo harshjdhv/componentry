@@ -217,7 +217,8 @@ export const components: Record<string, ComponentMetadata> = {
   },
   "magnetic-dock": {
     title: "Magnetic Dock",
-    description: "MacOS style dock that scales items based on mouse proximity.",
+    description:
+      "MacOS style dock that scales items based on mouse proximity. Ships with real macOS app icons embedded as self-contained data URIs.",
     category: "Components",
     slug: "magnetic-dock",
     previewVideo:

@@ -23,14 +23,14 @@ import { MatrixRain } from "@workspace/ui/components/matrix-rain";
 import { ScrollBasedVelocity } from "@workspace/ui/components/scroll-based-velocity";
 import { EyeTracking } from "@workspace/ui/components/eye-tracking";
 import { DitherGradient } from "@workspace/ui/components/dither-gradient";
-import {
-  MagneticDock,
-  DockIconHome,
-  DockIconSearch,
-  DockIconMail,
-  DockIconSettings,
-  DockIconFolder,
-} from "@workspace/ui/components/magnetic-dock";
+import { MagneticDock } from "@workspace/ui/components/magnetic-dock";
+import { MACOS_DOCK_ITEMS } from "@workspace/ui/components/magnetic-dock-icons";
+
+const heroDockItems = MACOS_DOCK_ITEMS.filter((item) =>
+  ["finder", "safari", "mail", "messages", "music", "settings"].includes(
+    item.id
+  )
+);
 
 const showcaseCardClass =
   "relative flex flex-col rounded-2xl bg-white p-1.5 shadow-[0_0_0_1px_rgba(0,0,0,0.055),0_10px_30px_-18px_rgba(0,0,0,0.35)] transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.075),0_18px_48px_-22px_rgba(0,0,0,0.45)] dark:bg-[#161616] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.07)] dark:hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)] transform-gpu will-change-transform";
@@ -244,30 +244,7 @@ export default function Home() {
 
                   <div className="z-10 flex h-[80px] items-center justify-center translate-y-2">
                     <MagneticDock
-                      items={[
-                        { id: "home", label: "Home", icon: <DockIconHome /> },
-                        {
-                          id: "search",
-                          label: "Search",
-                          icon: <DockIconSearch />,
-                        },
-                        {
-                          id: "mail",
-                          label: "Mail",
-                          icon: <DockIconMail />,
-                          badge: 3,
-                        },
-                        {
-                          id: "folder",
-                          label: "Projects",
-                          icon: <DockIconFolder />,
-                        },
-                        {
-                          id: "settings",
-                          label: "Settings",
-                          icon: <DockIconSettings />,
-                        },
-                      ]}
+                      items={heroDockItems}
                       position="bottom"
                       variant="glass"
                       className="mx-auto"
