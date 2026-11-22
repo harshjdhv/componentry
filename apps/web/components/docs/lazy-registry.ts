@@ -118,6 +118,10 @@ const docsImportMap: Record<
     import("@/components/docs/liquid-chrome").then((m) => ({
       default: m.LiquidChromeDocs,
     })),
+  "rain-glass": () =>
+    import("@/components/docs/rain-glass").then((m) => ({
+      default: m.RainGlassDocs,
+    })),
   "dither-gradient": () =>
     import("@/components/docs/dither-gradient").then((m) => ({
       default: m.DitherGradientDocs,

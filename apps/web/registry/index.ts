@@ -436,6 +436,14 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/liquidchrome.webm",
   },
+  "rain-glass": {
+    title: "Rain Glass",
+    description:
+      "Rain on a window: every droplet refracts a blurred field of coloured light lying behind the glass.",
+    category: "Hero Backgrounds",
+    slug: "rain-glass",
+    addedAt: "2026-11-23",
+  },
   // Visual Effects
   "ascii-effect": {
     title: "ASCII Effect",
