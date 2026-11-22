@@ -20,10 +20,10 @@ import { ComponentGuidance } from "@/components/component-guidance"
 import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-json-ld"
 import { cn } from "@/lib/utils"
 
-// Docs columns run full width, so they use a fixed inset instead of the
-// landing page's centered 1360px rail (which left a wide empty gutter).
-const docsGutterLeftClass = "pl-6 sm:pl-8 lg:pl-12 xl:pl-16"
-const docsGutterLeftOffsetClass = "left-6 sm:left-8 lg:left-12 xl:left-16"
+// The docs column pads its content evenly on both sides (40px on wide
+// screens). Not the landing page's centered 1360px rail.
+const docsGutterClass = "px-6 sm:px-8 xl:px-10"
+const docsGutterLeftOffsetClass = "left-6 sm:left-8 xl:left-10"
 
 export interface PropItem {
   name: string
@@ -185,7 +185,7 @@ export async function DocsPageLayout({
 
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {/* Full-bleed within the column — no centered max-width gutter on large screens */}
-          <div className={cn("w-full space-y-14 pt-14 pb-40 pr-6 sm:pr-8 lg:space-y-16 lg:pt-40 lg:pb-40 lg:pr-8", docsGutterLeftClass)}>
+          <div className={cn("w-full space-y-14 pt-14 pb-40 lg:space-y-16 lg:pt-40 lg:pb-40", docsGutterClass)}>
 
             {/* Header Section */}
             <header>
