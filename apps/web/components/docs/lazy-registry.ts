@@ -118,6 +118,10 @@ const docsImportMap: Record<
     import("@/components/docs/liquid-chrome").then((m) => ({
       default: m.LiquidChromeDocs,
     })),
+  "chladni-plate": () =>
+    import("@/components/docs/chladni-plate").then((m) => ({
+      default: m.ChladniPlateDocs,
+    })),
   "dither-gradient": () =>
     import("@/components/docs/dither-gradient").then((m) => ({
       default: m.DitherGradientDocs,

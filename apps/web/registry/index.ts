@@ -436,6 +436,14 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/liquidchrome.webm",
   },
+  "chladni-plate": {
+    title: "Chladni Plate",
+    description:
+      "Cymatic hero background: sand settling on the nodal lines of a vibrating plate as two standing-wave modes cross-fade.",
+    category: "Hero Backgrounds",
+    slug: "chladni-plate",
+    addedAt: "2026-11-23",
+  },
   // Visual Effects
   "ascii-effect": {
     title: "ASCII Effect",

@@ -222,6 +222,10 @@
       "type": "registry:ui"
     },
     {
+      "name": "chladni-plate",
+      "type": "registry:ui"
+    },
+    {
       "name": "gradient-hero-01",
       "type": "registry:block"
     },
