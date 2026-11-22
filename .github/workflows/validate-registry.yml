@@ -68,7 +68,9 @@ jobs:
   consumer:
     name: Consumer smoke test
     needs: checks
-    runs-on: ubuntu-latest
+    # Playwright 1.57 cannot install Chromium on ubuntu-26.04, which is what
+    # ubuntu-latest now resolves to. Pin the image until Playwright supports it.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
