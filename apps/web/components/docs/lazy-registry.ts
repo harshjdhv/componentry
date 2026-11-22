@@ -118,6 +118,10 @@ const docsImportMap: Record<
     import("@/components/docs/liquid-chrome").then((m) => ({
       default: m.LiquidChromeDocs,
     })),
+  "mercury-beads": () =>
+    import("@/components/docs/mercury-beads").then((m) => ({
+      default: m.MercuryBeadsDocs,
+    })),
   "dither-gradient": () =>
     import("@/components/docs/dither-gradient").then((m) => ({
       default: m.DitherGradientDocs,

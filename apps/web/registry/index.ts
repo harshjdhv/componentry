@@ -436,6 +436,14 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/liquidchrome.webm",
   },
+  "mercury-beads": {
+    title: "Mercury Beads",
+    description:
+      "Liquid metal droplets drifting, merging and separating under a chrome-like light.",
+    category: "Hero Backgrounds",
+    slug: "mercury-beads",
+    addedAt: "2026-11-23",
+  },
   // Visual Effects
   "ascii-effect": {
     title: "ASCII Effect",
