@@ -118,6 +118,10 @@ const docsImportMap: Record<
     import("@/components/docs/liquid-chrome").then((m) => ({
       default: m.LiquidChromeDocs,
     })),
+  "newton-fringe": () =>
+    import("@/components/docs/newton-fringe").then((m) => ({
+      default: m.NewtonFringeDocs,
+    })),
   "dither-gradient": () =>
     import("@/components/docs/dither-gradient").then((m) => ({
       default: m.DitherGradientDocs,

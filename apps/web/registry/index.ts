@@ -436,6 +436,14 @@ export const components: Record<string, ComponentMetadata> = {
     previewVideo:
       "https://pub-a50e7f4ea75a4970a1738e50d53b6eb1.r2.dev/preview-videos/hero-backgrounds/liquidchrome.webm",
   },
+  "newton-fringe": {
+    title: "Newton Fringe",
+    description:
+      "Thin-film interference fringes drifting between two contact points — iridescent Newton's rings on near-black.",
+    category: "Hero Backgrounds",
+    slug: "newton-fringe",
+    addedAt: "2026-11-23",
+  },
   // Visual Effects
   "ascii-effect": {
     title: "ASCII Effect",
