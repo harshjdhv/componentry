@@ -163,6 +163,10 @@ function DockItem({
             >
                 <motion.div
                     className="relative flex h-full w-full items-center justify-center"
+                    // Framer Motion adds tabIndex=0 to any element with tap/hover
+                    // gestures, which puts a second, unlabelled tab stop inside the
+                    // button. The button is already the focusable control.
+                    tabIndex={-1}
                     whileTap={reducedMotion ? undefined : { scale: 0.9 }}
                     style={{ transformOrigin: edge.origin }}
                 >
