@@ -110,6 +110,12 @@ function DockItem({
     const ref = React.useRef<HTMLButtonElement>(null)
     const [isHovered, setIsHovered] = React.useState(false)
     const [isFocused, setIsFocused] = React.useState(false)
+    // The magnified width is a motion value, which cannot be resolved on the
+    // server. Rendering it during SSR produces "56px" from the server and 56 on
+    // the client — a hydration mismatch. Hold the resting size until mount, when
+    // both sides agree, then let the motion value take over.
+    const [isMounted, setIsMounted] = React.useState(false)
+    React.useEffect(() => setIsMounted(true), [])
     const showLabel = showLabels && (isHovered || isFocused)
     const isVertical = position === "left" || position === "right"
     const edge = EDGE[position]
@@ -133,6 +139,7 @@ function DockItem({
     const smoothScale = useSpring(scale, { damping: 20, stiffness: 300, mass: 0.5 })
     const size = useTransform(smoothScale, (s) => s * iconSize)
     const currentSize = reducedMotion ? iconSize : size
+    const layoutSize = isMounted ? currentSize : iconSize
 
     return (
         <motion.button
@@ -152,8 +159,8 @@ function DockItem({
             // The slot widens along the dock so neighbors make room, but keeps its
             // depth, so the dock never grows. The icon overflows out of it instead.
             style={{
-                width: isVertical ? iconSize : currentSize,
-                height: isVertical ? currentSize : iconSize,
+                width: isVertical ? iconSize : layoutSize,
+                height: isVertical ? layoutSize : iconSize,
             }}
         >
             {/* Stage: the magnified icon, anchored to the dock edge */}
