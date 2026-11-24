@@ -275,8 +275,7 @@ export default function DocsPage() {
 
         {/* ── Hero ── */}
         <header className="mb-12">
-          {/* Matches paneloui.com/components' page title: Inter 28/34, 500, -0.025em, 520px, balanced. */}
-          <h1 className="max-w-[520px] text-balance font-[family-name:var(--font-inter)] text-[28px] font-medium leading-[34px] tracking-[-0.025em] text-zinc-950 dark:text-zinc-50">
+                   <h1 className="max-w-[520px] text-balance text-[28px] font-medium leading-[34px] tracking-[-0.025em] text-zinc-950 dark:text-zinc-50">
             Animated components you can copy and own – built on Tailwind and Motion.
           </h1>
         </header>

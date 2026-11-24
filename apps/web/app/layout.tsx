@@ -1,7 +1,6 @@
 import type React from "react";
 import type { Metadata, Viewport } from "next";
 import {
-  Geist,
   Geist_Mono,
   Inter,
   Instrument_Serif,
@@ -17,7 +16,7 @@ import { absoluteUrl, siteConfig } from "@/lib/site";
 import { getGithubStars } from "@/lib/github-stars";
 import { GithubStarsProvider } from "@/hooks/use-github-stars";
 
-const fontSans = Geist({
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -29,23 +28,10 @@ const fontMono = Geist_Mono({
   display: "swap",
 });
 
-// Only for page titles that follow paneloui.com's title style (see /docs).
-const fontInter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
 const fontSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-serif",
-  display: "swap",
-});
-
-const fontDisplay = Geist({
-  subsets: ["latin"],
-  variable: "--font-display",
   display: "swap",
 });
 
@@ -189,9 +175,9 @@ export default async function RootLayout({
         <JsonLd />
       </head>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} ${fontInter.variable} ${fontSerif.variable} ${fontDisplay.variable} relative font-sans antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} relative font-sans antialiased`}
         style={
-          { "--font-heading": "var(--font-display)" } as React.CSSProperties
+          { "--font-heading": "var(--font-sans)" } as React.CSSProperties
         }
       >
         <div className="isolate relative flex min-h-svh flex-col">

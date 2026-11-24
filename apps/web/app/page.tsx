@@ -88,9 +88,7 @@ export default function Home() {
                   <span className="font-semibold tracking-tight">Vercel OSS</span>
                   <span>Program</span>
                 </Badge>
-                {/* Same type as the /docs title (Inter 500, balanced), scaled for display:
-                    tighter leading and tracking than at 28px so it holds together big. */}
-                <h1 id="hero-heading" className="mt-6 max-w-[720px] text-balance font-[family-name:var(--font-inter)] text-[8.4vw] sm:text-[clamp(2.5rem,4vw,3.5rem)] font-medium leading-[1.08] tracking-[-0.035em] text-zinc-950 dark:text-zinc-50">
+                               <h1 id="hero-heading" className="mt-6 max-w-[720px] text-balance text-[8.4vw] sm:text-[clamp(2.5rem,4vw,3.5rem)] font-medium leading-[1.08] tracking-[-0.026em] text-zinc-950 dark:text-zinc-50">
                   <span className="block whitespace-nowrap sm:inline sm:whitespace-normal">The component library</span>{" "}<span className="block whitespace-nowrap sm:inline sm:whitespace-normal">for polished interfaces.</span>
                 </h1>
                 <p className="mt-5 max-w-[600px] sm:text-balance text-base leading-6 sm:text-[17px] sm:leading-7 text-zinc-600 dark:text-zinc-400">
