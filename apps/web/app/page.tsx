@@ -16,8 +16,8 @@ import { ResponsiveMagnetLines } from "@/components/landing/responsive-magnet-li
 import { Testimonials } from "@/components/landing/testimonials";
 import { Features } from "@/components/landing/features";
 import { CustomWorkCta } from "@/components/landing/custom-work-cta";
-import { InfiniteIconField } from "@/components/landing/infinite-icon-field";
 import { Footer } from "@/components/footer";
+import { ShowcaseCard } from "@/components/landing/showcase-card";
 
 // Componentry Previews for Bento
 import { MatrixRain } from "@workspace/ui/components/matrix-rain";
@@ -26,30 +26,13 @@ import { EyeTracking } from "@workspace/ui/components/eye-tracking";
 import { DitherGradient } from "@workspace/ui/components/dither-gradient";
 import { MagneticDock } from "@workspace/ui/components/magnetic-dock";
 import { MACOS_DOCK_ITEMS } from "@workspace/ui/components/magnetic-dock-icons";
+import { HeatmapLogo } from "@workspace/ui/components/heatmap-logo";
 
 const heroDockItems = MACOS_DOCK_ITEMS.filter((item) =>
   ["finder", "safari", "mail", "messages", "music", "settings"].includes(
     item.id
   )
 );
-
-const showcaseCardClass =
-  "relative flex flex-col rounded-2xl bg-white p-1.5 shadow-[0_0_0_1px_rgba(0,0,0,0.055),0_10px_30px_-18px_rgba(0,0,0,0.35)] transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.075),0_18px_48px_-22px_rgba(0,0,0,0.45)] dark:bg-[#161616] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.07)] dark:hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)] transform-gpu will-change-transform";
-
-const showcasePreviewClass =
-  "relative flex-1 w-full overflow-hidden rounded-[10px] bg-zinc-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.045)] dark:bg-background dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.055)]";
-
-const showcaseLabelClass =
-  "shrink-0 px-2.5 pb-1 pt-2 text-[13px] font-medium leading-5 text-zinc-700 text-pretty dark:text-zinc-400";
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] as const },
-  },
-};
 
 export default function Home() {
   return (
@@ -100,6 +83,21 @@ export default function Home() {
           </LandingContent>
 
           <LandingContent>
+            <section
+              aria-labelledby="showcase-heading"
+              className="mt-16 w-full sm:mt-20"
+            >
+              <h2
+                id="showcase-heading"
+                className="max-w-[720px] text-balance text-[32px] font-medium leading-[36px] tracking-[-0.028em] text-zinc-950 dark:text-zinc-50 sm:text-[42px] sm:leading-[46px] sm:tracking-[-0.033em]"
+              >
+                Not screenshots. Not mockups.{" "}
+                <span className="text-neutral-500 dark:text-neutral-400">
+                  Every card below is the live component, running in this page.
+                </span>
+              </h2>
+            </section>
+
             <DeferredGallery>
             <motion.div
               data-home-showcase
@@ -111,151 +109,110 @@ export default function Home() {
               }}
               className="mb-20 mt-6 grid w-full min-w-0 auto-rows-[min(300px,70vw)] grid-cols-1 gap-2.5 md:mt-6 md:auto-rows-[300px] md:grid-cols-4"
             >
-              {/* Card 1: 1x1 Dark */}
-              <motion.div
-                variants={cardVariants}
-                className={`md:col-span-1 md:row-span-1 ${showcaseCardClass}`}
+              <ShowcaseCard
+                href="/docs/components/matrix-rain"
+                title="Matrix rain"
+                className="md:col-span-1 md:row-span-1"
+                previewClassName="flex flex-col items-center justify-center p-6 pb-0 pt-0"
+              >
+                <div className="absolute inset-0 scale-150 opacity-60 mix-blend-multiply dark:mix-blend-screen">
+                  <MatrixRain speed={30} fontSize={10} variant="cyan" />
+                </div>
+              </ShowcaseCard>
+
+              <ShowcaseCard
+                href="/docs/components/scroll-based-velocity"
+                title="Scroll velocity"
+                className="md:col-span-2 md:row-span-1"
+                previewClassName="flex flex-col items-center justify-center pt-8"
               >
                 <div
-                  className={`${showcasePreviewClass} flex flex-col items-center justify-center p-6 pb-0 pt-0`}
+                  className="relative flex h-24 w-full min-w-0 overflow-hidden"
+                  style={{
+                    maskImage:
+                      "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+                  }}
                 >
-                  <div className="absolute inset-0 opacity-60 mix-blend-multiply dark:mix-blend-screen scale-150">
-                    <MatrixRain speed={30} fontSize={10} variant="cyan" />
-                  </div>
-                </div>
-                <div className={showcaseLabelClass}>
-                  Matrix rain
-                </div>
-              </motion.div>
-
-              {/* Card 2: 2x1 Dark */}
-              <motion.div
-                variants={cardVariants}
-                className={`md:col-span-2 md:row-span-1 ${showcaseCardClass}`}
-              >
-                <div
-                  className={`${showcasePreviewClass} flex flex-col items-center justify-center pt-8`}
-                >
-                  <div
-                    className="relative flex h-24 w-full min-w-0 overflow-hidden"
-                    style={{
-                      maskImage:
-                        "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-                    }}
-                  >
-                    <ScrollBasedVelocity
-                      text="COMPONENTRY"
-                      default_velocity={3}
-                      className="font-sans text-4xl font-black tracking-tighter text-zinc-800 dark:text-white sm:text-6xl md:text-8xl"
-                    />
-                  </div>
-                </div>
-                <div className={showcaseLabelClass}>
-                  Scroll velocity
-                </div>
-              </motion.div>
-
-              {/* Card 3: 1x2 White */}
-              <motion.div
-                variants={cardVariants}
-                className={`md:col-span-1 md:row-span-2 ${showcaseCardClass}`}
-              >
-                <div className={showcasePreviewClass}>
-                  <InfiniteIconField />
-                </div>
-                <div className={showcaseLabelClass}>
-                  Infinite icon field
-                </div>
-              </motion.div>
-
-              {/* Card 4: 2x1 White */}
-              <motion.div
-                variants={cardVariants}
-                className={`md:col-span-2 md:row-span-1 ${showcaseCardClass}`}
-              >
-                <div
-                  className={`${showcasePreviewClass} flex flex-col items-center justify-center p-0`}
-                >
-                  <ResponsiveMagnetLines
-                    rows={5}
-                    containerSize="100%"
-                    lineColor="rgba(113,113,122,0.5)"
-                    lineWidth="4px"
-                    lineHeight="32px"
+                  <ScrollBasedVelocity
+                    text="COMPONENTRY"
+                    default_velocity={3}
+                    className="font-sans text-4xl font-black tracking-tighter text-zinc-800 dark:text-white sm:text-6xl md:text-8xl"
                   />
                 </div>
-                <div className="flex shrink-0 items-center justify-between gap-2 px-2.5 pb-1 pt-2 text-[13px] font-medium leading-5 text-zinc-700 dark:text-zinc-400">
-                  Magnet lines
-                  <span className="hidden shrink-0 font-mono text-xs tracking-wider text-zinc-400 opacity-60 sm:inline">
-                    [ hover over me ]
-                  </span>
-                </div>
-              </motion.div>
+              </ShowcaseCard>
 
-              {/* Card 5: 1x1 Dither Gradient */}
-              <motion.div
-                variants={cardVariants}
-                className={`md:col-span-1 md:row-span-1 ${showcaseCardClass}`}
+              <ShowcaseCard
+                href="/docs/components/heatmap-logo"
+                title="Heatmap logo"
+                className="md:col-span-1 md:row-span-2"
+                previewClassName="flex items-center justify-center p-6"
               >
-                <div
-                  className={`${showcasePreviewClass} flex flex-col items-center justify-center`}
-                >
-                  <div className="absolute inset-0 z-0 opacity-100 rounded-xl overflow-hidden">
-                    <DitherGradient
-                      colorFrom="#ffaa40"
-                      colorTo="#9c40ff"
-                      colorMid="#ff00cc"
-                      intensity={0.5}
-                      speed={2}
-                    />
-                  </div>
-                </div>
-                <div className={showcaseLabelClass}>
-                  Dither gradient
-                </div>
-              </motion.div>
+                <HeatmapLogo image="/logo-new.svg" className="w-full max-w-[220px]" />
+              </ShowcaseCard>
 
-              {/* Card 6: 1x1 Eye tracking */}
-              <motion.div
-                variants={cardVariants}
-                className={`md:col-span-1 md:row-span-1 ${showcaseCardClass}`}
+              <ShowcaseCard
+                href="/docs/components/magnet-lines"
+                title="Magnet lines"
+                hint="[ hover over me ]"
+                interactive
+                className="md:col-span-2 md:row-span-1"
+                previewClassName="flex flex-col items-center justify-center p-0"
               >
-                <div
-                  className={`${showcasePreviewClass} flex flex-col items-center justify-center p-0`}
-                >
-                  <EyeTracking eyeSize={78} gap={22} variant="realistic" />
-                </div>
-                <div className="flex shrink-0 items-center justify-between gap-2 px-2.5 pb-1 pt-2 text-[13px] font-medium leading-5 text-zinc-700 dark:text-zinc-400">
-                  Eye tracking
-                  <span className="hidden shrink-0 font-mono text-xs tracking-wider text-zinc-400 opacity-60 sm:inline">
-                    [ move cursor ]
-                  </span>
-                </div>
-              </motion.div>
+                <ResponsiveMagnetLines
+                  rows={5}
+                  containerSize="100%"
+                  lineColor="rgba(113,113,122,0.5)"
+                  lineWidth="4px"
+                  lineHeight="32px"
+                />
+              </ShowcaseCard>
 
-              {/* Card 7: 3x1 Magnetic Dock */}
-              <motion.div
-                variants={cardVariants}
-                className={`md:col-span-3 md:row-span-1 ${showcaseCardClass}`}
+              <ShowcaseCard
+                href="/docs/components/dither-gradient"
+                title="Dither gradient"
+                className="md:col-span-1 md:row-span-1"
+                previewClassName="flex flex-col items-center justify-center"
               >
-                <div
-                  className={`${showcasePreviewClass} flex max-h-[260px] items-center justify-center overflow-hidden p-6 text-black sm:p-10`}
-                >
-                  <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_16px] opacity-70 dark:opacity-60" />
+                <div className="absolute inset-0 z-0 overflow-hidden rounded-xl opacity-100">
+                  <DitherGradient
+                    colorFrom="#ffaa40"
+                    colorTo="#9c40ff"
+                    colorMid="#ff00cc"
+                    intensity={0.5}
+                    speed={2}
+                  />
+                </div>
+              </ShowcaseCard>
 
-                  <div className="z-10 flex h-[80px] items-center justify-center translate-y-2">
-                    <MagneticDock
-                      items={heroDockItems}
-                      position="bottom"
-                      variant="glass"
-                      className="mx-auto"
-                    />
-                  </div>
+              <ShowcaseCard
+                href="/docs/components/eye-tracking"
+                title="Eye tracking"
+                hint="[ move cursor ]"
+                interactive
+                className="md:col-span-1 md:row-span-1"
+                previewClassName="flex flex-col items-center justify-center p-0"
+              >
+                <EyeTracking eyeSize={78} gap={22} variant="realistic" />
+              </ShowcaseCard>
+
+              <ShowcaseCard
+                href="/docs/components/magnetic-dock"
+                title="Magnetic dock"
+                interactive
+                className="md:col-span-3 md:row-span-1"
+                previewClassName="flex max-h-[260px] items-center justify-center overflow-hidden p-6 text-black sm:p-10"
+              >
+                <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] opacity-70 [background-size:16px_16px] dark:bg-[radial-gradient(#27272a_1px,transparent_1px)] dark:opacity-60" />
+
+                <div className="z-10 flex h-[80px] translate-y-2 items-center justify-center">
+                  <MagneticDock
+                    items={heroDockItems}
+                    position="bottom"
+                    variant="glass"
+                    className="mx-auto"
+                  />
                 </div>
-                <div className={showcaseLabelClass}>
-                  Magnetic dock
-                </div>
-              </motion.div>
+              </ShowcaseCard>
             </motion.div>
             </DeferredGallery>
           </LandingContent>
