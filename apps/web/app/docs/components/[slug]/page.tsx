@@ -90,48 +90,14 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     };
 }
 
-// Loading skeleton for docs page
+// Loading skeleton for the content column; the shell comes from the layout.
 function DocsPageSkeleton() {
     return (
-        <div className="flex flex-col lg:flex-row w-full h-full min-h-screen lg:h-screen bg-white dark:bg-background overflow-hidden">
-            {/* Left Column: Scrollable Content Skeleton */}
-            <div className="relative z-20 flex h-full w-full min-w-0 flex-col bg-white dark:bg-background lg:h-full lg:w-1/2 lg:max-w-[50%] lg:basis-1/2">
-                <div className="pointer-events-none absolute inset-x-0 top-0 z-30 hidden h-[150px] select-none bg-[linear-gradient(to_top,transparent,#ffffff)] backdrop-blur-[4px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,#000_50%,transparent)] lg:block dark:bg-[linear-gradient(to_top,transparent,var(--background))]" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[150px] select-none bg-[linear-gradient(to_bottom,transparent,#ffffff)] backdrop-blur-[4px] [mask-image:linear-gradient(to_top,#000_50%,transparent)] [-webkit-mask-image:linear-gradient(to_top,#000_50%,transparent)] dark:bg-[linear-gradient(to_bottom,transparent,var(--background))]" />
-
-                <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    <div className="w-full animate-pulse space-y-14 px-6 pb-40 sm:px-8 lg:space-y-16 lg:pt-40 xl:px-10">
-
-                        {/* Header Section */}
-                        <div className="space-y-10">
-                            <div className="space-y-4">
-                                <div className="h-12 w-3/4 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-                                <div className="h-8 w-full bg-zinc-200 dark:bg-zinc-800/50 rounded-lg" />
-                                <div className="h-8 w-2/3 bg-zinc-200 dark:bg-zinc-800/50 rounded-lg" />
-                            </div>
-                        </div>
-
-                        {/* Installation Section */}
-                        <div className="space-y-6 pt-8">
-                            <div className="h-8 w-32 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-                            <div className="h-16 w-full bg-zinc-200 dark:bg-zinc-800/30 rounded-xl" />
-                        </div>
-
-                        {/* Usage Section */}
-                        <div className="space-y-6 pt-8">
-                            <div className="h-8 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-                            <div className="h-48 w-full bg-zinc-200 dark:bg-zinc-800/30 rounded-xl border border-zinc-200 dark:border-zinc-800" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Right Column: Sticky Preview Skeleton */}
-            <div className="order-first z-10 flex aspect-[4/5] w-full max-h-[75svh] flex-col bg-white dark:bg-background lg:sticky lg:top-0 lg:order-last lg:aspect-auto lg:h-full lg:max-h-none lg:w-1/2 lg:max-w-[50%] lg:flex-1 lg:basis-1/2">
-                <div className="relative h-full w-full overflow-hidden bg-white p-3 dark:bg-background lg:p-0 lg:pt-3 lg:pb-3 lg:pr-3 lg:pl-1.5">
-                    <div className="w-full h-full bg-[#f7f7f7] dark:bg-zinc-800/20 rounded-xl border border-zinc-200 dark:border-zinc-800 animate-pulse" />
-                </div>
-            </div>
+        <div className="animate-pulse space-y-4">
+            <div className="h-4 w-40 rounded bg-zinc-100 dark:bg-zinc-800/60" />
+            <div className="h-10 w-72 rounded-lg bg-zinc-100 dark:bg-zinc-800/60" />
+            <div className="h-5 w-full max-w-xl rounded bg-zinc-100 dark:bg-zinc-800/40" />
+            <div className="!mt-8 h-[440px] rounded-2xl bg-zinc-100 sm:h-[520px] xl:h-[580px] dark:bg-zinc-800/30" />
         </div>
     );
 }

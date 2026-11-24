@@ -432,3 +432,21 @@ button:not(:disabled) {
 [data-block-code-panel] pre {
   scrollbar-color: rgba(113, 113, 122, 0.35) transparent;
 }
+
+/* The inset docs shell scrolls the window, so give back the scrollbar the docs
+   route hides; it sits at the far right edge of the page. */
+html.route-hide-scrollbar:has([data-docs-inset]) {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(113 113 122 / 0.4) transparent;
+}
+
+html.route-hide-scrollbar:has([data-docs-inset])::-webkit-scrollbar {
+  display: block;
+  width: 10px;
+}
+
+html.route-hide-scrollbar:has([data-docs-inset])::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: rgb(113 113 122 / 0.4) padding-box;
+}

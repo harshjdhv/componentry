@@ -274,13 +274,11 @@ export default function DocsPage() {
         <div className="w-full">
 
         {/* ── Hero ── */}
-        <header className="mb-12 max-w-2xl space-y-2.5">
-          <h1 className="text-[28px] font-medium leading-[1.1] tracking-[-0.035em] text-zinc-900 sm:text-[32px] dark:text-zinc-50">
-            Browse the collection.
+        <header className="mb-12">
+          {/* Matches paneloui.com/components' page title: Inter 28/34, 500, -0.025em, 520px, balanced. */}
+          <h1 className="max-w-[520px] text-balance font-[family-name:var(--font-inter)] text-[28px] font-medium leading-[34px] tracking-[-0.025em] text-zinc-950 dark:text-zinc-50">
+            Animated components you can copy and own – built on Tailwind and Motion.
           </h1>
-          <p className="max-w-xl text-pretty text-[15px] font-normal leading-6 tracking-[-0.01em] text-zinc-500 sm:text-[16px] sm:leading-7 dark:text-zinc-400">
-            Every component ships as editable source. Hover a preview to see it in motion, then copy it or install from the CLI.
-          </p>
         </header>
 
         {/* ── Featured (video previews only) ── */}

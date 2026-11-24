@@ -2,7 +2,8 @@ import type React from "react";
 import type { Metadata, Viewport } from "next";
 import {
   Geist,
-  JetBrains_Mono,
+  Geist_Mono,
+  Inter,
   Instrument_Serif,
 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
@@ -22,9 +23,16 @@ const fontSans = Geist({
   display: "swap",
 });
 
-const fontMono = JetBrains_Mono({
+const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
+});
+
+// Only for page titles that follow paneloui.com's title style (see /docs).
+const fontInter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -181,7 +189,7 @@ export default async function RootLayout({
         <JsonLd />
       </head>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} ${fontDisplay.variable} relative font-sans antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontInter.variable} ${fontSerif.variable} ${fontDisplay.variable} relative font-sans antialiased`}
         style={
           { "--font-heading": "var(--font-display)" } as React.CSSProperties
         }
