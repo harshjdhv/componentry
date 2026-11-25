@@ -17,7 +17,11 @@ const gettingStarted: NavGroup = {
   items: [
     {
       title: "Introduction",
-      href: "/docs",
+      href: "/docs/introduction",
+    },
+    {
+      title: "All Components",
+      href: "/docs/components",
     },
     {
       title: "MCP",

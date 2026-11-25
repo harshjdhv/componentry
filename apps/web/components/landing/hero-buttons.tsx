@@ -48,7 +48,7 @@ export function HeroButtons() {
   return (
     <div ref={root} className="flex w-full min-w-0 flex-wrap items-center justify-start gap-2 sm:justify-center">
       <Button
-        render={<Link href="/docs" />}
+        render={<Link href="/docs/components" />}
         onClick={() => posthog.capture("components_browse_started")}
         onPointerEnter={(event) => {
           if (event.pointerType === "mouse") setBrowseHovered(true);

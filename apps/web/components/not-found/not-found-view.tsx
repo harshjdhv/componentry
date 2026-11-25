@@ -16,7 +16,7 @@ const swap = {
 
 const LINKS = [
   { href: "/", label: "Home", Icon: House },
-  { href: "/docs", label: "Components", Icon: LayoutGrid },
+  { href: "/docs/components", label: "Components", Icon: LayoutGrid },
 ] as const
 
 export function NotFoundView() {

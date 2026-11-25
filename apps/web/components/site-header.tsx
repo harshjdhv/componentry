@@ -38,7 +38,7 @@ export function SiteHeader({ sidebarToggle, landingGutter, inset }: SiteHeaderPr
     const fullStars = `${new Intl.NumberFormat("en-US").format(stars)} stars`
     const navItems = [
         {
-            href: "/docs",
+            href: "/docs/components",
             label: "Docs",
             active: pathname === "/docs" || (pathname.startsWith("/docs/") && !pathname.startsWith("/docs/mcp")),
         },

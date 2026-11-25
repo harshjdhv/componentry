@@ -63,7 +63,7 @@ export async function DocsInsetLayout({
     <>
       <BreadcrumbJsonLd
         items={[
-          { name: "Docs", path: "/docs" },
+          { name: "Components", path: "/docs/components" },
           { name: title, path: `/docs/components/${slug}` },
         ]}
       />
