@@ -5,20 +5,25 @@
  * control bar at the bottom center. The bar shows optional preset swatches and a
  * chevron that expands the page's DialKit controls.
  *
+ * Inside the docs preview (DocsInsetPreview) the same bar docks under the
+ * preview box instead of floating over it, and opens downward.
+ *
  * A page registers its controls with `useDialKit` (one panel per page), renders
  * its component inside <DocsPlayground>, and pushes generated code with
  * `useLiveCode`, which feeds <LiveCodeBlock> in the Usage section.
  */
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
+import { createPortal } from "react-dom"
 import { motion, useDragControls, useMotionValue } from "framer-motion"
-import { ChevronUp, GripVertical, SlidersHorizontal, X } from "lucide-react"
+import { ChevronDown, ChevronUp, GripVertical, SlidersHorizontal, X } from "lucide-react"
 import { useTheme } from "next-themes"
 import { DialRoot, DialStore, type ControlMeta } from "dialkit"
 import "dialkit/styles.css"
 import "./docs-playground.css"
 import { cn } from "@/lib/utils"
 import { usePlaygroundStore } from "@/hooks/use-playground-store"
+import { usePropsRowSlot } from "@/components/docs-inset/props-row-slot"
 
 export interface PlaygroundPreset {
   name: string
@@ -196,6 +201,7 @@ export function DocsPlayground({
   const toggle = () => setOpen((value) => !value)
   const launcherRef = useRef<HTMLButtonElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
+  const propsSlot = usePropsRowSlot()
   useHexColors()
 
   // Corner launcher: focus moves into the panel on open, Escape closes it, and
@@ -240,6 +246,82 @@ export function DocsPlayground({
       <DialRoot mode="inline" productionEnabled theme={resolvedTheme === "light" ? "light" : "dark"} />
     </div>
   )
+
+  // Inside the docs preview: the same bar, docked under the preview box (not
+  // floating over the component), opening downward.
+  if (propsSlot !== undefined) {
+    const docked = (hasPresets || controls) && (
+      <div className="mt-3">
+        {/* Bar: swatches + toggle, centred under the preview. */}
+        <div className="flex justify-center">
+          <div style={{ borderRadius: 8, minWidth }} className={cn("cy-dial", SURFACE, "flex-col")}>
+            <div className="flex items-center gap-2">
+              {hasPresets ? (
+                <div role="radiogroup" aria-label={presetsLabel} className="flex flex-1 items-center justify-center gap-2">
+                  {presets!.map(({ name, swatch }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      role="radio"
+                      aria-checked={preset === name}
+                      aria-label={name}
+                      title={name}
+                      onClick={() => onPresetChange?.(name)}
+                      style={{ "--swatch": swatch } as CSSProperties}
+                      className={SWATCH}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <span className="flex flex-1 items-center gap-2 px-1 text-[13px] font-medium text-foreground/70">
+                  <SlidersHorizontal className="size-3.5" />
+                  {label}
+                </span>
+              )}
+
+              {controls && (
+                <button
+                  type="button"
+                  aria-label={open ? "Hide options" : "More options"}
+                  aria-expanded={open}
+                  onClick={toggle}
+                  className={`${ICON_BUTTON} w-5`}
+                >
+                  {/* Opens downward from the bar, so the arrow points down until open. */}
+                  <ChevronDown
+                    className={`size-4 transition-transform duration-300 ease-[cubic-bezier(0.2,0,0,1)] ${open ? "rotate-180" : ""}`}
+                  />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Controls: full preview width, rows flowing into columns. Always mounted
+            so DialKit's height is settled; grid rows animate 0fr -> 1fr. */}
+        {controls && (
+          <div
+            inert={!open}
+            aria-hidden={!open}
+            className={`grid transition-[grid-template-rows,opacity] duration-200 ease-[cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <div style={{ borderRadius: 12 }} className={cn("cy-dial cy-dial-wide mt-2", SURFACE, "flex-col p-3")}>
+                <DialRoot mode="inline" productionEnabled theme={resolvedTheme === "light" ? "light" : "dark"} />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+
+    return (
+      <div ref={stageRef} className={cn("relative h-full w-full", className)}>
+        {children}
+        {propsSlot && docked && createPortal(docked, propsSlot)}
+      </div>
+    )
+  }
 
   // No color swatches to show: a round launcher in the corner instead of a mostly empty bar.
   if (!hasPresets) {

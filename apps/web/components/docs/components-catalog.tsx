@@ -43,7 +43,7 @@ export function ComponentsCatalog() {
                 Featured
               </h2>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 min-[87.5rem]:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 min-[87.5rem]:grid-cols-3">
               {featured.map((component, i) => (
                 <ComponentCard
                   key={component.slug}
@@ -66,7 +66,7 @@ export function ComponentsCatalog() {
                     {category}
                   </h2>
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 min-[87.5rem]:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 min-[87.5rem]:grid-cols-3">
                   {items.map((component, i) => (
                     <ComponentCard
                       key={component.slug}

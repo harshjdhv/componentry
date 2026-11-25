@@ -5,6 +5,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { useDocStore } from "@/hooks/use-doc-store"
 import { Tabs, TabsList, TabsTab } from "@workspace/ui/components/tabs"
+import { PropsRowSlotContext } from "./props-row-slot"
 import type { VariantItem } from "@/components/docs-preview-wrapper"
 
 interface DocsInsetPreviewProps {
@@ -43,6 +44,7 @@ export function DocsInsetPreview({
   const variant = activeVariant >= 0 ? variants[activeVariant] : undefined
   const isFullWidth = variant ? Boolean(variant.fullWidth || fullWidth) : fullWidth
   const [tab, setTab] = React.useState<"preview" | "code">("preview")
+  const [propsSlot, setPropsSlot] = React.useState<HTMLElement | null>(null)
 
   return (
     <div>
@@ -71,7 +73,9 @@ export function DocsInsetPreview({
               "flex items-center justify-center overflow-auto p-6 [scrollbar-width:none] lg:p-10 [&::-webkit-scrollbar]:hidden"
           )}
         >
-          {variant ? variant.preview : children}
+          <PropsRowSlotContext.Provider value={propsSlot}>
+            {variant ? variant.preview : children}
+          </PropsRowSlotContext.Provider>
         </div>
 
         {variants.length > 0 && (
@@ -114,6 +118,9 @@ export function DocsInsetPreview({
         </div>
       )}
     </div>
+
+      {/* Inline props row: a playground inside the stage portals its controls here. */}
+      <div ref={setPropsSlot} />
     </div>
   )
 }

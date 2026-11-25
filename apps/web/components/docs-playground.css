@@ -53,3 +53,21 @@
 .cy-dial .dialkit-root {
   font-variant-numeric: tabular-nums;
 }
+
+/* Docked panel under the docs preview: rows flow into columns (masonry-style)
+   across the preview's width instead of one tall list. Each direct row or folder
+   of the root panel stays within one column. */
+.cy-dial-wide .dialkit-folder-root > .dialkit-folder-content > .dialkit-folder-inner {
+  display: block;
+  column-width: 240px;
+  column-gap: 12px;
+}
+
+.cy-dial-wide .dialkit-folder-root > .dialkit-folder-content > .dialkit-folder-inner > * {
+  break-inside: avoid;
+  margin-bottom: var(--dial-row-gap, 4px);
+}
+
+.cy-dial-wide .dialkit-versions-host {
+  display: none;
+}

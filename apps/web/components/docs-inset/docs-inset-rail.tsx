@@ -13,8 +13,18 @@ import { docsSponsors, docsSponsorSlots, sponsorStats, type Sponsor } from "@/li
 const GITHUB_URL = "https://github.com/harshjdhv/componentry"
 const X_URL = "https://x.com/harshjdhv"
 
-// A soft tint on the page surface: groups the content without drawing a line.
-const card = "rounded-xl bg-black/[0.025] p-4 dark:bg-white/[0.03]"
+// Flat on the page: hairline border and a faint fill, no shadow, so the cards sit
+// with the content instead of hovering above it.
+const card =
+  "rounded-2xl border border-black/[0.07] bg-white p-1.5 dark:border-white/[0.06] dark:bg-white/[0.02]"
+// Inner area inside a card (banner / slots); same surface as the card itself.
+const inset = "rounded-xl"
+const heading = "text-[14px] font-medium tracking-[-0.01em] text-foreground"
+const body = "mt-1 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400"
+const primaryButton =
+  "inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-foreground text-[13px] font-medium text-background shadow-[inset_0_-1px_0_rgba(0,0,0,0.12)] transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const ghostButton =
+  "inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-foreground/[0.06] text-[13px] font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-foreground/[0.09] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
 function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -33,7 +43,11 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 const slot =
-  "group flex items-center justify-center rounded-md bg-white transition-colors duration-150 ease-out hover:bg-zinc-50 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
+  "group flex items-center justify-center rounded-lg transition-colors duration-150 ease-out"
+// Filled sponsors carry weight; open slots are dashed outlines so they read as "available".
+const filledSlot = "bg-white/80 hover:bg-white dark:bg-white/[0.04] dark:hover:bg-white/[0.07]"
+const openSlot =
+  "border border-dashed border-black/[0.12] hover:border-black/[0.25] hover:bg-white/60 dark:border-white/[0.1] dark:hover:border-white/[0.22] dark:hover:bg-white/[0.02]"
 
 /** A tier's row of slots: real sponsors first, then open "Your logo here" slots. */
 function SponsorTier({
@@ -48,11 +62,11 @@ function SponsorTier({
   size: "lg" | "sm"
 }) {
   const open = Math.max(count - sponsors.length, 0)
-  const height = size === "lg" ? "h-[72px]" : "h-14"
+  const height = size === "lg" ? "h-16" : "h-12"
 
   return (
     <div>
-      <p className="mb-1.5 text-[11.5px] text-zinc-400 dark:text-zinc-500">{label}</p>
+      <p className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.04em] text-zinc-400 dark:text-zinc-500">{label}</p>
       <div className={cn("grid gap-1.5", size === "sm" && "grid-cols-2")}>
         {sponsors.map((sponsor) => (
           <a
@@ -61,7 +75,7 @@ function SponsorTier({
             target="_blank"
             rel="noopener noreferrer sponsored"
             aria-label={sponsor.name}
-            className={cn(slot, height, "px-4")}
+            className={cn(slot, filledSlot, height, "px-4")}
           >
             <span
               aria-hidden
@@ -85,6 +99,7 @@ function SponsorTier({
             href="/sponsors"
             className={cn(
               slot,
+              openSlot,
               height,
               "gap-1.5 text-[12.5px] text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200"
             )}
@@ -99,54 +114,33 @@ function SponsorTier({
 }
 
 /**
- * Right column of the docs shell, docked to the bottom: custom-work pitch,
- * sponsor placements, then the star / follow card (replaces the old popup). Later cards
- * (newsletter, paid version) stack above them in the same card style.
+ * Right column of the docs shell, docked to the top: sponsor placements, then the
+ * star / follow card. Bordered rather than filled so it sits with the page.
  */
 export function DocsInsetRail({ className }: { className?: string }) {
   const stars = useGithubStars()
-  const visitors = sponsorStats[0]
   const hasOpenSlots =
     docsSponsors.main.length < docsSponsorSlots.main ||
     docsSponsors.supporter.length < docsSponsorSlots.supporter
 
   return (
     <aside className={cn("w-[296px] shrink-0", className)}>
-      <div className="flex h-full flex-col gap-2 overflow-y-auto px-2 pt-2 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <section aria-labelledby="docs-custom-heading" className={cn(card, "mt-auto")}>
-          <p className="text-[11.5px] text-zinc-400 dark:text-zinc-500">Available for work</p>
-          <h2 id="docs-custom-heading" className="mt-1 text-[14px] font-medium tracking-[-0.01em] text-foreground">
-            Need a custom component?
-          </h2>
-          <p className="mt-1 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400">
-            I build bespoke components and websites tailored to your brand.
-          </p>
-          <a
-            href={X_URL}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => posthog.capture("docs_rail_custom_work_clicked")}
-            className="mt-4 inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md bg-foreground/[0.06] text-[13px] font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-foreground/[0.1] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            <XIcon className="size-3" />
-            DM me on X
-          </a>
-        </section>
-
+      <div className="flex h-full flex-col gap-2 overflow-y-auto px-2 pt-10 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <section aria-labelledby="docs-sponsors-heading" className={card}>
-          <h2
-            id="docs-sponsors-heading"
-            className="text-[14px] font-medium tracking-[-0.01em] text-foreground"
-          >
-            Sponsors
-          </h2>
-          {hasOpenSlots && visitors && (
-            <p className="mt-1 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400">
-              Put your logo in front of {visitors.value} developers every month.
-            </p>
-          )}
+          <div className="flex items-center justify-between px-2.5 pt-2 pb-2.5">
+            <h2 id="docs-sponsors-heading" className={heading}>
+              Sponsors
+            </h2>
+            <Link
+              href="/sponsors"
+              className="group -mr-1 inline-flex items-center gap-0.5 rounded px-1 text-[12.5px] text-zinc-500 transition-colors hover:text-foreground dark:text-zinc-400"
+            >
+              {hasOpenSlots ? "Tiers" : "Become one"}
+              <ArrowUpRight className="size-3 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
+            </Link>
+          </div>
 
-          <div className="mt-4 space-y-3.5">
+          <div className={cn(inset, "space-y-3 p-2.5")}>
             <SponsorTier label="Main" sponsors={docsSponsors.main} count={docsSponsorSlots.main} size="lg" />
             <SponsorTier
               label="Supporter"
@@ -156,45 +150,56 @@ export function DocsInsetRail({ className }: { className?: string }) {
             />
           </div>
 
-          <Link
-            href="/sponsors"
-            className="group mt-4 flex items-center justify-between pt-1 text-[13px] text-zinc-500 transition-colors hover:text-zinc-900 dark:border-white/[0.06] dark:text-zinc-400 dark:hover:text-zinc-100"
-          >
-            {hasOpenSlots ? "See sponsorship tiers" : "Become a sponsor"}
-            <ArrowUpRight className="size-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-          </Link>
+          {hasOpenSlots && (
+            <dl className="grid grid-cols-2 divide-x divide-black/[0.06] px-1 pt-3 pb-2 dark:divide-white/[0.06]">
+              {sponsorStats.slice(0, 2).map((stat) => (
+                <div key={stat.label} className="px-2.5">
+                  <dt className="text-[11.5px] text-zinc-500 dark:text-zinc-400">{stat.label}</dt>
+                  <dd className="mt-0.5 text-[15px] font-medium tracking-[-0.01em] text-foreground tabular-nums">
+                    {stat.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </section>
 
         <section aria-labelledby="docs-support-heading" className={card}>
-          <ComponentryLogomark className="size-5 text-foreground" />
-          <h2 id="docs-support-heading" className="mt-3 text-[14px] font-medium tracking-[-0.01em] text-foreground">
-            Enjoying Componentry?
-          </h2>
-          <p className="mt-1 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400">
-            It’s free and open source. A star helps more people find it.
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <a
-              href={X_URL}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => posthog.capture("docs_rail_support_clicked", { target: "x" })}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-foreground/[0.06] text-[13px] font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-foreground/[0.1] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              <XIcon className="size-3" />
-              Follow
-            </a>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => posthog.capture("docs_rail_support_clicked", { target: "github" })}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-foreground text-[13px] font-medium text-background transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              <GitHubIcon className="size-3.5" />
-              Star
-              <span className="tabular-nums opacity-55">{formatStars(stars)}</span>
-            </a>
+          {/* Banner: plain soft tint with the logo tile, no pattern. */}
+          <div className={cn(inset, "flex h-[88px] items-center justify-center bg-black/[0.03] dark:bg-white/[0.03]")}>
+            <div className="flex size-11 items-center justify-center rounded-xl border border-black/[0.08] bg-white dark:border-white/[0.08] dark:bg-[#171717]">
+              <ComponentryLogomark className="size-5 text-foreground" />
+            </div>
+          </div>
+
+          <div className="px-2.5 pt-3 pb-2.5">
+            <h2 id="docs-support-heading" className={heading}>
+              Enjoying Componentry?
+            </h2>
+            <p className={body}>It’s free and open source. A star helps more people find it.</p>
+            <div className="mt-3.5 grid grid-cols-2 gap-1.5">
+              <a
+                href={X_URL}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => posthog.capture("docs_rail_support_clicked", { target: "x" })}
+                className={ghostButton}
+              >
+                <XIcon className="size-3" />
+                Follow
+              </a>
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => posthog.capture("docs_rail_support_clicked", { target: "github" })}
+                className={primaryButton}
+              >
+                <GitHubIcon className="size-3.5" />
+                Star
+                <span className="tabular-nums opacity-55">{formatStars(stars)}</span>
+              </a>
+            </div>
           </div>
         </section>
       </div>
