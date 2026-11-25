@@ -29,6 +29,23 @@ nextEnv.updateInitialEnv(rootEnv)
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["@workspace/ui"],
+  // Components removed from the library leave indexed URLs behind. Without a
+  // redirect those URLs 404 and take their rankings and inbound links with them.
+  // Point each removed slug at the closest surviving component.
+  async redirects() {
+    return [
+      {
+        source: "/docs/components/grain-gradient",
+        destination: "/docs/components/dither-gradient",
+        permanent: true,
+      },
+      {
+        source: "/docs/components/split-flap-display",
+        destination: "/docs/components/flipping-word-swap",
+        permanent: true,
+      },
+    ]
+  },
 }
 
 export default nextConfig
