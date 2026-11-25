@@ -1,5 +1,6 @@
 "use client";
 
+import { eyebrow, headingDisplay } from "./type";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -256,10 +257,8 @@ export function Testimonials() {
         transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
         className="mx-auto mb-7 max-w-[1360px] text-center"
       >
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-600">
-          Wall of love
-        </p>
-        <h2 className="text-balance text-3xl font-medium leading-[1.05] tracking-[-0.06em] text-zinc-950 dark:text-zinc-50 sm:text-4xl">
+        <p className={cn("mb-3", eyebrow)}>Wall of love</p>
+        <h2 className={headingDisplay}>
           Loved by builders with taste
         </h2>
       </motion.div>

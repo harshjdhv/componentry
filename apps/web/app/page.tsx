@@ -7,6 +7,7 @@ import { Badge } from "@workspace/ui/components/coss-badge";
 import { SiteHeader } from "@/components/site-header";
 import { HeroAtmosphere } from "@/components/landing/hero-atmosphere";
 import { HeroButtons } from "@/components/landing/hero-buttons";
+import { LatestComponent } from "@/components/landing/latest-component";
 import { DeferredGallery } from "@/components/landing/deferred-gallery";
 import {
   LandingContent,
@@ -78,6 +79,7 @@ export default function Home() {
                   Animated React components with editable source code. Install via shadcn CLI or your AI editor with MCP.
                 </p>
                 <div className="mt-8 w-full"><HeroButtons /></div>
+                <LatestComponent />
               </div>
             </section>
           </LandingContent>

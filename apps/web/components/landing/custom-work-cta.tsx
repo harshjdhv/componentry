@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@workspace/ui/lib/utils";
+import { bodyMuted, headingDisplay } from "./type";
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Check, Copy } from "lucide-react";
@@ -34,10 +36,10 @@ export function CustomWorkCta() {
       <section aria-labelledby="custom-work-heading" className="py-16 sm:py-20 lg:py-24">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1fr] lg:gap-20">
           <div className="max-w-lg">
-            <h2 id="custom-work-heading" className="text-balance text-[2rem] font-medium leading-[1.04] tracking-[-0.06em] text-zinc-950 dark:text-zinc-50 sm:text-[2.75rem]">
+            <h2 id="custom-work-heading" className={headingDisplay}>
               Something in mind?<br />Let’s build it.
             </h2>
-            <p className="mt-5 max-w-sm text-pretty text-base leading-7 text-zinc-600 dark:text-zinc-400">
+            <p className={cn("mt-5 max-w-sm", bodyMuted)}>
               Custom components, landing pages, and the interactions that make a product feel right.
             </p>
           </div>
