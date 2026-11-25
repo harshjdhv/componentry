@@ -7,7 +7,6 @@ import { CopyButton } from "@/components/copy-button"
 import { PackageManagerCommand } from "@/components/package-manager-command"
 import type { PackageManager } from "@/lib/install-command"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@workspace/ui/components/tabs"
-import { underlineListClass, underlineTabClass } from "./underline-tabs"
 
 const ADD_COMMANDS: Record<PackageManager, string> = {
   pnpm: "pnpm add",
@@ -119,9 +118,9 @@ export function DocsInsetInstall({
   let step = 0
   return (
     <Tabs defaultValue="cli" className="gap-5">
-      <TabsList variant="underline" aria-label="Installation method" className={underlineListClass}>
-        <TabsTab value="cli" className={underlineTabClass}>CLI</TabsTab>
-        <TabsTab value="manual" className={underlineTabClass}>Manual</TabsTab>
+      <TabsList aria-label="Installation method">
+        <TabsTab value="cli">CLI</TabsTab>
+        <TabsTab value="manual">Manual</TabsTab>
       </TabsList>
 
       <TabsPanel value="cli">{cli}</TabsPanel>

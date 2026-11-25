@@ -81,51 +81,53 @@ export function DocsInsetSidebar({ className }: { className?: string }) {
             aria-hidden
             style={{ transform: `translateY(${pill.y}px)` }}
             className={cn(
-              "pointer-events-none absolute top-0 right-3 left-3 h-[30px] rounded-lg bg-white shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] will-change-transform dark:bg-white/[0.07] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.06)]",
+              "pointer-events-none absolute top-0 right-3 left-3 h-[30px] rounded-md bg-black/[0.05] will-change-transform dark:bg-white/[0.07]",
               pill.animate && !reduceMotion && "transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
             )}
           />
         )}
-        {docsConfig.nav.map((group) => (
-          <div key={group.title} className="pt-5 first:pt-2">
-            <h4 className="mb-1.5 px-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-400 dark:text-zinc-500">
-              {group.title}
-            </h4>
-            <ul className="flex flex-col gap-px">
-              {group.items.map((item) => {
-                const slug = item.href.split("/").pop()
-                const comp = slug ? components[slug] : undefined
-                const isActive = activeHref === item.href
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      ref={isActive ? activeRef : undefined}
-                      aria-current={pathname === item.href ? "page" : undefined}
-                      onClick={(event) => {
-                        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
-                        setActiveHref(item.href)
-                      }}
-                      className={cn(
-                        "relative flex h-[30px] items-center gap-2 rounded-lg px-2.5 text-[14px] leading-none tracking-[-0.011em] transition-[color,background-color] duration-150 ease-out",
-                        isActive
-                          ? "font-medium text-zinc-950 dark:text-white"
-                          : "text-zinc-500 hover:bg-black/[0.035] hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/[0.04] dark:hover:text-zinc-100"
-                      )}
-                    >
-                      <span className="truncate">{item.title}</span>
-                      {comp && isNewComponent(comp) && (
-                        <span className="ml-auto shrink-0 rounded-md bg-emerald-500/10 px-1.5 py-[3px] text-[10.5px] font-medium leading-none text-emerald-700 dark:text-emerald-400">
-                          New
-                        </span>
-                      )}
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        ))}
+        {docsConfig.nav.map((group) => {
+          return (
+            <div key={group.title} className="pt-5 first:pt-2">
+              <h4 className="mb-1 px-2.5 text-[13px] font-medium text-zinc-900 dark:text-zinc-100">
+                {group.title}
+              </h4>
+              <ul className="flex flex-col gap-px">
+                {group.items.map((item) => {
+                  const slug = item.href.split("/").pop()
+                  const comp = slug ? components[slug] : undefined
+                  const isActive = activeHref === item.href
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        ref={isActive ? activeRef : undefined}
+                        aria-current={pathname === item.href ? "page" : undefined}
+                        onClick={(event) => {
+                          if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
+                          setActiveHref(item.href)
+                        }}
+                        className={cn(
+                          "relative flex h-[30px] items-center gap-2 rounded-md px-2.5 text-[14px] leading-none transition-[color,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]",
+                          isActive
+                            ? "font-medium text-zinc-950 dark:text-white"
+                            : "text-zinc-600 hover:bg-black/[0.03] hover:text-zinc-950 hover:duration-100 dark:text-zinc-300/80 dark:hover:bg-white/[0.03] dark:hover:text-zinc-50"
+                        )}
+                      >
+                        <span className="truncate">{item.title}</span>
+                        {comp && isNewComponent(comp) && (
+                          <span className="ml-auto shrink-0 rounded-sm px-1.5 py-[3px] text-[10.5px] font-medium leading-none text-emerald-700 bg-emerald-500/10 dark:text-emerald-400">
+                            New
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )
+        })}
       </nav>
     </aside>
   )

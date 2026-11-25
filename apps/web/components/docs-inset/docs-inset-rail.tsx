@@ -13,9 +13,8 @@ import { docsSponsors, docsSponsorSlots, sponsorStats, type Sponsor } from "@/li
 const GITHUB_URL = "https://github.com/harshjdhv/componentry"
 const X_URL = "https://x.com/harshjdhv"
 
-// Same card as the old "Enjoying Componentry?" popup, so the column reads as that popup, docked.
-const card =
-  "rounded-xl border border-black/[0.07] bg-white p-4 shadow-[0_12px_32px_-8px_rgb(0_0_0/0.14)] dark:border-white/[0.07] dark:bg-[#141415] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.04),0_12px_32px_-8px_rgb(0_0_0/0.6)]"
+// A soft tint on the page surface: groups the content without drawing a line.
+const card = "rounded-xl bg-black/[0.025] p-4 dark:bg-white/[0.03]"
 
 function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -34,7 +33,7 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 const slot =
-  "group flex items-center justify-center rounded-md bg-zinc-50 shadow-[0_0_0_1px_rgb(0_0_0/0.05)] transition-[background-color,box-shadow] duration-150 ease-out hover:bg-zinc-100 dark:bg-white/[0.03] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.05)] dark:hover:bg-white/[0.06]"
+  "group flex items-center justify-center rounded-md bg-white transition-colors duration-150 ease-out hover:bg-zinc-50 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
 
 /** A tier's row of slots: real sponsors first, then open "Your logo here" slots. */
 function SponsorTier({
@@ -53,7 +52,7 @@ function SponsorTier({
 
   return (
     <div>
-      <p className="mb-2 text-[12px] text-zinc-400 dark:text-zinc-500">{label}</p>
+      <p className="mb-1.5 text-[11.5px] text-zinc-400 dark:text-zinc-500">{label}</p>
       <div className={cn("grid gap-1.5", size === "sm" && "grid-cols-2")}>
         {sponsors.map((sponsor) => (
           <a
@@ -100,33 +99,54 @@ function SponsorTier({
 }
 
 /**
- * Right column of the docs shell, docked to the bottom: sponsor placements,
- * then the star / follow card (replaces the old bottom-right popup). Later cards
+ * Right column of the docs shell, docked to the bottom: custom-work pitch,
+ * sponsor placements, then the star / follow card (replaces the old popup). Later cards
  * (newsletter, paid version) stack above them in the same card style.
  */
 export function DocsInsetRail({ className }: { className?: string }) {
   const stars = useGithubStars()
   const visitors = sponsorStats[0]
+  const hasOpenSlots =
+    docsSponsors.main.length < docsSponsorSlots.main ||
+    docsSponsors.supporter.length < docsSponsorSlots.supporter
 
   return (
     <aside className={cn("w-[296px] shrink-0", className)}>
       <div className="flex h-full flex-col gap-2 overflow-y-auto px-2 pt-2 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <section aria-labelledby="docs-sponsors-heading" className={cn(card, "mt-auto")}>
-          <div className="mb-4 flex items-baseline justify-between gap-2">
-            <h2
-              id="docs-sponsors-heading"
-              className="text-[14px] font-semibold tracking-[-0.01em] text-foreground"
-            >
-              Sponsors
-            </h2>
-            {visitors && (
-              <span className="text-[12px] text-zinc-400 dark:text-zinc-500">
-                {visitors.value} visitors / mo
-              </span>
-            )}
-          </div>
+        <section aria-labelledby="docs-custom-heading" className={cn(card, "mt-auto")}>
+          <p className="text-[11.5px] text-zinc-400 dark:text-zinc-500">Available for work</p>
+          <h2 id="docs-custom-heading" className="mt-1 text-[14px] font-medium tracking-[-0.01em] text-foreground">
+            Need a custom component?
+          </h2>
+          <p className="mt-1 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400">
+            I build bespoke components and websites tailored to your brand.
+          </p>
+          <a
+            href={X_URL}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => posthog.capture("docs_rail_custom_work_clicked")}
+            className="mt-4 inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md bg-foreground/[0.06] text-[13px] font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-foreground/[0.1] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            <XIcon className="size-3" />
+            DM me on X
+          </a>
+        </section>
 
-          <div className="space-y-4">
+        <section aria-labelledby="docs-sponsors-heading" className={card}>
+          <h2
+            id="docs-sponsors-heading"
+            className="text-[14px] font-medium tracking-[-0.01em] text-foreground"
+          >
+            Sponsors
+          </h2>
+          {hasOpenSlots && visitors && (
+            <p className="mt-1 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400">
+              Put your logo in front of {visitors.value} developers every month.
+            </p>
+          )}
+
+          <div className="mt-4 space-y-3.5">
             <SponsorTier label="Main" sponsors={docsSponsors.main} count={docsSponsorSlots.main} size="lg" />
             <SponsorTier
               label="Supporter"
@@ -138,20 +158,20 @@ export function DocsInsetRail({ className }: { className?: string }) {
 
           <Link
             href="/sponsors"
-            className="group mt-4 flex items-center justify-between border-t border-black/[0.06] pt-3.5 text-[13px] text-zinc-500 transition-colors hover:text-zinc-900 dark:border-white/[0.06] dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="group mt-4 flex items-center justify-between pt-1 text-[13px] text-zinc-500 transition-colors hover:text-zinc-900 dark:border-white/[0.06] dark:text-zinc-400 dark:hover:text-zinc-100"
           >
-            Become a sponsor
+            {hasOpenSlots ? "See sponsorship tiers" : "Become a sponsor"}
             <ArrowUpRight className="size-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
           </Link>
         </section>
 
         <section aria-labelledby="docs-support-heading" className={card}>
           <ComponentryLogomark className="size-5 text-foreground" />
-          <h2 id="docs-support-heading" className="mt-3 text-[14px] font-semibold tracking-[-0.01em] text-foreground">
+          <h2 id="docs-support-heading" className="mt-3 text-[14px] font-medium tracking-[-0.01em] text-foreground">
             Enjoying Componentry?
           </h2>
-          <p className="mt-1 text-pretty text-[13px] leading-snug text-foreground/55">
-            Star the repo and follow along on X for new components.
+          <p className="mt-1 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400">
+            It’s free and open source. A star helps more people find it.
           </p>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <a

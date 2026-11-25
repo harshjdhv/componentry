@@ -46,11 +46,8 @@ export function ComponentGuidance({ slug }: { slug: string }) {
     const [credit] = guide.sections
     if (!credit) return null
     return (
-      <div className="pt-10">
-        <p className="mb-2.5 text-[12px] font-medium uppercase tracking-[0.08em] text-zinc-500 dark:text-zinc-400">
-          {guide.heading ?? "Inspired by"}
-        </p>
-        <p className="max-w-xl text-pretty text-[17px] font-normal leading-8 tracking-[-0.015em] text-zinc-700 dark:text-zinc-200">
+      <Section title={guide.heading ?? "Inspired by"}>
+        <p className="text-pretty text-[15px] leading-7 text-zinc-500 dark:text-zinc-400">
           <GuideCopy
             body={credit.body}
             href={credit.href}
@@ -58,7 +55,7 @@ export function ComponentGuidance({ slug }: { slug: string }) {
           />
           .
         </p>
-      </div>
+      </Section>
     )
   }
 

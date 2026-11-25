@@ -64,7 +64,7 @@ export function SiteHeader({ sidebarToggle, landingGutter, inset }: SiteHeaderPr
             className={cn(
                 "fixed top-0 left-0 right-0 z-50 w-full transition-[background-color,border-color] duration-200",
                 inset
-                    ? "border-b border-black/[0.07] bg-[#f4f4f5] dark:border-white/[0.07] dark:bg-[#0a0a0a]"
+                    ? "border-b border-transparent bg-white dark:bg-[#111111]"
                     : landingGutter
                     ? "border-b border-transparent bg-white dark:bg-[#0a0a0a]"
                     : "border-b border-line bg-white dark:bg-background"
