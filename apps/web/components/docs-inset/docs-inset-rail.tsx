@@ -1,174 +1,182 @@
 "use client"
 
-import * as React from "react"
+import type React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { motion, useReducedMotion } from "framer-motion"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, Plus } from "lucide-react"
+import posthog from "posthog-js"
 
 import { cn } from "@/lib/utils"
 import { ComponentryLogomark } from "@/components/logos/componentry-logomark"
 import { formatStars, useGithubStars } from "@/hooks/use-github-stars"
+import { docsSponsors, docsSponsorSlots, sponsorStats, type Sponsor } from "@/lib/sponsors"
 
 const GITHUB_URL = "https://github.com/harshjdhv/componentry"
 const X_URL = "https://x.com/harshjdhv"
 
-type TocItem = { id: string; title: string }
+// Same card as the old "Enjoying Componentry?" popup, so the column reads as that popup, docked.
+const card =
+  "rounded-xl border border-black/[0.07] bg-white p-4 shadow-[0_12px_32px_-8px_rgb(0_0_0/0.14)] dark:border-white/[0.07] dark:bg-[#141415] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.04),0_12px_32px_-8px_rgb(0_0_0/0.6)]"
 
-const MARKER_SPRING = { type: "spring", duration: 0.3, bounce: 0 } as const
-
-/**
- * Reads the page's sections ([data-section-title] in the content column) and highlights
- * the one nearest the top as the window scrolls. The rail stays mounted across
- * navigation, so it re-reads whenever the content changes (new route, or a
- * section streaming in after Suspense).
- */
-function useToc() {
-  const pathname = usePathname()
-  const [items, setItems] = React.useState<TocItem[]>([])
-  const [activeId, setActiveId] = React.useState<string | null>(null)
-
-  React.useEffect(() => {
-    const main = document.querySelector("[data-docs-inset-content]")
-    if (!main) return
-    let sections: HTMLElement[] = []
-    let frame = 0
-
-    const update = () => {
-      let current = sections[0]?.id ?? null
-      for (const el of sections) {
-        if (el.getBoundingClientRect().top <= 120) current = el.id
-      }
-      // At the very bottom the last short section never reaches the line; pick it anyway.
-      const root = document.documentElement
-      if (sections.length && window.scrollY + window.innerHeight >= root.scrollHeight - 4) {
-        current = sections.at(-1)!.id
-      }
-      setActiveId(current)
-    }
-
-    const collect = () => {
-      sections = Array.from(main.querySelectorAll<HTMLElement>("[data-section-title][id]"))
-      const next = sections.map((el) => ({ id: el.id, title: el.dataset.sectionTitle! }))
-      setItems((prev) =>
-        prev.length === next.length && prev.every((p, i) => p.id === next[i]!.id) ? prev : next
-      )
-      update()
-    }
-
-    const observer = new MutationObserver(() => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(collect)
-    })
-    observer.observe(main, { childList: true, subtree: true })
-    collect()
-    window.addEventListener("scroll", update, { passive: true })
-    return () => {
-      observer.disconnect()
-      cancelAnimationFrame(frame)
-      window.removeEventListener("scroll", update)
-    }
-  }, [pathname])
-
-  return { items, activeId }
+function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M12 0C5.373 0 0 5.372 0 12c0 5.303 3.438 9.8 8.207 11.387.6.11.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.388-1.333-1.757-1.333-1.757-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.834 2.807 1.305 3.493.998.108-.776.418-1.305.762-1.605-2.666-.304-5.467-1.333-5.467-5.93 0-1.312.469-2.382 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.009-.323 3.301 1.23A11.52 11.52 0 0 1 12 5.8c1.02.005 2.047.139 3.006.404 2.291-1.553 3.298-1.23 3.298-1.23.652 1.653.241 2.874.117 3.176.769.839 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.48 5.921.431.371.824 1.103.824 2.222v3.293c0 .319.192.688.802.576C20.566 21.795 24 17.298 24 12 24 5.372 18.627 0 12 0Z" />
+    </svg>
+  )
 }
 
-export function DocsInsetRail({ className }: { className?: string }) {
-  const { items, activeId } = useToc()
-  const stars = useGithubStars()
+function XIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  )
+}
 
-  const reduceMotion = useReducedMotion()
+const slot =
+  "group flex items-center justify-center rounded-md bg-zinc-50 shadow-[0_0_0_1px_rgb(0_0_0/0.05)] transition-[background-color,box-shadow] duration-150 ease-out hover:bg-zinc-100 dark:bg-white/[0.03] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.05)] dark:hover:bg-white/[0.06]"
 
-  const scrollTo = (id: string) => {
-    document
-      .getElementById(id)
-      ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" })
-  }
+/** A tier's row of slots: real sponsors first, then open "Your logo here" slots. */
+function SponsorTier({
+  label,
+  sponsors,
+  count,
+  size,
+}: {
+  label: string
+  sponsors: Sponsor[]
+  count: number
+  size: "lg" | "sm"
+}) {
+  const open = Math.max(count - sponsors.length, 0)
+  const height = size === "lg" ? "h-[72px]" : "h-14"
 
   return (
-    <aside className={cn("h-full w-72 shrink-0", className)}>
-      <div className="flex h-full flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {items.length > 0 && (
-          <nav aria-label="On this page" className="px-6 pt-12">
-            <h4 className="mb-3 text-[12px] font-medium text-zinc-400 dark:text-zinc-500">
-              On this page
-            </h4>
-            {/* Track on the left; the active marker glides along it. */}
-            <ul className="relative flex flex-col before:absolute before:inset-y-1.5 before:left-0 before:w-px before:bg-black/[0.08] dark:before:bg-white/[0.08]">
-              {items.map((item) => {
-                const active = item.id === activeId
-                return (
-                  <li key={item.id} className="relative">
-                    {active && (
-                      <motion.span
-                        layoutId="docs-toc-marker"
-                        aria-hidden
-                        transition={reduceMotion ? { duration: 0 } : MARKER_SPRING}
-                        className="absolute inset-y-1.5 left-0 w-px bg-zinc-900 dark:bg-zinc-50"
-                      />
-                    )}
-                    <a
-                      href={`#${item.id}`}
-                      onClick={(event) => {
-                        event.preventDefault()
-                        scrollTo(item.id)
-                      }}
-                      aria-current={active ? "location" : undefined}
-                      className={cn(
-                        "flex h-8 items-center pl-3.5 text-[13.5px] tracking-[-0.006em] transition-colors duration-150 ease-out",
-                        active
-                          ? "text-zinc-900 dark:text-zinc-50"
-                          : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-                      )}
-                    >
-                      {item.title}
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </nav>
-        )}
+    <div>
+      <p className="mb-2 text-[12px] text-zinc-400 dark:text-zinc-500">{label}</p>
+      <div className={cn("grid gap-1.5", size === "sm" && "grid-cols-2")}>
+        {sponsors.map((sponsor) => (
+          <a
+            key={sponsor.name}
+            href={sponsor.href}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            aria-label={sponsor.name}
+            className={cn(slot, height, "px-4")}
+          >
+            <span
+              aria-hidden
+              className="h-6 w-full bg-zinc-800 transition-colors group-hover:bg-zinc-950 dark:bg-zinc-200 dark:group-hover:bg-white"
+              style={{
+                maskImage: `url(${sponsor.logo})`,
+                WebkitMaskImage: `url(${sponsor.logo})`,
+                maskRepeat: "no-repeat",
+                WebkitMaskRepeat: "no-repeat",
+                maskPosition: "center",
+                WebkitMaskPosition: "center",
+                maskSize: "contain",
+                WebkitMaskSize: "contain",
+              }}
+            />
+          </a>
+        ))}
+        {Array.from({ length: open }, (_, i) => (
+          <Link
+            key={`open-${i}`}
+            href="/sponsors"
+            className={cn(
+              slot,
+              height,
+              "gap-1.5 text-[12.5px] text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200"
+            )}
+          >
+            <Plus className="size-3.5" />
+            {size === "lg" ? "Your logo here" : "Your logo"}
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
 
-        {/* Pinned to the bottom of the panel. */}
-        <div className="mt-auto px-6 pt-10 pb-6">
-          <div className="border-t border-black/[0.06] pt-6 dark:border-white/[0.06]">
-            <ComponentryLogomark className="size-5" />
-            <p className="mt-3 text-[14px] font-medium tracking-[-0.01em] text-zinc-900 dark:text-zinc-50">
-              Free and open source
-            </p>
-            <p className="mt-1 text-[13px] leading-5 text-zinc-500 dark:text-zinc-400">
-              Star the repo and follow along on X for new components.
-            </p>
-            <div className="mt-4 flex gap-1.5">
-              <a
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg bg-zinc-900 text-[12.5px] font-medium text-white transition-[scale] duration-150 ease-out active:scale-[0.96] dark:bg-zinc-100 dark:text-zinc-900"
-              >
-                Star
-                <span className="tabular-nums opacity-60">{formatStars(stars)}</span>
-              </a>
-              <a
-                href={X_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-8 flex-1 items-center justify-center rounded-lg bg-black/[0.04] text-[12.5px] font-medium text-zinc-800 transition-[scale] duration-150 ease-out active:scale-[0.96] dark:bg-white/[0.06] dark:text-zinc-100"
-              >
-                Follow
-              </a>
-            </div>
+/**
+ * Right column of the docs shell, docked to the bottom: sponsor placements,
+ * then the star / follow card (replaces the old bottom-right popup). Later cards
+ * (newsletter, paid version) stack above them in the same card style.
+ */
+export function DocsInsetRail({ className }: { className?: string }) {
+  const stars = useGithubStars()
+  const visitors = sponsorStats[0]
+
+  return (
+    <aside className={cn("w-[296px] shrink-0", className)}>
+      <div className="flex h-full flex-col gap-2 overflow-y-auto px-2 pt-2 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <section aria-labelledby="docs-sponsors-heading" className={cn(card, "mt-auto")}>
+          <div className="mb-4 flex items-baseline justify-between gap-2">
+            <h2
+              id="docs-sponsors-heading"
+              className="text-[14px] font-semibold tracking-[-0.01em] text-foreground"
+            >
+              Sponsors
+            </h2>
+            {visitors && (
+              <span className="text-[12px] text-zinc-400 dark:text-zinc-500">
+                {visitors.value} visitors / mo
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <SponsorTier label="Main" sponsors={docsSponsors.main} count={docsSponsorSlots.main} size="lg" />
+            <SponsorTier
+              label="Supporter"
+              sponsors={docsSponsors.supporter}
+              count={docsSponsorSlots.supporter}
+              size="sm"
+            />
           </div>
 
           <Link
             href="/sponsors"
-            className="group mt-6 flex items-center justify-between border-t border-black/[0.06] pt-5 text-[13px] text-zinc-500 transition-colors hover:text-zinc-900 dark:border-white/[0.06] dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="group mt-4 flex items-center justify-between border-t border-black/[0.06] pt-3.5 text-[13px] text-zinc-500 transition-colors hover:text-zinc-900 dark:border-white/[0.06] dark:text-zinc-400 dark:hover:text-zinc-100"
           >
-            Sponsor Componentry
+            Become a sponsor
             <ArrowUpRight className="size-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
           </Link>
-        </div>
+        </section>
+
+        <section aria-labelledby="docs-support-heading" className={card}>
+          <ComponentryLogomark className="size-5 text-foreground" />
+          <h2 id="docs-support-heading" className="mt-3 text-[14px] font-semibold tracking-[-0.01em] text-foreground">
+            Enjoying Componentry?
+          </h2>
+          <p className="mt-1 text-pretty text-[13px] leading-snug text-foreground/55">
+            Star the repo and follow along on X for new components.
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <a
+              href={X_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => posthog.capture("docs_rail_support_clicked", { target: "x" })}
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-foreground/[0.06] text-[13px] font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-foreground/[0.1] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <XIcon className="size-3" />
+              Follow
+            </a>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => posthog.capture("docs_rail_support_clicked", { target: "github" })}
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-foreground text-[13px] font-medium text-background transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <GitHubIcon className="size-3.5" />
+              Star
+              <span className="tabular-nums opacity-55">{formatStars(stars)}</span>
+            </a>
+          </div>
+        </section>
       </div>
     </aside>
   )

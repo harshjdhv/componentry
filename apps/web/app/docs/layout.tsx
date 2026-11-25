@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { absoluteUrl } from "@/lib/site"
-import { SupportPrompt } from "@/components/support-prompt"
 
 export const metadata: Metadata = {
   title: "Components Documentation",
@@ -28,7 +27,6 @@ export default function DocsLayout({
           {children}
         </main>
       </div>
-      <SupportPrompt />
     </div>
   )
 }

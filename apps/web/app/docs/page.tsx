@@ -6,9 +6,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { components, getFeaturedComponents, isNewComponent, type ComponentCategory, type ComponentMetadata } from "@/registry"
 
-import { landingGutterClass } from "@/components/landing/landing-frame"
-import { SiteHeader } from "@/components/site-header"
-import { DocsScrollEdgeFade } from "@/components/docs-scroll-edge-fade"
+import { DocsInsetShell } from "@/components/docs-inset/docs-inset-shell"
 import { cn } from "@/lib/utils"
 import { AsciiCatalogPreview } from "@/components/docs/previews/ascii-effect-preview"
 import { TextMorphCardPreview } from "@/components/docs/previews/text-morph-card-preview"
@@ -264,32 +262,25 @@ export default function DocsPage() {
     .filter(g => g.items.length > 0)
 
   return (
-    <div className="min-h-screen bg-white dark:bg-background text-zinc-900 dark:text-zinc-100 font-sans overflow-x-hidden">
-      <DocsScrollEdgeFade position="bottom" />
-
-      {/* ── Top Floating Header ── */}
-      <SiteHeader />
-
-      <main className={cn("relative z-10 pt-28 pb-32", landingGutterClass)}>
-        <div className="w-full">
+    <DocsInsetShell>
+        <div className="w-full text-zinc-900 dark:text-zinc-100">
 
         {/* ── Hero ── */}
         <header className="mb-12">
-          {/* Matches paneloui.com/components' page title: Inter 28/34, 500, -0.025em, 520px, balanced. */}
-          <h1 className="max-w-[520px] text-balance font-[family-name:var(--font-inter)] text-[28px] font-medium leading-[34px] tracking-[-0.025em] text-zinc-950 dark:text-zinc-50">
+          <h1 className="max-w-[560px] text-balance text-[28px] font-medium leading-[1.1] tracking-[-0.035em] text-zinc-900 sm:text-[32px] dark:text-zinc-50">
             Animated components you can copy and own – built on Tailwind and Motion.
           </h1>
         </header>
 
         {/* ── Featured (video previews only) ── */}
         {featured.length > 0 && (
-          <section id="featured" className="mb-20 scroll-mt-32">
+          <section id="featured" data-section-title="Featured" className="mb-20 scroll-mt-24">
             <div className="mb-6 flex items-center justify-between gap-4">
               <h2 className="text-[20px] font-medium leading-7 tracking-[-0.02em] text-zinc-900 dark:text-zinc-50">
                 Featured
               </h2>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               {featured.map((component, i) => (
                 <ComponentCard
                   key={component.slug}
@@ -306,13 +297,13 @@ export default function DocsPage() {
         <div className="space-y-20">
           {grouped.map(({ category, items }) => {
             return (
-              <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-32">
+              <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} data-section-title={category} className="scroll-mt-24">
                 <div className="mb-6 flex items-center justify-between gap-4">
                   <h2 className="text-[20px] font-medium leading-7 tracking-[-0.02em] text-zinc-900 dark:text-zinc-50">
                     {category}
                   </h2>
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3">
                   {items.map((component, i) => (
                     <ComponentCard
                       key={component.slug}
@@ -328,7 +319,6 @@ export default function DocsPage() {
 
 
         </div>
-      </main >
-    </div >
+    </DocsInsetShell>
   )
 }

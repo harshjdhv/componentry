@@ -450,3 +450,41 @@ html.route-hide-scrollbar:has([data-docs-inset])::-webkit-scrollbar-thumb {
   border-radius: 999px;
   background: rgb(113 113 122 / 0.4) padding-box;
 }
+
+/* Rubber-band overscroll reveals the <html> background. Paint it with the shell's
+   own columns (page colour | window colour | page colour) so the bounce shows
+   more of the same layout instead of a flat strip. Column edges mirror
+   docs-inset-shell.tsx: sidebar 16rem from lg, rail 296px from xl. */
+html:has([data-docs-inset]) {
+  --docs-page: #f4f4f5;
+  --docs-window: #ffffff;
+  /* !important: app/layout.tsx sets an inline #0a0a0a on <html> for every route. */
+  background-color: var(--docs-window) !important;
+}
+
+html.dark:has([data-docs-inset]) {
+  --docs-page: #0a0a0a;
+  --docs-window: #111111;
+}
+
+@media (min-width: 64rem) {
+  html:has([data-docs-inset]) {
+    background-image: linear-gradient(
+      to right,
+      var(--docs-page) 16rem,
+      var(--docs-window) 16rem calc(100% - 0.5rem),
+      var(--docs-page) calc(100% - 0.5rem)
+    );
+  }
+}
+
+@media (min-width: 80rem) {
+  html:has([data-docs-inset]) {
+    background-image: linear-gradient(
+      to right,
+      var(--docs-page) 16rem,
+      var(--docs-window) 16rem calc(100% - 296px),
+      var(--docs-page) calc(100% - 296px)
+    );
+  }
+}

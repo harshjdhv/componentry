@@ -10,16 +10,9 @@ import {
 } from "@/components/landing/landing-frame"
 import { SiteHeader } from "@/components/site-header"
 import { cn } from "@/lib/utils"
+import { sponsorHref, sponsorStats } from "@/lib/sponsors"
 import posthog from "posthog-js"
 
-const sponsorHref =
-  "https://polar.sh/checkout/polar_c_e9A0LLA2aX2Uh7lwbxLHFh0xQdgLgA49FO57w4NJpJN"
-
-const sponsorStats = [
-  { value: "25k+", label: "Monthly visitors" },
-  { value: "150k+", label: "Page views" },
-  { value: "60+", label: "Free components" },
-]
 
 const sponsorWall: {
   name: string

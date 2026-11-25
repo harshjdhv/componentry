@@ -6,13 +6,10 @@ import { Check, Copy } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 /*
- * Type and card system follow paneloui.com's feature section:
- * heading Inter 42/46 · 500 · -1.4px, ink lead + muted continuation;
+ * Heading Geist 32/42 · 500 · -0.035em, ink lead + muted continuation;
  * cards 16px radius, 6px padding, hairline ring, 10px-radius preview;
- * captions Inter 15/22 with a medium ink lead.
+ * captions Geist 15/22 with a medium ink lead.
  */
-
-const inter = "font-[family-name:var(--font-inter)]"
 
 const card =
   "flex min-w-0 flex-col rounded-2xl bg-white p-1.5 shadow-[0_0_0_1px_rgb(10_10_10/0.055)] dark:bg-[#141414] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.07)]"
@@ -25,7 +22,7 @@ const inset =
 
 function Caption({ lead, children }: { lead: string; children: React.ReactNode }) {
   return (
-    <p className={cn(inter, "px-[18px] pt-4 pb-5 text-pretty text-[15px] leading-[22px] text-neutral-500 dark:text-neutral-400")}>
+    <p className={cn("px-[18px] pt-4 pb-5 text-pretty text-[15px] leading-[22px] tracking-[-0.01em] text-neutral-500 dark:text-neutral-400")}>
       <span className="font-medium text-neutral-950 dark:text-neutral-50">{lead}</span> {children}
     </p>
   )
@@ -205,8 +202,7 @@ export function Features() {
       <h2
         id="features-heading"
         className={cn(
-          inter,
-          "max-w-[720px] text-balance text-[32px] font-medium leading-[36px] tracking-[-0.033em] sm:text-[42px] sm:leading-[46px]"
+          "max-w-[720px] text-balance text-[32px] font-medium leading-[1.1] tracking-[-0.035em] sm:text-[42px]"
         )}
       >
         <span className="text-neutral-950 dark:text-neutral-50">Yours to own, not just install.</span>{" "}
