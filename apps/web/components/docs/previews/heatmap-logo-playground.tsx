@@ -30,7 +30,7 @@ const PRESETS = (Object.keys(PALETTES) as PaletteName[]).map((name) => ({
 }))
 
 function toCode({ palette, glow }: { palette: PaletteName; glow: number }) {
-  const props = [`image="/logo.svg"`]
+  const props = [`image="/logo-new.svg"`]
   if (palette !== DEFAULTS.palette) {
     props.push(`colors={${JSON.stringify(PALETTES[palette]).replaceAll(",", ", ")}}`)
   }

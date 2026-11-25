@@ -45,6 +45,46 @@ export function DocsInsetPreview({
   const isFullWidth = variant ? Boolean(variant.fullWidth || fullWidth) : fullWidth
   const [tab, setTab] = React.useState<"preview" | "code">("preview")
   const [propsSlot, setPropsSlot] = React.useState<HTMLElement | null>(null)
+  const stageInnerRef = React.useRef<HTMLDivElement>(null)
+  const [tallStage, setTallStage] = React.useState<number | null>(null)
+
+  // Several playgrounds ask for more height than the 360/430px stage gives them
+  // (a 640px scroll demo, a card grid, a 3D ring). Rather than hand-tuning every
+  // page, grow the stage to whatever the content actually needs, up to a cap so a
+  // runaway preview cannot take over the page. Hysteresis stops it oscillating
+  // between grown and base height on the next measurement.
+  React.useEffect(() => {
+    const el = stageInnerRef.current
+    if (!el || typeof window === "undefined") return
+
+    const baseHeight = () =>
+      window.matchMedia("(min-width: 640px)").matches ? 430 : 360
+
+    const CAP = 780
+
+    const measure = () => {
+      const base = baseHeight()
+      const need = el.scrollHeight
+      setTallStage((current) => {
+        const stage = current ?? base
+        if (need > stage + 4) return Math.min(need, CAP)
+        if (need < stage - 48) return null
+        return current
+      })
+    }
+
+    measure()
+
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    const query = window.matchMedia("(min-width: 640px)")
+    query.addEventListener("change", measure)
+
+    return () => {
+      observer.disconnect()
+      query.removeEventListener("change", measure)
+    }
+  }, [isFullWidth, variant])
 
   return (
     <div>
@@ -65,8 +105,12 @@ export function DocsInsetPreview({
     <div className="relative overflow-hidden rounded-2xl border border-black/[0.07] bg-white dark:border-white/[0.07] dark:bg-[#111111]">
       {/* Stage. Same colour as the inset window, so a component without its own
           background sits on neutral ground; ones that paint their own cover it. */}
-      <div className="relative isolate h-[360px] bg-white sm:h-[430px] dark:bg-[#111111]">
+      <div
+        className="relative isolate h-[360px] bg-white sm:h-[430px] dark:bg-[#111111]"
+        style={tallStage ? { height: `${tallStage}px` } : undefined}
+      >
         <div
+          ref={stageInnerRef}
           className={cn(
             "h-full w-full",
             !isFullWidth &&
