@@ -149,19 +149,19 @@ function ComponentCard({
         onMouseLeave={stopPreview}
         onFocus={startPreview}
         onBlur={stopPreview}
-        className="group relative flex flex-col rounded-2xl border border-border bg-white dark:bg-zinc-900/50 overflow-hidden transition-[border-color,box-shadow] duration-300 hover:border-input hover:shadow-card-hover"
+        className="group relative flex flex-col overflow-hidden rounded-[16px] bg-white p-1.5 shadow-[0_0_0_1px_rgb(10_10_10/0.055)] transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgb(10_10_10/0.075),0_18px_48px_-22px_rgb(0_0_0/0.45)] dark:bg-[#161616] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.07)] dark:hover:shadow-[0_0_0_1px_rgb(255_255_255/0.12)]"
       >
         {/* ── Preview area ── */}
-        <div className="p-1.5">
+        <div>
           <div
             className={cn(
-              "relative h-[260px] w-full rounded-xl border border-dashed border-border shadow-surface-inset overflow-hidden",
+              "relative h-[260px] w-full overflow-hidden rounded-[10px] shadow-[inset_0_0_0_1px_rgb(10_10_10/0.045)] dark:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.055)]",
               component.slug === "text-morph" ||
                 component.slug === "flipping-word-swap"
                 ? "bg-background"
                 : component.slug === "spectral-ribbon"
                   ? "bg-black"
-                : "bg-zinc-50 dark:bg-zinc-900/80",
+                : "bg-[#fafafa] dark:bg-background",
             )}
           >
             {!videoOnly && component.slug === "ascii-effect" && (
