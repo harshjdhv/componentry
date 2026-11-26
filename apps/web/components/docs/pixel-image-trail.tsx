@@ -7,7 +7,7 @@ const defaultCode = `import { PixelImageTrail } from "@/components/ui/pixel-imag
 <PixelImageTrail
   src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1800&q=85"
   alt="A green mountain lake beneath a cloudy sky"
-  className="h-screen"
+  className="h-[600px]"
 />`;
 
 export async function PixelImageTrailDocs() {

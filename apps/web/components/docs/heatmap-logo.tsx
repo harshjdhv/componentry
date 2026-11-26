@@ -8,7 +8,7 @@ const usageCode = `import { HeatmapLogo } from "@/components/ui/heatmap-logo"
 export default function Demo() {
   return (
     <div className="flex justify-center p-6">
-      <HeatmapLogo image="/logo.svg" className="w-96" />
+      <HeatmapLogo image="/logo-new.svg" className="w-96" />
     </div>
   )
 }`

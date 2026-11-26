@@ -6,7 +6,7 @@ import { readComponentSource } from "@/lib/source-code";
 
 const basicUsageCode = `import { ClosingPlasma } from "@/components/ui/closing-plasma"
 
-<div className="w-full h-screen">
+<div className="w-full h-[420px]">
   <ClosingPlasma
     speed={1}
   />

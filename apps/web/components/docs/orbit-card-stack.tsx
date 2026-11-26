@@ -57,7 +57,7 @@ export default function TeamPreview() {
         <h2 className="text-2xl font-semibold">{activeMember.name}</h2>
       </div>
 
-      <div className="h-[620px] w-full">
+      <div className="h-[540px] w-full">
         <OrbitCardStack
           items={team}
           defaultActiveIndex={2}

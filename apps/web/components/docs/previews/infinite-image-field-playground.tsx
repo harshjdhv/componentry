@@ -26,7 +26,7 @@ function generateCode(config: Config): string {
     `  smoothing={${config.smoothing}}`,
     `  gap={${config.gap}}`,
     `  borderRadius={${config.borderRadius}}`,
-    `  className="w-full h-screen"`,
+    `  className="w-full h-[420px]"`,
     `/>`,
   ].join("\n");
 }

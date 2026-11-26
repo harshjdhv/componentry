@@ -127,7 +127,7 @@ function generateCode(config: Config) {
     })
     .join("\n    ");
 
-  return `<div className="w-full h-screen">\n  <ClosingPlasma \n    ${props}\n  />\n</div>`;
+  return `<div className="w-full h-[420px]">\n  <ClosingPlasma \n    ${props}\n  />\n</div>`;
 }
 
 const sameConfig = (a: Config, b: Config) =>

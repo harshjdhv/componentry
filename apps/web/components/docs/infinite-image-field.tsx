@@ -8,7 +8,7 @@ import { readComponentSource } from "@/lib/source-code";
 
 const basicUsageCode = `import { InfiniteImageField } from "@/components/ui/infinite-image-field"
 
-<InfiniteImageField className="w-full h-screen" />`;
+<InfiniteImageField className="w-full h-[420px]" />`;
 export async function InfiniteImageFieldDocs() {
   const sourceCode =
     (await readComponentSource("infinite-image-field")) ||

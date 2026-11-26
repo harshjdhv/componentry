@@ -9,7 +9,7 @@ import { readComponentSource } from "@/lib/source-code";
 
 const defaultCode = `import { WheelCarousel } from "@/components/ui/wheel-carousel"
 
-<div className="h-[680px] w-full">
+<div className="h-[560px] w-full">
   <WheelCarousel />
 </div>`;
 
@@ -36,13 +36,13 @@ const projects: WheelCarouselItem[] = [
   },
 ]
 
-<div className="h-[680px] w-full">
+<div className="h-[560px] w-full">
   <WheelCarousel items={projects} />
 </div>`;
 
 const rightSideCode = `import { WheelCarousel } from "@/components/ui/wheel-carousel"
 
-<div className="h-[680px] w-full">
+<div className="h-[560px] w-full">
   <WheelCarousel
     photoSide="right"
     photoAspect="4/3"

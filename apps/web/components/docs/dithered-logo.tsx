@@ -7,7 +7,7 @@ const componentryLogoSrc = "/images/dithered-logo/logo.svg";
 
 const defaultCode = `import { DitheredLogo } from "@/components/ui/dithered-logo"
 
-<div className="h-[600px] w-full bg-white text-black">
+<div className="h-[430px] w-full bg-white text-black">
   <DitheredLogo
     imageSrc="https://componentry.dev/images/dithered-logo/logo.svg"
     className="h-full w-full"

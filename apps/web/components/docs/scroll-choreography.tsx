@@ -15,7 +15,7 @@ const images = {
 
 export default function Demo() {
   return (
-    <div className="w-full min-h-screen">
+    <div className="w-full min-h-[600px]">
       <ScrollChoreography images={images} />
     </div>
   )

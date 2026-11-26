@@ -8,7 +8,7 @@ const defaultCode = `import { FisheyeInfiniteGrid } from "@/components/ui/fishey
 export default function Gallery() {
   return (
     <FisheyeInfiniteGrid
-      className="h-full min-h-[620px] w-full"
+      className="h-full min-h-[430px] w-full"
     />
   )
 }`;

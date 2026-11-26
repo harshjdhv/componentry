@@ -7,7 +7,7 @@ const basicUsageCode = `import { AuroraFlow } from "@/components/ui/aurora-flow"
 
 <AuroraFlow
   preset="ocean"
-  className="min-h-[600px]"
+  className="min-h-[430px]"
 />`;
 
 export async function AuroraFlowDocs() {

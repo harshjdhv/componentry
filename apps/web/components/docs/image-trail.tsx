@@ -13,7 +13,7 @@ const myImages = [
 
 export function Hero() {
   return (
-    <div className="relative w-full h-[600px] overflow-hidden bg-black">
+    <div className="relative w-full h-[500px] overflow-hidden bg-black">
       <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
         <h1 className="text-4xl font-bold text-white">DISCOVERY</h1>
       </div>

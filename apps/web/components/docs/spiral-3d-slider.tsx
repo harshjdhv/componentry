@@ -101,7 +101,7 @@ export default function Gallery() {
       items={slides}
       autoRotate
       autoSpeed={0.13}
-      className="min-h-[720px]"
+      className="min-h-[430px]"
     />
   )
 }`;
