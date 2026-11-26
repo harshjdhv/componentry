@@ -27,6 +27,10 @@ const gettingStarted: NavGroup = {
       title: "MCP",
       href: "/docs/mcp",
     },
+    {
+      title: "Changelog",
+      href: "/docs/changelog",
+    },
   ],
 };
 
