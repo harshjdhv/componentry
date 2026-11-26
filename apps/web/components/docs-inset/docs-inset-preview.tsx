@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { AppWindow, CodeXml } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useDocStore } from "@/hooks/use-doc-store"
@@ -97,8 +98,16 @@ export function DocsInsetPreview({
         className="mb-3"
       >
         <TabsList aria-label="Preview or code">
-          <TabsTab value="preview">Preview</TabsTab>
-          {code && <TabsTab value="code">Code</TabsTab>}
+          <TabsTab value="preview">
+            <AppWindow aria-hidden />
+            Preview
+          </TabsTab>
+          {code && (
+            <TabsTab value="code">
+              <CodeXml aria-hidden />
+              Code
+            </TabsTab>
+          )}
         </TabsList>
       </Tabs>
 

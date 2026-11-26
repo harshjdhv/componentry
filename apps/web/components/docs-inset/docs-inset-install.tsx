@@ -5,6 +5,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { CopyButton } from "@/components/copy-button"
 import { PackageManagerCommand } from "@/components/package-manager-command"
+import { docsLine } from "./surface"
 import type { PackageManager } from "@/lib/install-command"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@workspace/ui/components/tabs"
 
@@ -118,9 +119,23 @@ export function DocsInsetInstall({
   let step = 0
   return (
     <Tabs defaultValue="cli" className="gap-5">
-      <TabsList aria-label="Installation method">
-        <TabsTab value="cli">CLI</TabsTab>
-        <TabsTab value="manual">Manual</TabsTab>
+      <TabsList
+        variant="underline"
+        aria-label="Installation method"
+        className={cn(
+          "w-full justify-start gap-x-5 border-b data-[orientation=horizontal]:py-0 *:data-[slot=tab-indicator]:rounded-full *:data-[slot=tabs-tab]:hover:bg-transparent",
+          docsLine
+        )}
+      >
+        {(["cli", "manual"] as const).map((value) => (
+          <TabsTab
+            key={value}
+            value={value}
+            className="h-9 grow-0 rounded-none px-0 text-[14px] font-medium text-zinc-500 hover:text-zinc-800 data-active:text-zinc-950 sm:h-9 sm:text-[14px] dark:text-zinc-500 dark:hover:text-zinc-200 dark:data-active:text-zinc-50"
+          >
+            {value === "cli" ? "CLI" : "Manual"}
+          </TabsTab>
+        ))}
       </TabsList>
 
       <TabsPanel value="cli">{cli}</TabsPanel>
