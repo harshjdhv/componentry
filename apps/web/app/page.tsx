@@ -1,5 +1,5 @@
-import { IndexLanding } from "@/components/landing/index-landing";
+import { PremiumLanding } from "@/components/landing/premium-landing";
 
 export default function Home() {
-  return <IndexLanding />;
+  return <PremiumLanding />;
 }
