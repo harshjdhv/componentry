@@ -6,6 +6,7 @@ import { AppWindow, CodeXml } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useDocStore } from "@/hooks/use-doc-store"
 import { Tabs, TabsList, TabsTab } from "@workspace/ui/components/tabs"
+import { PageContextMenu } from "@/components/page-context-menu"
 import { PropsRowSlotContext } from "./props-row-slot"
 import { CustomizePanel, VariantRow } from "./customize-panel"
 import type { VariantItem } from "@/components/docs-preview-wrapper"
@@ -20,6 +21,11 @@ interface DocsInsetPreviewProps {
   /** Alternate previews, switched with tabs; the code block follows via useDocStore. */
   variants?: VariantItem[]
   hideDefaultVariant?: boolean
+  /** The page as markdown; shows the Copy page button beside the tabs. */
+  markdown?: string
+  /** Registry slug and component source, for the Copy page menu. */
+  slug?: string
+  sourceCode?: string
 }
 
 /**
@@ -33,6 +39,9 @@ export function DocsInsetPreview({
   fullWidth,
   variants = [],
   hideDefaultVariant = false,
+  markdown,
+  slug,
+  sourceCode,
 }: DocsInsetPreviewProps) {
   const [activeVariant, setActiveVariant] = React.useState(
     hideDefaultVariant && variants.length > 0 ? 0 : -1
@@ -90,27 +99,29 @@ export function DocsInsetPreview({
 
   return (
     <div>
-      <Tabs
-        value={tab}
-        onValueChange={(value) => {
-          if (value !== "preview" && value !== "code") return
-          setTab(value)
-        }}
-        className="mb-3"
-      >
-        <TabsList aria-label="Preview or code">
-          <TabsTab value="preview">
-            <AppWindow aria-hidden />
-            Preview
-          </TabsTab>
-          {code && (
-            <TabsTab value="code">
-              <CodeXml aria-hidden />
-              Code
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <Tabs
+          value={tab}
+          onValueChange={(value) => {
+            if (value !== "preview" && value !== "code") return
+            setTab(value)
+          }}
+        >
+          <TabsList aria-label="Preview or code">
+            <TabsTab value="preview">
+              <AppWindow aria-hidden />
+              Preview
             </TabsTab>
-          )}
-        </TabsList>
-      </Tabs>
+            {code && (
+              <TabsTab value="code">
+                <CodeXml aria-hidden />
+                Code
+              </TabsTab>
+            )}
+          </TabsList>
+        </Tabs>
+        {markdown && slug && <PageContextMenu content={markdown} slug={slug} source={sourceCode} />}
+      </div>
 
     <div className="relative overflow-hidden rounded-2xl border border-black/[0.07] bg-docs-surface dark:border-white/[0.07]">
       {/* Stage. Same colour as the inset window, so a component without its own

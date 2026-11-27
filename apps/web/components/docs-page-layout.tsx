@@ -124,6 +124,7 @@ export async function DocsPageLayout({
 
   return (
     <DocsInsetLayout
+      usageCode={resolvedUsageCode || undefined}
       title={title}
       description={description}
       slug={installPackageName}

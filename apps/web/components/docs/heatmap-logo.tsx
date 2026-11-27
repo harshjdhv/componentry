@@ -24,6 +24,7 @@ export async function HeatmapLogoDocs() {
       preview={<HeatmapLogoPlayground />}
       fullWidthPreview
       code={<LiveCodeBlock defaultCode={usageCode} />}
+      usageCode={usageCode}
       installDependencies="@paper-design/shaders-react"
       sourceCode={sourceCode ?? undefined}
       props={[

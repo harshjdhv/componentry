@@ -12,6 +12,7 @@ import { DocsInsetPreview } from "./docs-inset-preview"
 import { DocsInsetInstall } from "./docs-inset-install"
 import { RelatedComponents } from "./related-components"
 import { highlightCode } from "@/lib/shiki"
+import { buildDocsPageMarkdown } from "@/lib/docs-page-markdown"
 import type { BundledLanguage } from "shiki"
 
 export interface DocsInsetLayoutProps {
@@ -33,6 +34,8 @@ export interface DocsInsetLayoutProps {
   /** Full component source for the Manual install tab. */
   sourceCode?: string
   sourceFilename?: string
+  /** Usage snippet as plain text, for the page's markdown (Copy Page). */
+  usageCode?: string
 }
 
 /**
@@ -55,9 +58,25 @@ export async function DocsInsetLayout({
   usageNote,
   sourceCode,
   sourceFilename,
+  usageCode,
 }: DocsInsetLayoutProps) {
   const hasSource = Boolean(sourceCode && !sourceCode.startsWith("// Unable to load"))
   const sourceHtml = hasSource ? await highlightCode(sourceCode!, "tsx" as BundledLanguage) : undefined
+
+  // Plain-text version of the page for "Copy Page" / "View as Markdown".
+  const markdown = buildDocsPageMarkdown({
+    title,
+    description,
+    installPackageName: slug,
+    installDependencies,
+    installSourceCode: hasSource ? sourceCode : undefined,
+    installSourceFilename: sourceFilename,
+    usageCode: usageCode ?? "",
+    examples: (variants ?? []).flatMap((variant) =>
+      variant.code ? [{ title: variant.title, code: variant.code }] : []
+    ),
+    props,
+  })
 
   return (
     <>
@@ -80,6 +99,9 @@ export async function DocsInsetLayout({
 
       <div id="preview" data-section-title="Preview" className="scroll-mt-6">
         <DocsInsetPreview
+          markdown={markdown}
+          slug={slug}
+          sourceCode={hasSource ? sourceCode : undefined}
           code={code}
           fullWidth={fullWidthPreview}
           variants={variants}
