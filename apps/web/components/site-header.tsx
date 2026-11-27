@@ -14,6 +14,8 @@ interface SiteHeaderProps {
     sidebarToggle?: React.ReactNode
     /** Landing pages use a transparent bottom border on the same rail. */
     landingGutter?: boolean
+    /** Inset docs shell: sits on the grey page background, full-width gutter. */
+    inset?: boolean
 }
 
 function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -24,7 +26,7 @@ function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
     )
 }
 
-export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
+export function SiteHeader({ sidebarToggle, landingGutter, inset }: SiteHeaderProps) {
     const pathname = usePathname()
     const stars = useGithubStars()
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false)
@@ -36,9 +38,19 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
     const fullStars = `${new Intl.NumberFormat("en-US").format(stars)} stars`
     const navItems = [
         {
-            href: "/docs",
+            // Written docs (introduction, changelog…); components and MCP have their own items.
+            href: "/docs/introduction",
             label: "Docs",
-            active: pathname === "/docs" || (pathname.startsWith("/docs/") && !pathname.startsWith("/docs/mcp")),
+            active:
+                pathname === "/docs" ||
+                (pathname.startsWith("/docs/") &&
+                    !pathname.startsWith("/docs/components") &&
+                    !pathname.startsWith("/docs/mcp")),
+        },
+        {
+            href: "/docs/components",
+            label: "Components",
+            active: pathname === "/docs/components" || pathname.startsWith("/docs/components/"),
         },
         {
             href: "/blocks",
@@ -61,16 +73,18 @@ export function SiteHeader({ sidebarToggle, landingGutter }: SiteHeaderProps) {
         <header
             className={cn(
                 "fixed top-0 left-0 right-0 z-50 w-full transition-[background-color,border-color] duration-200",
-                landingGutter
+                inset
+                    ? "border-b border-line bg-docs-surface"
+                    : landingGutter
                     ? "border-b border-transparent bg-white dark:bg-[#0a0a0a]"
                     : "border-b border-line bg-white dark:bg-background"
             )}
         >
-            <div className={cn("h-14 w-full", landingGutterClass)}>
+            <div className={cn("h-14 w-full", inset ? "px-3 lg:pl-5 lg:pr-4" : landingGutterClass)}>
                 <div className="flex h-full w-full items-center">
                 <div className="flex flex-1 items-center gap-5">
                     {sidebarToggle && (
-                        <div className="md:hidden">
+                        <div className={inset ? "lg:hidden" : "md:hidden"}>
                             {sidebarToggle}
                         </div>
                     )}

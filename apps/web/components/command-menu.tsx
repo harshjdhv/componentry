@@ -76,7 +76,7 @@ const commandGroups: CommandMenuGroup[] = [
       createItem("Pages", { title: "Home", href: "/", icon: <ArrowRight /> }),
       createItem("Pages", {
         title: "Documentation",
-        href: "/docs",
+        href: "/docs/introduction",
         icon: <ArrowRight />,
       }),
       ...(gettingStartedGroup?.items.map((item) =>

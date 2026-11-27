@@ -5,12 +5,16 @@
  * control bar at the bottom center. The bar shows optional preset swatches and a
  * chevron that expands the page's DialKit controls.
  *
+ * Inside the docs preview (DocsInsetPreview) the controls dock under the
+ * preview box instead of floating over it, and are always shown.
+ *
  * A page registers its controls with `useDialKit` (one panel per page), renders
  * its component inside <DocsPlayground>, and pushes generated code with
  * `useLiveCode`, which feeds <LiveCodeBlock> in the Usage section.
  */
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
+import { createPortal } from "react-dom"
 import { motion, useDragControls, useMotionValue } from "framer-motion"
 import { ChevronUp, GripVertical, SlidersHorizontal, X } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -19,11 +23,16 @@ import "dialkit/styles.css"
 import "./docs-playground.css"
 import { cn } from "@/lib/utils"
 import { usePlaygroundStore } from "@/hooks/use-playground-store"
+import { usePropsRowSlot } from "@/components/docs-inset/props-row-slot"
+import { PanelRow, SwatchRow } from "@/components/docs-inset/customize-panel"
 
 export interface PlaygroundPreset {
   name: string
-  /** CSS background for the swatch: a color or a gradient. See `gradientSwatch`. */
-  swatch: string
+  /**
+   * CSS background for the swatch: a color or a gradient. See `gradientSwatch`.
+   * Leave it out for presets that aren't colors (effect settings, word sets).
+   */
+  swatch?: string
 }
 
 interface DocsPlaygroundProps {
@@ -116,35 +125,6 @@ function useHexColors() {
   }, [])
 }
 
-/** Option shown in a preset select once values no longer match a preset. */
-export const CUSTOM_PRESET = "Custom"
-
-/**
- * Presets that aren't colors belong in the panel as a DialKit select (swatches are
- * for colors). Picking one calls `apply`; editing values away from every preset
- * flips the select to "Custom", and landing back on one selects it again.
- *
- * @param selected the select's current value (e.g. `dial.values.preset`)
- * @param matching the preset whose values match the current ones, or null
- */
-export function usePresetSelect(
-  selected: string,
-  matching: string | null,
-  apply: (name: string) => void,
-  select: (name: string) => void,
-) {
-  const previous = useRef({ selected, matching })
-  useEffect(() => {
-    const before = previous.current
-    previous.current = { selected, matching }
-    if (selected !== before.selected) {
-      if (selected !== CUSTOM_PRESET && selected !== matching) apply(selected)
-    } else if (matching !== before.matching) {
-      select(matching ?? CUSTOM_PRESET)
-    }
-  }, [selected, matching, apply, select])
-}
-
 /** Push generated code to the Usage section's <LiveCodeBlock>. */
 export function useLiveCode(code: string) {
   useEffect(() => {
@@ -196,6 +176,7 @@ export function DocsPlayground({
   const toggle = () => setOpen((value) => !value)
   const launcherRef = useRef<HTMLButtonElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
+  const propsSlot = usePropsRowSlot()
   useHexColors()
 
   // Corner launcher: focus moves into the panel on open, Escape closes it, and
@@ -240,6 +221,35 @@ export function DocsPlayground({
       <DialRoot mode="inline" productionEnabled theme={resolvedTheme === "light" ? "light" : "dark"} />
     </div>
   )
+
+  // Inside the docs preview: rows go into the customize panel under the preview
+  // box (not floating over the component), always shown rather than behind a toggle.
+  // The panel card and any variant row belong to DocsInsetPreview.
+  if (propsSlot !== undefined) {
+    const docked = (hasPresets || controls) && (
+      <>
+        {hasPresets && (
+          <SwatchRow label={presetsLabel} presets={presets!} value={preset} onChange={onPresetChange} />
+        )}
+
+        {/* DialKit rows flow into columns across the panel (see .cy-dial-wide). */}
+        {controls && (
+          <PanelRow label="Adjust" titleOnlyWithOptions>
+            <div role="group" aria-label={label}>
+              <DialRoot mode="inline" productionEnabled theme={resolvedTheme === "light" ? "light" : "dark"} />
+            </div>
+          </PanelRow>
+        )}
+      </>
+    )
+
+    return (
+      <div ref={stageRef} className={cn("relative h-full w-full", className)}>
+        {children}
+        {propsSlot && docked && createPortal(docked, propsSlot)}
+      </div>
+    )
+  }
 
   // No color swatches to show: a round launcher in the corner instead of a mostly empty bar.
   if (!hasPresets) {
@@ -330,7 +340,7 @@ export function DocsPlayground({
                   aria-label={name}
                   title={name}
                   onClick={() => onPresetChange?.(name)}
-                  style={{ "--swatch": swatch } as CSSProperties}
+                  style={{ "--swatch": swatch ?? "var(--muted)" } as CSSProperties}
                   className={SWATCH}
                 />
               ))}

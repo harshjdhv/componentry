@@ -13,8 +13,8 @@ export const metadata = pageMetadata({
 export default function CollectionsPage() {
   return (
     <>
-      <BreadcrumbJsonLd items={[{ name: "Components", path: "/docs" }, { name: "Collections", path: "/collections" }]} />
-      <nav aria-label="Breadcrumb" className="mb-8 text-sm text-zinc-500"><Link href="/docs" className="underline underline-offset-4">Components</Link><span aria-hidden="true"> / </span><span>Collections</span></nav>
+      <BreadcrumbJsonLd items={[{ name: "Components", path: "/docs/components" }, { name: "Collections", path: "/collections" }]} />
+      <nav aria-label="Breadcrumb" className="mb-8 text-sm text-zinc-500"><Link href="/docs/components" className="underline underline-offset-4">Components</Link><span aria-hidden="true"> / </span><span>Collections</span></nav>
       <header className="mb-14 max-w-2xl">
         <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Find the right effect.</h1>
         <p className="mt-5 text-pretty text-base leading-7 text-zinc-500 dark:text-zinc-400">React components, grouped by what you want to build. Compare the interactions, explore the demos, and make the source your own.</p>

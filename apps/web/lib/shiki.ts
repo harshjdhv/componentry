@@ -4,6 +4,7 @@ import {
   type BundledLanguage,
   type BundledTheme,
 } from "shiki";
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 
 // Singleton pattern - cache the highlighter instance
 let highlighterPromise: Promise<Highlighter> | null = null;
@@ -22,6 +23,11 @@ export async function getHighlighter(): Promise<Highlighter> {
     highlighterPromise = createHighlighter({
       themes: THEMES,
       langs: LANGS,
+      // Pure-JS regex engine instead of Oniguruma WASM: the WASM instance is
+      // process-wide and can get corrupted in a long-running dev server, after
+      // which every highlight throws until restart. Output is identical for
+      // every component source here.
+      engine: createJavaScriptRegexEngine(),
     });
   }
   return highlighterPromise;
@@ -55,9 +61,58 @@ export async function highlightCode(
     return cached;
   }
 
-  const highlighter = await getHighlighter();
+  let html: string;
+  try {
+    html = render(await getHighlighter(), code, lang, lightTheme, darkTheme);
+  } catch (error) {
+    // Rebuild the highlighter once; if it still fails, show plain code rather
+    // than failing the whole page.
+    highlighterPromise = null;
+    try {
+      html = render(await getHighlighter(), code, lang, lightTheme, darkTheme);
+    } catch {
+      console.warn(`[shiki] highlighting ${lang} failed, rendering plain code:`, (error as Error).message?.slice(0, 120));
+      return plainCodeHtml(code);
+    }
+  }
 
-  const html = highlighter.codeToHtml(code.trim(), {
+  // Cache the result (limit cache size to prevent memory issues)
+  if (htmlCache.size > 500) {
+    // Clear oldest entries (simple LRU approximation)
+    const firstKey = htmlCache.keys().next().value;
+    if (firstKey) htmlCache.delete(firstKey);
+  }
+  htmlCache.set(cacheKey, html);
+
+  return html;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+/** Same structure as Shiki's output (pre > code > span.line), without colours. */
+function plainCodeHtml(code: string): string {
+  const lines = code
+    .trim()
+    .split("\n")
+    .map((line, i) => `<span class="line" data-line="${i + 1}">${escapeHtml(line) || "\u00A0"}</span>`)
+    .join("\n");
+  return `<pre class="shiki" tabindex="0"><code class="grid counter-reset-line">${lines}</code></pre>`;
+}
+
+function render(
+  highlighter: Highlighter,
+  code: string,
+  lang: BundledLanguage,
+  lightTheme: BundledTheme,
+  darkTheme: BundledTheme,
+): string {
+  return highlighter.codeToHtml(code.trim(), {
     lang,
     themes: {
       light: lightTheme,
@@ -95,14 +150,4 @@ export async function highlightCode(
       },
     ],
   });
-
-  // Cache the result (limit cache size to prevent memory issues)
-  if (htmlCache.size > 500) {
-    // Clear oldest entries (simple LRU approximation)
-    const firstKey = htmlCache.keys().next().value;
-    if (firstKey) htmlCache.delete(firstKey);
-  }
-  htmlCache.set(cacheKey, html);
-
-  return html;
 }

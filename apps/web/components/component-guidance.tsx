@@ -46,11 +46,8 @@ export function ComponentGuidance({ slug }: { slug: string }) {
     const [credit] = guide.sections
     if (!credit) return null
     return (
-      <div className="pt-10">
-        <p className="mb-2.5 text-[12px] font-medium uppercase tracking-[0.08em] text-zinc-500 dark:text-zinc-400">
-          {guide.heading ?? "Inspired by"}
-        </p>
-        <p className="max-w-xl text-pretty text-[17px] font-normal leading-8 tracking-[-0.015em] text-zinc-700 dark:text-zinc-200">
+      <Section title={guide.heading ?? "Inspired by"}>
+        <p className="text-pretty text-[15px] leading-7 text-zinc-500 dark:text-zinc-400">
           <GuideCopy
             body={credit.body}
             href={credit.href}
@@ -58,26 +55,37 @@ export function ComponentGuidance({ slug }: { slug: string }) {
           />
           .
         </p>
-      </div>
+      </Section>
     )
   }
 
+  // Plain title + copy, held to a readable measure (~70ch). The full column
+  // width made lines run ~140 characters.
   return (
     <Section title={guide.heading ?? "Working with this component"} className="pt-8">
-      <div className="space-y-7">
+      {/* Tips sit on a slight indent under the section heading. One foreground at
+          three strengths keeps the block a step below the heading in both themes:
+          title 85%, copy 55%. */}
+      <div className="max-w-[640px] space-y-6 pl-4">
         {guide.sections.map((section) => (
-          <div key={section.title || section.href || section.body}>
+          <div
+            key={section.title || section.href || section.body}
+            // Titled tips show as indented subsections in the page outline.
+            {...(section.title
+              ? {
+                  id: `guide-${section.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`,
+                  "data-section-title": section.title,
+                  "data-section-depth": "3",
+                }
+              : {})}
+          >
             {section.title ? (
-              <h3 className="mb-2 text-[15px] font-medium text-zinc-800 dark:text-zinc-200">
+              <h3 className="mb-1 text-[15px] font-medium leading-6 text-foreground/85">
                 {section.title}
               </h3>
             ) : null}
-            <p className="text-pretty text-[15px] leading-7 text-zinc-500 dark:text-zinc-400">
-              <GuideCopy
-                body={section.body}
-                href={section.href}
-                linkLabel={section.linkLabel}
-              />
+            <p className="text-pretty text-[14.5px] leading-6 text-foreground/55">
+              <GuideCopy body={section.body} href={section.href} linkLabel={section.linkLabel} />
             </p>
           </div>
         ))}

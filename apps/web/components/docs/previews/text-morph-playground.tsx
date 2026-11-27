@@ -1,16 +1,14 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useDialKitController } from "dialkit";
 import { TextMorph } from "@workspace/ui/components/text-morph";
 import {
-  CUSTOM_PRESET,
   DocsPlayground,
   useLiveCode,
-  usePresetSelect,
 } from "@/components/docs-playground";
 
-// Word sets, not colors, so they live in the panel as a select.
+// Word sets, not colors: shown in the customize panel by name, without swatches.
 const PRESETS = [
   {
     name: "Studio",
@@ -28,11 +26,6 @@ const PRESETS = [
 
 type Slider = [number, number, number, number];
 const controls = {
-  preset: {
-    type: "select" as const,
-    options: [...PRESETS.map((p) => p.name), CUSTOM_PRESET],
-    default: PRESETS[0].name,
-  },
   words: {
     type: "text" as const,
     default: PRESETS[0].words.join(", "),
@@ -79,23 +72,19 @@ export function TextMorphPlayground() {
     PRESETS.find((p) => p.words.join("|") === words.join("|"))?.name ?? null;
 
   const { setValues } = dial;
-  usePresetSelect(
-    dial.values.preset,
-    matching,
-    useCallback(
-      (name: string) => {
-        const next = PRESETS.find((p) => p.name === name);
-        if (next) setValues({ words: next.words.join(", ") });
-      },
-      [setValues],
-    ),
-    useCallback((name: string) => setValues({ preset: name }), [setValues]),
-  );
+  const applyPreset = (name: string) => {
+    const next = PRESETS.find((p) => p.name === name);
+    if (next) setValues({ words: next.words.join(", ") });
+  };
 
   useLiveCode(generateCode({ words, interval, morphDuration }));
 
   return (
     <DocsPlayground
+      presets={PRESETS.map(({ name }) => ({ name }))}
+      preset={matching}
+      onPresetChange={applyPreset}
+      presetsLabel="Preset"
       minWidth={280}
       className="flex min-h-[440px] items-center justify-center overflow-hidden px-8 py-16"
     >

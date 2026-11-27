@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata, Viewport } from "next";
 import {
   Geist,
-  JetBrains_Mono,
+  Geist_Mono,
   Instrument_Serif,
 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
@@ -22,7 +22,7 @@ const fontSans = Geist({
   display: "swap",
 });
 
-const fontMono = JetBrains_Mono({
+const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",

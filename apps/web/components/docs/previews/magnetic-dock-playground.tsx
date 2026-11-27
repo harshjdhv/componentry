@@ -61,7 +61,7 @@ export function MagneticDockPlayground() {
         items={ITEMS}
         iconSize={config.size}
         maxScale={config.magnification}
-        className="max-w-full"
+        className="max-w-full origin-center scale-[0.68] sm:scale-[0.85] lg:scale-100"
       />
     </DocsPlayground>
   )

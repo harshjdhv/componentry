@@ -5,7 +5,7 @@ import { MusicPlayer } from "@workspace/ui/components/music-player";
 
 export function MusicPlayerPreview() {
   return (
-    <div className="flex flex-col items-center justify-center p-8 gap-12">
+    <div className="flex flex-col items-center justify-center gap-8 p-4 sm:gap-12 sm:p-8">
       <MusicPlayer
         src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         coverArt="https://i.scdn.co/image/ab67616d0000b27315ebbedaacef61af244262a8"

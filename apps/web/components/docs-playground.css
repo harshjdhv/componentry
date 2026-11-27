@@ -1,20 +1,21 @@
 /* Componentry skin for DialKit controls inside DocsPlayground.
    Our own card (class "cy-dial") is the container; DialKit renders bare rows inside it. */
 
-/* Solid surfaces, same as the control bar's cells. */
+/* Same fill as the tab tracks (bg-muted, a 4% overlay), so sliders and the
+   Preview / Code style tabs in the customize panel read as one set. */
 .cy-dial .dialkit-root {
-  --dial-surface: #1c1c1d;
-  --dial-surface-hover: #222224;
-  --dial-surface-active: #2a2a2d; /* slider fill */
+  --dial-surface: rgb(255 255 255 / 0.04);
+  --dial-surface-hover: rgb(255 255 255 / 0.06);
+  --dial-surface-active: rgb(255 255 255 / 0.08); /* slider fill, = --input */
   --dial-radius: 8px;
-  --dial-row-height: 32px;
+  --dial-row-height: 34px; /* = the Preview / Code tab track */
   --dial-row-gap: 4px;
 }
 
 .cy-dial .dialkit-root[data-theme="light"] {
-  --dial-surface: #e8e8ea;
-  --dial-surface-hover: #e2e2e5;
-  --dial-surface-active: #d9d9dd;
+  --dial-surface: rgb(0 0 0 / 0.04);
+  --dial-surface-hover: rgb(0 0 0 / 0.06);
+  --dial-surface-active: rgb(0 0 0 / 0.1); /* = --input */
 }
 
 /* Strip DialKit's own card, header, copy toolbar and saved versions. */
@@ -49,7 +50,45 @@
   min-width: 0;
 }
 
+/* 14px type like the Preview / Code tabs (DialKit defaults to 13px). */
+.cy-dial .dialkit-slider-label,
+.cy-dial .dialkit-slider-value,
+.cy-dial .dialkit-slider-input,
+.cy-dial .dialkit-select-trigger,
+.cy-dial .dialkit-select-label,
+.cy-dial .dialkit-select-value,
+.cy-dial .dialkit-select-option,
+.cy-dial .dialkit-labeled-control,
+.cy-dial .dialkit-labeled-control-label,
+.cy-dial .dialkit-color-label,
+.cy-dial .dialkit-text-label,
+.cy-dial .dialkit-text-input,
+.cy-dial .dialkit-toggle-label,
+.cy-dial .dialkit-segmented-button,
+.cy-dial .dialkit-button,
+.cy-dial .dialkit-color-control {
+  font-size: 14px;
+}
+
 /* Values update while dragging; keep digits from jittering. */
 .cy-dial .dialkit-root {
   font-variant-numeric: tabular-nums;
+}
+
+/* Docked panel under the docs preview: rows flow into columns (masonry-style)
+   across the preview's width instead of one tall list. Each direct row or folder
+   of the root panel stays within one column. */
+.cy-dial-wide .dialkit-folder-root > .dialkit-folder-content > .dialkit-folder-inner {
+  display: block;
+  column-width: 240px;
+  column-gap: 12px;
+}
+
+.cy-dial-wide .dialkit-folder-root > .dialkit-folder-content > .dialkit-folder-inner > * {
+  break-inside: avoid;
+  margin-bottom: var(--dial-row-gap, 4px);
+}
+
+.cy-dial-wide .dialkit-versions-host {
+  display: none;
 }

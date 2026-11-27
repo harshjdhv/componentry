@@ -14,6 +14,7 @@ import {
 } from "@/components/landing/landing-frame";
 import { ResponsiveMagnetLines } from "@/components/landing/responsive-magnet-lines";
 import { Testimonials } from "@/components/landing/testimonials";
+import { Features } from "@/components/landing/features";
 import { CustomWorkCta } from "@/components/landing/custom-work-cta";
 import { InfiniteIconField } from "@/components/landing/infinite-icon-field";
 import { Footer } from "@/components/footer";
@@ -262,6 +263,7 @@ export default function Home() {
       </main>
 
       <LandingGutter>
+        <Features />
         <Testimonials />
         <CustomWorkCta />
       </LandingGutter>

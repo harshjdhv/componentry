@@ -1,6 +1,6 @@
-import { DocsPageLayout } from "@/components/docs-page-layout"
-import { readComponentSource } from "@/lib/source-code"
+import { DocsInsetLayout } from "@/components/docs-inset/docs-inset-layout"
 import { LiveCodeBlock } from "@/components/live-code-block"
+import { readComponentSource } from "@/lib/source-code"
 import { HeatmapLogoPlayground } from "@/components/docs/previews/heatmap-logo-playground"
 
 const usageCode = `import { HeatmapLogo } from "@/components/ui/heatmap-logo"
@@ -17,16 +17,16 @@ export async function HeatmapLogoDocs() {
   const sourceCode = await readComponentSource("heatmap-logo")
 
   return (
-    <DocsPageLayout
+    <DocsInsetLayout
       title="Heatmap Logo"
       description="A logo that glows like hot metal, with heat drifting slowly through the mark. Feed it any solid logo and a color ramp."
+      slug="heatmap-logo"
       preview={<HeatmapLogoPlayground />}
       fullWidthPreview
-      previewCode={usageCode}
-      installPackageName="heatmap-logo"
+      code={<LiveCodeBlock defaultCode={usageCode} />}
+      usageCode={usageCode}
       installDependencies="@paper-design/shaders-react"
-      installSourceCode={sourceCode ?? "// Unable to load source code"}
-      usageCode={<LiveCodeBlock defaultCode={usageCode} />}
+      sourceCode={sourceCode ?? undefined}
       props={[
         {
           name: "image",

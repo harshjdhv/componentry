@@ -1,13 +1,34 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronDown, Copy } from "lucide-react"
+import { Check, ChevronDown, Copy, FileCode2, Link2, Terminal } from "lucide-react"
+import posthog from "posthog-js"
+import {
+  Menu,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuPopup,
+  MenuSeparator,
+  MenuTrigger,
+} from "@workspace/ui/components/menu"
+import {
+  segmentedControlItemLayoutClassName,
+  segmentedControlItemSizeClassNames,
+  segmentedControlRootClassName,
+} from "@workspace/ui/lib/segmented-control"
 import { cn } from "@/lib/utils"
 import { AI_ASSISTANTS } from "@/config/ai"
-import posthog from "posthog-js"
+import { getInstallCommand, registryUrl } from "@/lib/install-command"
+import { CursorIcon, GeminiIcon, MistralIcon, PerplexityIcon, V0Icon } from "@/components/brand-icons"
 
 interface PageContextMenuProps {
+  /** The page as markdown (see buildDocsPageMarkdown). */
   content: string
+  /** Registry slug, for the install command and Open in v0. */
+  slug: string
+  /** Full component source, for Copy source. */
+  source?: string
   className?: string
 }
 
@@ -53,161 +74,169 @@ function SciraIcon({ className }: { className?: string }) {
   )
 }
 
-const ICONS = {
+const ICONS: Record<string, (props: { className?: string }) => React.ReactElement> = {
   chatgpt: ChatGPTIcon,
   claude: ClaudeIcon,
+  cursor: CursorIcon,
+  perplexity: PerplexityIcon,
+  gemini: GeminiIcon,
+  mistral: MistralIcon,
   scira: SciraIcon,
 }
 
-const menuItemClass =
-  "relative flex w-full items-center gap-2.5 px-2.5 py-2 text-left text-[13px] font-medium text-zinc-700 transition-[background-color,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] before:pointer-events-none before:absolute before:inset-0 before:bg-zinc-100/90 before:opacity-0 before:transition-opacity before:duration-300 before:ease-[cubic-bezier(0.22,1,0.36,1)] hover:before:opacity-100 dark:text-zinc-300 dark:before:bg-zinc-800/80"
+/**
+ * Segments share the Preview / Code tabs' size (segmented-control helpers), so
+ * the two controls in that row read as a pair. Text sits nearer foreground than
+ * an unselected tab, since both halves are always actionable.
+ */
+const SEGMENT = cn(
+  "relative flex shrink-0 cursor-pointer items-center justify-center rounded-md font-medium text-base text-foreground/80 outline-none transition-[color,background-color,scale] duration-150 ease-out hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97] sm:text-sm",
+  segmentedControlItemLayoutClassName,
+  segmentedControlItemSizeClassNames.default
+)
 
-const segmentClass =
-  "relative overflow-hidden transition-[color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] before:pointer-events-none before:absolute before:inset-0 before:bg-zinc-200/60 before:opacity-0 before:transition-opacity before:duration-300 before:ease-[cubic-bezier(0.22,1,0.36,1)] hover:before:opacity-100 active:scale-[0.985] dark:before:bg-zinc-800/70"
-
-export function PageContextMenu({ content, className }: PageContextMenuProps) {
+/**
+ * "Copy page" split button for docs pages. The main segment copies the page as
+ * markdown; the chevron opens a menu with more ways to take the page or the
+ * component elsewhere (raw markdown, link, install command, source, v0, chat
+ * assistants). Copy actions confirm with a check on the main segment.
+ */
+export function PageContextMenu({ content, slug, source, className }: PageContextMenuProps) {
   const [copied, setCopied] = React.useState(false)
-  const [isOpen, setIsOpen] = React.useState(false)
-  const dropdownRef = React.useRef<HTMLDivElement>(null)
+  const timer = React.useRef<ReturnType<typeof setTimeout>>(undefined)
+  React.useEffect(() => () => clearTimeout(timer.current), [])
 
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
-
-  React.useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false)
-    }
-    document.addEventListener("keydown", handleEscape)
-    return () => document.removeEventListener("keydown", handleEscape)
-  }, [])
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(content)
-    posthog.capture("docs_markdown_copied")
+  const copy = async (text: string, event: string) => {
+    await navigator.clipboard.writeText(text)
+    posthog.capture(event)
     setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => setCopied(false), 1600)
   }
 
-  const getPrompt = (url: string) => {
-    return `I'm looking at this Componentry documentation: ${url}. The full docs are copied to my clipboard as markdown. Help me install, use, and customize this component.`
-  }
-
-  const openLink = async (assistant: (typeof AI_ASSISTANTS)[number]) => {
-    const url = new URL(window.location.pathname, "https://componentry.dev").toString()
-    const prompt = getPrompt(url)
-
-    await navigator.clipboard.writeText(content)
-    posthog.capture("docs_ai_assistant_opened", { assistant_id: assistant.id })
-    window.open(assistant.url(prompt), "_blank", "noopener,noreferrer")
-    setIsOpen(false)
-  }
+  const pageUrl = () => new URL(window.location.pathname, "https://componentry.dev").toString()
 
   const viewMarkdown = () => {
-    const blob = new Blob([content], { type: "text/markdown" })
-    const url = URL.createObjectURL(blob)
-    window.open(url, "_blank")
-    setIsOpen(false)
+    const url = URL.createObjectURL(new Blob([content], { type: "text/plain;charset=utf-8" }))
+    window.open(url, "_blank", "noopener")
+    setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  }
+
+  const open = (href: string, event: string, properties?: Record<string, string>) => {
+    window.open(href, "_blank", "noopener,noreferrer")
+    posthog.capture(event, properties)
+  }
+
+  const ask = (assistant: (typeof AI_ASSISTANTS)[number]) => {
+    // Open before the clipboard write: browsers block popups opened after an await.
+    const prompt = `I'm looking at this Componentry documentation: ${pageUrl()}. The full docs are copied to my clipboard as markdown. Help me install, use, and customize this component.`
+    open(assistant.url(prompt), "docs_ai_assistant_opened", { assistant_id: assistant.id })
+    void copy(content, "docs_markdown_copied").catch(() => {})
   }
 
   return (
-    <div className={cn("relative inline-flex", className)} ref={dropdownRef}>
-      <div className="inline-flex items-stretch overflow-hidden rounded-lg border border-border/40 bg-zinc-100/80 shadow-sm backdrop-blur-sm dark:border-white/[0.06] dark:bg-zinc-900/50">
-        <button
-          type="button"
-          onClick={handleCopy}
-          className={cn(
-            segmentClass,
-            "inline-flex items-center gap-2 px-3 py-2 text-[13px] font-medium",
-            copied ? "text-foreground" : "text-zinc-600 dark:text-zinc-400"
-          )}
-        >
-          <span className="relative z-[1] inline-grid w-[9.25rem] overflow-hidden">
-            <span
-              className={cn(
-                "col-start-1 row-start-1 inline-flex items-center justify-center gap-2 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                copied
-                  ? "-translate-y-1 opacity-0 blur-[2px]"
-                  : "translate-y-0 opacity-100 blur-0"
-              )}
-            >
-              <Copy className="size-3.5" />
-              <span>Copy as Markdown</span>
-            </span>
-            <span
-              className={cn(
-                "col-start-1 row-start-1 inline-flex items-center justify-center gap-2 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                copied
-                  ? "translate-y-0 opacity-100 blur-0"
-                  : "translate-y-1 opacity-0 blur-[2px]"
-              )}
-            >
-              <span className="relative size-3.5">
-                <Check className="absolute inset-0 size-3.5" />
-              </span>
-              <span>Copied</span>
-            </span>
-          </span>
-        </button>
+    <div className={cn(segmentedControlRootClassName, "shrink-0", className)}>
+      <button
+        type="button"
+        onClick={() => copy(content, "docs_markdown_copied")}
+        className={SEGMENT}
+      >
+        {/* Icon swap only, so the label never changes width. */}
+        <span className="relative size-4.5 sm:size-4">
+          <Copy
+            aria-hidden
+            className={cn(
+              "absolute inset-0 size-full transition-[opacity,scale,filter] duration-200 ease-out",
+              copied && "scale-50 opacity-0 blur-[2px]"
+            )}
+          />
+          <Check
+            aria-hidden
+            className={cn(
+              "absolute inset-0 size-full transition-[opacity,scale,filter] duration-200 ease-out",
+              !copied && "scale-50 opacity-0 blur-[2px]"
+            )}
+          />
+        </span>
+        Copy page
+        <span className="sr-only" aria-live="polite">
+          {copied ? "Copied" : ""}
+        </span>
+      </button>
 
-        <button
-          type="button"
-          onClick={() => setIsOpen((open) => !open)}
-          aria-expanded={isOpen}
-          aria-haspopup="menu"
-          aria-label="More export options"
+      {/* Divider between the two halves; hidden while the chevron is raised (menu open). */}
+      <span
+        aria-hidden
+        className="mx-0.5 h-4 w-px shrink-0 bg-foreground/15 transition-opacity duration-150 has-[+[data-popup-open]]:opacity-0"
+      />
+
+      <Menu>
+        <MenuTrigger
+          aria-label="More ways to use this page"
           className={cn(
-            segmentClass,
-            "flex items-center justify-center self-stretch px-2 text-zinc-500 hover:text-zinc-800 dark:text-zinc-500 dark:hover:text-zinc-200",
-            isOpen && "before:opacity-100 text-zinc-800 dark:text-zinc-200"
+            SEGMENT,
+            "group/trigger px-[calc(--spacing(1.5)-1px)] data-popup-open:bg-background data-popup-open:text-foreground data-popup-open:shadow-sm/5 dark:data-popup-open:bg-input"
           )}
         >
           <ChevronDown
-            className={cn(
-              "relative z-[1] size-3.5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-              isOpen && "rotate-180"
-            )}
+            aria-hidden
+            className="transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-data-popup-open/trigger:rotate-180"
           />
-        </button>
-      </div>
-
-      {isOpen && (
-        <div
-          role="menu"
-          className="absolute left-0 top-full z-50 mt-1.5 w-56 overflow-hidden rounded-lg border border-border/40 bg-white/95 shadow-[0_8px_32px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100 dark:border-white/[0.06] dark:bg-[#121212]/95"
-        >
-          <button type="button" role="menuitem" onClick={viewMarkdown} className={menuItemClass}>
-            <span className="relative z-[1] inline-flex items-center gap-2.5">
-              <MarkdownIcon className="size-4 text-zinc-500 dark:text-zinc-400" />
+        </MenuTrigger>
+        <MenuPopup className="w-60">
+          <MenuGroup>
+            <MenuGroupLabel>Page</MenuGroupLabel>
+            <MenuItem onClick={viewMarkdown}>
+              <MarkdownIcon />
               View as Markdown
-            </span>
-          </button>
+            </MenuItem>
+            <MenuItem onClick={() => copy(pageUrl(), "docs_page_link_copied")}>
+              <Link2 />
+              Copy link
+            </MenuItem>
+          </MenuGroup>
 
-          {AI_ASSISTANTS.map((assistant) => {
-            const Icon = ICONS[assistant.id as keyof typeof ICONS]
-            return (
-              <button
-                key={assistant.id}
-                type="button"
-                role="menuitem"
-                onClick={() => openLink(assistant)}
-                className={menuItemClass}
-              >
-                <span className="relative z-[1] inline-flex items-center gap-2.5">
-                  {Icon && <Icon className="size-4 shrink-0" />}
+          <MenuSeparator />
+          <MenuGroup>
+            <MenuGroupLabel>Component</MenuGroupLabel>
+            <MenuItem onClick={() => copy(getInstallCommand(slug, "pnpm"), "docs_install_command_copied")}>
+              <Terminal />
+              Copy install command
+            </MenuItem>
+            {source && (
+              <MenuItem onClick={() => copy(source, "docs_source_copied")}>
+                <FileCode2 />
+                Copy source code
+              </MenuItem>
+            )}
+            <MenuItem
+              onClick={() =>
+                open(
+                  `https://v0.dev/chat/api/open?url=${encodeURIComponent(registryUrl.replace("{name}", slug))}`,
+                  "docs_open_in_v0"
+                )
+              }
+            >
+              <V0Icon />
+              Open in v0
+            </MenuItem>
+          </MenuGroup>
+
+          <MenuSeparator />
+          <MenuGroup>
+            <MenuGroupLabel>Ask AI</MenuGroupLabel>
+            {AI_ASSISTANTS.map((assistant) => {
+              const Icon = ICONS[assistant.id]
+              return (
+                <MenuItem key={assistant.id} onClick={() => ask(assistant)}>
+                  {Icon && <Icon />}
                   Open in {assistant.name}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      )}
+                </MenuItem>
+              )
+            })}
+          </MenuGroup>
+        </MenuPopup>
+      </Menu>
     </div>
   )
 }

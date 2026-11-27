@@ -107,7 +107,7 @@ export function SubSection({ title, children, id }: SubSectionProps) {
   const sectionId = id || title.toLowerCase().replace(/\s+/g, "-")
 
   return (
-    <div id={sectionId} className="space-y-4">
+    <div id={sectionId} data-section-title={title} data-section-depth="3" className="space-y-4">
       <h3 className="text-xl font-medium text-foreground/90">
         {title}
       </h3>
