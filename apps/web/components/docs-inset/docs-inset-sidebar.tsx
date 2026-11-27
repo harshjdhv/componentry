@@ -89,7 +89,7 @@ export function DocsInsetSidebar({ className }: { className?: string }) {
         {docsConfig.nav.map((group) => {
           return (
             <div key={group.title} className="pt-5 first:pt-2">
-              <h4 className="mb-1 px-2.5 text-[13px] font-medium text-zinc-900 dark:text-zinc-100">
+              <h4 className="mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-widest text-zinc-500">
                 {group.title}
               </h4>
               <ul className="flex flex-col gap-px">

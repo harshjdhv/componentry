@@ -7,4 +7,4 @@ export const docsLine = "border-black/[0.05] dark:border-white/[0.05]"
  */
 export const docsShell = "rounded-[14px] bg-zinc-100/80 p-1 dark:bg-white/[0.03]"
 
-export const docsPanel = "rounded-[10px] bg-white dark:bg-[#111111]"
+export const docsPanel = "rounded-[10px] bg-docs-surface"

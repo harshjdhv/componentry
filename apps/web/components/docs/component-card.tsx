@@ -153,18 +153,18 @@ export function ComponentCard({
         onFocus={startPreview}
         onBlur={stopPreview}
         className={cn(
-          "group relative flex flex-col overflow-hidden border border-border bg-white transition-colors duration-200 ease-out hover:border-black/[0.14] dark:hover:border-white/[0.14] dark:bg-zinc-900/50",
+          "group relative flex flex-col overflow-hidden border border-border transition-colors duration-200 ease-out hover:border-black/[0.14] dark:hover:border-white/[0.14]",
           compact ? "rounded-xl" : "rounded-2xl",
         )}
       >
         {/* ── Preview area ── */}
-        <div className={compact ? "p-1" : "p-1.5"}>
+        <div className={compact ? "p-[3px]" : "p-1"}>
           <div
             className={cn(
               "relative w-full border border-dashed border-border shadow-surface-inset overflow-hidden",
               // Preview videos/posters are ~1.54:1 (1280×832, 960×624); keep that shape at any width.
               "aspect-[20/13]",
-              compact ? "rounded-lg" : "rounded-xl",
+              compact ? "rounded-[9px]" : "rounded-xl",
               component.slug === "text-morph" ||
                 component.slug === "flipping-word-swap"
                 ? "bg-background"
@@ -234,12 +234,12 @@ export function ComponentCard({
         </div>
 
         {/* ── Info area ── */}
-        <div className={cn("flex flex-col", compact ? "gap-0.5 px-3 pb-3 pt-2" : "gap-1 px-4 pb-4 pt-2")}>
+        <div className={cn("flex flex-col", compact ? "gap-0.5 px-2.5 pb-2.5 pt-2" : "gap-0.5 px-3 pb-3 pt-2.5")}>
           <div className="flex items-center justify-between gap-2">
             <h3
               className={cn(
                 "font-medium tracking-[-0.01em] text-zinc-900 dark:text-zinc-100",
-                compact ? "text-[14px]" : "text-[15px]",
+                compact ? "text-[13.5px] leading-5" : "text-[14.5px] leading-5",
               )}
             >
               {component.title}

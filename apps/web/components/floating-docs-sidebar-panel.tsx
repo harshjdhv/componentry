@@ -187,7 +187,7 @@ export function FloatingDocsSidebarPanel() {
                     key={index}
                     className={index > 0 ? "border-t border-border/40 pt-5 mt-5" : ""}
                   >
-                    <h4 className="mb-2.5 px-3 text-[11px] font-semibold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">
+                    <h4 className="mb-2.5 px-3 text-[11px] font-semibold uppercase tracking-widest text-zinc-500">
                       {group.title}
                     </h4>
                     <LineNav
