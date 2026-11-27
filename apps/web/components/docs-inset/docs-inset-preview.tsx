@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { useDocStore } from "@/hooks/use-doc-store"
 import { Tabs, TabsList, TabsTab } from "@workspace/ui/components/tabs"
 import { PropsRowSlotContext } from "./props-row-slot"
+import { CustomizePanel, VariantRow } from "./customize-panel"
 import type { VariantItem } from "@/components/docs-preview-wrapper"
 
 interface DocsInsetPreviewProps {
@@ -111,11 +112,11 @@ export function DocsInsetPreview({
         </TabsList>
       </Tabs>
 
-    <div className="relative overflow-hidden rounded-2xl border border-black/[0.07] bg-white dark:border-white/[0.07] dark:bg-[#111111]">
+    <div className="relative overflow-hidden rounded-2xl border border-black/[0.07] bg-docs-surface dark:border-white/[0.07]">
       {/* Stage. Same colour as the inset window, so a component without its own
           background sits on neutral ground; ones that paint their own cover it. */}
       <div
-        className="relative isolate h-[360px] bg-white sm:h-[430px] dark:bg-[#111111]"
+        className="relative isolate h-[360px] bg-docs-surface sm:h-[430px]"
         style={tallStage ? { height: `${tallStage}px` } : undefined}
       >
         <div
@@ -130,31 +131,6 @@ export function DocsInsetPreview({
             {variant ? variant.preview : children}
           </PropsRowSlotContext.Provider>
         </div>
-
-        {variants.length > 0 && (
-          <div className="pointer-events-none absolute bottom-0 left-0 z-30 max-w-full p-3 lg:p-4">
-            <Tabs
-              value={String(activeVariant)}
-              onValueChange={(value) => {
-                if (value == null) return
-                setActiveVariant(Number(value))
-              }}
-              className="pointer-events-auto min-w-0"
-            >
-              <TabsList
-                aria-label="Preview variants"
-                className="max-w-full justify-start overflow-x-auto bg-zinc-100/30 backdrop-blur-md dark:bg-zinc-950/30 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
-              >
-                {!hideDefaultVariant && <TabsTab value="-1">Default</TabsTab>}
-                {variants.map((v, i) => (
-                  <TabsTab key={i} value={String(i)}>
-                    {v.title}
-                  </TabsTab>
-                ))}
-              </TabsList>
-            </Tabs>
-          </div>
-        )}
       </div>
 
       {/* Code tab: covers the stage at the same size, so switching never jumps. */}
@@ -163,7 +139,7 @@ export function DocsInsetPreview({
           inert={tab !== "code"}
           aria-hidden={tab !== "code"}
           className={cn(
-            "absolute inset-0 z-[45] overflow-auto bg-white transition-opacity duration-200 ease-out motion-reduce:transition-none dark:bg-[#111111] [&_[data-code-block]]:min-h-full [&_[data-code-block]]:rounded-none [&_[data-code-block]]:bg-transparent",
+            "absolute inset-0 z-[45] overflow-auto bg-docs-surface transition-opacity duration-200 ease-out motion-reduce:transition-none [&_[data-code-block]]:min-h-full [&_[data-code-block]]:rounded-none [&_[data-code-block]]:bg-transparent",
             tab === "code" ? "opacity-100" : "pointer-events-none opacity-0"
           )}
         >
@@ -172,8 +148,20 @@ export function DocsInsetPreview({
       )}
     </div>
 
-      {/* Inline props row: a playground inside the stage portals its controls here. */}
-      <div ref={setPropsSlot} />
+      {/* Customize panel: variant row here, then whatever the playground inside the
+          stage portals into the slot (preset swatches, DialKit rows). Hidden when empty. */}
+      <CustomizePanel slotRef={setPropsSlot}>
+        {variants.length > 0 && (
+          <VariantRow
+            options={[
+              ...(hideDefaultVariant ? [] : [{ value: "-1", label: "Default" }]),
+              ...variants.map((v, i) => ({ value: String(i), label: v.title })),
+            ]}
+            value={String(activeVariant)}
+            onChange={(value) => setActiveVariant(Number(value))}
+          />
+        )}
+      </CustomizePanel>
     </div>
   )
 }

@@ -5,8 +5,8 @@
  * control bar at the bottom center. The bar shows optional preset swatches and a
  * chevron that expands the page's DialKit controls.
  *
- * Inside the docs preview (DocsInsetPreview) the same bar docks under the
- * preview box instead of floating over it, and opens downward.
+ * Inside the docs preview (DocsInsetPreview) the controls dock under the
+ * preview box instead of floating over it, and are always shown.
  *
  * A page registers its controls with `useDialKit` (one panel per page), renders
  * its component inside <DocsPlayground>, and pushes generated code with
@@ -16,7 +16,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { createPortal } from "react-dom"
 import { motion, useDragControls, useMotionValue } from "framer-motion"
-import { ChevronDown, ChevronUp, GripVertical, SlidersHorizontal, X } from "lucide-react"
+import { ChevronUp, GripVertical, SlidersHorizontal, X } from "lucide-react"
 import { useTheme } from "next-themes"
 import { DialRoot, DialStore, type ControlMeta } from "dialkit"
 import "dialkit/styles.css"
@@ -24,11 +24,15 @@ import "./docs-playground.css"
 import { cn } from "@/lib/utils"
 import { usePlaygroundStore } from "@/hooks/use-playground-store"
 import { usePropsRowSlot } from "@/components/docs-inset/props-row-slot"
+import { PanelRow, SwatchRow } from "@/components/docs-inset/customize-panel"
 
 export interface PlaygroundPreset {
   name: string
-  /** CSS background for the swatch: a color or a gradient. See `gradientSwatch`. */
-  swatch: string
+  /**
+   * CSS background for the swatch: a color or a gradient. See `gradientSwatch`.
+   * Leave it out for presets that aren't colors (effect settings, word sets).
+   */
+  swatch?: string
 }
 
 interface DocsPlaygroundProps {
@@ -119,35 +123,6 @@ function useHexColors() {
       unsubscribers.forEach((off) => off())
     }
   }, [])
-}
-
-/** Option shown in a preset select once values no longer match a preset. */
-export const CUSTOM_PRESET = "Custom"
-
-/**
- * Presets that aren't colors belong in the panel as a DialKit select (swatches are
- * for colors). Picking one calls `apply`; editing values away from every preset
- * flips the select to "Custom", and landing back on one selects it again.
- *
- * @param selected the select's current value (e.g. `dial.values.preset`)
- * @param matching the preset whose values match the current ones, or null
- */
-export function usePresetSelect(
-  selected: string,
-  matching: string | null,
-  apply: (name: string) => void,
-  select: (name: string) => void,
-) {
-  const previous = useRef({ selected, matching })
-  useEffect(() => {
-    const before = previous.current
-    previous.current = { selected, matching }
-    if (selected !== before.selected) {
-      if (selected !== CUSTOM_PRESET && selected !== matching) apply(selected)
-    } else if (matching !== before.matching) {
-      select(matching ?? CUSTOM_PRESET)
-    }
-  }, [selected, matching, apply, select])
 }
 
 /** Push generated code to the Usage section's <LiveCodeBlock>. */
@@ -247,72 +222,25 @@ export function DocsPlayground({
     </div>
   )
 
-  // Inside the docs preview: the same bar, docked under the preview box (not
-  // floating over the component), opening downward.
+  // Inside the docs preview: rows go into the customize panel under the preview
+  // box (not floating over the component), always shown rather than behind a toggle.
+  // The panel card and any variant row belong to DocsInsetPreview.
   if (propsSlot !== undefined) {
     const docked = (hasPresets || controls) && (
-      <div className="mt-3">
-        {/* Bar: swatches + toggle, centred under the preview. */}
-        <div className="flex justify-center">
-          <div style={{ borderRadius: 8, minWidth }} className={cn("cy-dial", SURFACE, "flex-col")}>
-            <div className="flex items-center gap-2">
-              {hasPresets ? (
-                <div role="radiogroup" aria-label={presetsLabel} className="flex flex-1 items-center justify-center gap-2">
-                  {presets!.map(({ name, swatch }) => (
-                    <button
-                      key={name}
-                      type="button"
-                      role="radio"
-                      aria-checked={preset === name}
-                      aria-label={name}
-                      title={name}
-                      onClick={() => onPresetChange?.(name)}
-                      style={{ "--swatch": swatch } as CSSProperties}
-                      className={SWATCH}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <span className="flex flex-1 items-center gap-2 px-1 text-[13px] font-medium text-foreground/70">
-                  <SlidersHorizontal className="size-3.5" />
-                  {label}
-                </span>
-              )}
-
-              {controls && (
-                <button
-                  type="button"
-                  aria-label={open ? "Hide options" : "More options"}
-                  aria-expanded={open}
-                  onClick={toggle}
-                  className={`${ICON_BUTTON} w-5`}
-                >
-                  {/* Opens downward from the bar, so the arrow points down until open. */}
-                  <ChevronDown
-                    className={`size-4 transition-transform duration-300 ease-[cubic-bezier(0.2,0,0,1)] ${open ? "rotate-180" : ""}`}
-                  />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Controls: full preview width, rows flowing into columns. Always mounted
-            so DialKit's height is settled; grid rows animate 0fr -> 1fr. */}
-        {controls && (
-          <div
-            inert={!open}
-            aria-hidden={!open}
-            className={`grid transition-[grid-template-rows,opacity] duration-200 ease-[cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
-          >
-            <div className="min-h-0 overflow-hidden">
-              <div style={{ borderRadius: 12 }} className={cn("cy-dial cy-dial-wide mt-2", SURFACE, "flex-col p-3")}>
-                <DialRoot mode="inline" productionEnabled theme={resolvedTheme === "light" ? "light" : "dark"} />
-              </div>
-            </div>
-          </div>
+      <>
+        {hasPresets && (
+          <SwatchRow label={presetsLabel} presets={presets!} value={preset} onChange={onPresetChange} />
         )}
-      </div>
+
+        {/* DialKit rows flow into columns across the panel (see .cy-dial-wide). */}
+        {controls && (
+          <PanelRow label="Adjust" titleOnlyWithOptions>
+            <div role="group" aria-label={label}>
+              <DialRoot mode="inline" productionEnabled theme={resolvedTheme === "light" ? "light" : "dark"} />
+            </div>
+          </PanelRow>
+        )}
+      </>
     )
 
     return (
@@ -412,7 +340,7 @@ export function DocsPlayground({
                   aria-label={name}
                   title={name}
                   onClick={() => onPresetChange?.(name)}
-                  style={{ "--swatch": swatch } as CSSProperties}
+                  style={{ "--swatch": swatch ?? "var(--muted)" } as CSSProperties}
                   className={SWATCH}
                 />
               ))}

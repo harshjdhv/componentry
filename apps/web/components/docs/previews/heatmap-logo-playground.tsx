@@ -10,14 +10,14 @@ const COMPONENTRY_MARK = `data:image/svg+xml;utf8,${encodeURIComponent(
 )}`
 
 const PALETTES = {
-  Ember: ["#1a0b0b", "#4a1716", "#8f2f2b", "#d4615a", "#ef8b87", "#ffd2c4", "#fff6f1"],
-  Ice: ["#050b1a", "#0f2550", "#1f4fa8", "#4f8ef0", "#9cc8ff", "#e2f0ff", "#ffffff"],
-  Toxic: ["#060d05", "#10260c", "#1f5214", "#3f9a1f", "#8be03a", "#d6ff8a", "#f7ffe6"],
-  Mono: ["#0a0a0a", "#262626", "#404040", "#737373", "#a3a3a3", "#e5e5e5", "#ffffff"],
+  Red: ["#1a0b0b", "#4a1716", "#8f2f2b", "#d4615a", "#ef8b87", "#ffd2c4", "#fff6f1"],
+  Blue: ["#050b1a", "#0f2550", "#1f4fa8", "#4f8ef0", "#9cc8ff", "#e2f0ff", "#ffffff"],
+  Green: ["#060d05", "#10260c", "#1f5214", "#3f9a1f", "#8be03a", "#d6ff8a", "#f7ffe6"],
+  Gray: ["#0a0a0a", "#262626", "#404040", "#737373", "#a3a3a3", "#e5e5e5", "#ffffff"],
 } as const
 type PaletteName = keyof typeof PALETTES
 
-const DEFAULTS = { palette: "Ice" as PaletteName, glow: 0 }
+const DEFAULTS = { palette: "Blue" as PaletteName, glow: 0 }
 
 const config = {
   glow: [DEFAULTS.glow, 0, 1, 0.01] as [number, number, number, number],
