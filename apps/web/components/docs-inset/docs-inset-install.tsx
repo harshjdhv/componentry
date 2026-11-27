@@ -5,7 +5,6 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { CopyButton } from "@/components/copy-button"
 import { PackageManagerCommand } from "@/components/package-manager-command"
-import { docsLine } from "./surface"
 import type { PackageManager } from "@/lib/install-command"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@workspace/ui/components/tabs"
 
@@ -122,10 +121,7 @@ export function DocsInsetInstall({
       <TabsList
         variant="underline"
         aria-label="Installation method"
-        className={cn(
-          "w-full justify-start gap-x-5 border-b data-[orientation=horizontal]:py-0 *:data-[slot=tab-indicator]:rounded-full *:data-[slot=tabs-tab]:hover:bg-transparent",
-          docsLine
-        )}
+        className="justify-start gap-x-5 data-[orientation=horizontal]:py-0 *:data-[slot=tab-indicator]:rounded-full *:data-[slot=tabs-tab]:hover:bg-transparent"
       >
         {(["cli", "manual"] as const).map((value) => (
           <TabsTab
