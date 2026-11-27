@@ -59,22 +59,23 @@ export function ComponentGuidance({ slug }: { slug: string }) {
     )
   }
 
+  // Plain title + copy, held to a readable measure (~70ch). The full column
+  // width made lines run ~140 characters.
   return (
     <Section title={guide.heading ?? "Working with this component"} className="pt-8">
-      <div className="space-y-7">
+      {/* Tips sit on a slight indent under the section heading. One foreground at
+          three strengths keeps the block a step below the heading in both themes:
+          title 85%, copy 55%. */}
+      <div className="max-w-[640px] space-y-6 pl-4">
         {guide.sections.map((section) => (
           <div key={section.title || section.href || section.body}>
             {section.title ? (
-              <h3 className="mb-2 text-[15px] font-medium text-zinc-800 dark:text-zinc-200">
+              <h3 className="mb-1 text-[15px] font-medium leading-6 text-foreground/85">
                 {section.title}
               </h3>
             ) : null}
-            <p className="text-pretty text-[15px] leading-7 text-zinc-500 dark:text-zinc-400">
-              <GuideCopy
-                body={section.body}
-                href={section.href}
-                linkLabel={section.linkLabel}
-              />
+            <p className="text-pretty text-[14.5px] leading-6 text-foreground/55">
+              <GuideCopy body={section.body} href={section.href} linkLabel={section.linkLabel} />
             </p>
           </div>
         ))}
