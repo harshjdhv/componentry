@@ -38,9 +38,19 @@ export function SiteHeader({ sidebarToggle, landingGutter, inset }: SiteHeaderPr
     const fullStars = `${new Intl.NumberFormat("en-US").format(stars)} stars`
     const navItems = [
         {
-            href: "/docs/components",
+            // Written docs (introduction, changelog…); components and MCP have their own items.
+            href: "/docs/introduction",
             label: "Docs",
-            active: pathname === "/docs" || (pathname.startsWith("/docs/") && !pathname.startsWith("/docs/mcp")),
+            active:
+                pathname === "/docs" ||
+                (pathname.startsWith("/docs/") &&
+                    !pathname.startsWith("/docs/components") &&
+                    !pathname.startsWith("/docs/mcp")),
+        },
+        {
+            href: "/docs/components",
+            label: "Components",
+            active: pathname === "/docs/components" || pathname.startsWith("/docs/components/"),
         },
         {
             href: "/blocks",
