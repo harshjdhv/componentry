@@ -68,7 +68,17 @@ export function ComponentGuidance({ slug }: { slug: string }) {
           title 85%, copy 55%. */}
       <div className="max-w-[640px] space-y-6 pl-4">
         {guide.sections.map((section) => (
-          <div key={section.title || section.href || section.body}>
+          <div
+            key={section.title || section.href || section.body}
+            // Titled tips show as indented subsections in the page outline.
+            {...(section.title
+              ? {
+                  id: `guide-${section.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`,
+                  "data-section-title": section.title,
+                  "data-section-depth": "3",
+                }
+              : {})}
+          >
             {section.title ? (
               <h3 className="mb-1 text-[15px] font-medium leading-6 text-foreground/85">
                 {section.title}

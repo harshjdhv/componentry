@@ -3,15 +3,11 @@
 import type React from "react"
 import Link from "next/link"
 import { ArrowUpRight, Plus } from "lucide-react"
-import posthog from "posthog-js"
 
 import { cn } from "@/lib/utils"
-import { ComponentryLogomark } from "@/components/logos/componentry-logomark"
-import { formatStars, useGithubStars } from "@/hooks/use-github-stars"
+import { DocsToc } from "./docs-toc"
+import { docsLine } from "./surface"
 import { docsSponsors, docsSponsorSlots, sponsorStats, type Sponsor } from "@/lib/sponsors"
-
-const GITHUB_URL = "https://github.com/harshjdhv/componentry"
-const X_URL = "https://x.com/harshjdhv"
 
 // Flat on the page: hairline border and a faint fill, no shadow, so the cards sit
 // with the content instead of hovering above it.
@@ -20,27 +16,6 @@ const card =
 // Inner area inside a card (banner / slots); same surface as the card itself.
 const inset = "rounded-xl"
 const heading = "text-[14px] font-medium tracking-[-0.01em] text-foreground"
-const body = "mt-1 text-pretty text-[13px] leading-5 text-zinc-500 dark:text-zinc-400"
-const primaryButton =
-  "inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-foreground text-[13px] font-medium text-background shadow-[inset_0_-1px_0_rgba(0,0,0,0.12)] transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const ghostButton =
-  "inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-foreground/[0.06] text-[13px] font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-foreground/[0.09] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M12 0C5.373 0 0 5.372 0 12c0 5.303 3.438 9.8 8.207 11.387.6.11.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.388-1.333-1.757-1.333-1.757-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.834 2.807 1.305 3.493.998.108-.776.418-1.305.762-1.605-2.666-.304-5.467-1.333-5.467-5.93 0-1.312.469-2.382 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.009-.323 3.301 1.23A11.52 11.52 0 0 1 12 5.8c1.02.005 2.047.139 3.006.404 2.291-1.553 3.298-1.23 3.298-1.23.652 1.653.241 2.874.117 3.176.769.839 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.48 5.921.431.371.824 1.103.824 2.222v3.293c0 .319.192.688.802.576C20.566 21.795 24 17.298 24 12 24 5.372 18.627 0 12 0Z" />
-    </svg>
-  )
-}
-
-function XIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  )
-}
 
 const slot =
   "group flex items-center justify-center rounded-lg transition-colors duration-150 ease-out"
@@ -118,7 +93,6 @@ function SponsorTier({
  * star / follow card. Bordered rather than filled so it sits with the page.
  */
 export function DocsInsetRail({ className }: { className?: string }) {
-  const stars = useGithubStars()
   const hasOpenSlots =
     docsSponsors.main.length < docsSponsorSlots.main ||
     docsSponsors.supporter.length < docsSponsorSlots.supporter
@@ -126,6 +100,9 @@ export function DocsInsetRail({ className }: { className?: string }) {
   return (
     <aside className={cn("w-[296px] shrink-0", className)}>
       <div className="flex h-full flex-col gap-2 overflow-y-auto px-2 pt-10 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {/* Page outline first, like dithercn; px-4 lines its text up with the card headings below. */}
+        <DocsToc className={cn("mb-3 border-b px-4 pb-6", docsLine)} />
+
         <section aria-labelledby="docs-sponsors-heading" className={card}>
           <div className="flex items-center justify-between px-2.5 pt-2 pb-2.5">
             <h2 id="docs-sponsors-heading" className={heading}>
@@ -164,44 +141,6 @@ export function DocsInsetRail({ className }: { className?: string }) {
           )}
         </section>
 
-        <section aria-labelledby="docs-support-heading" className={card}>
-          {/* Banner: plain soft tint with the logo tile, no pattern. */}
-          <div className={cn(inset, "flex h-[88px] items-center justify-center bg-black/[0.03] dark:bg-white/[0.03]")}>
-            <div className="flex size-11 items-center justify-center rounded-xl border border-black/[0.08] bg-white dark:border-white/[0.08] dark:bg-[#171717]">
-              <ComponentryLogomark className="size-5 text-foreground" />
-            </div>
-          </div>
-
-          <div className="px-2.5 pt-3 pb-2.5">
-            <h2 id="docs-support-heading" className={heading}>
-              Enjoying Componentry?
-            </h2>
-            <p className={body}>It’s free and open source. A star helps more people find it.</p>
-            <div className="mt-3.5 grid grid-cols-2 gap-1.5">
-              <a
-                href={X_URL}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => posthog.capture("docs_rail_support_clicked", { target: "x" })}
-                className={ghostButton}
-              >
-                <XIcon className="size-3" />
-                Follow
-              </a>
-              <a
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => posthog.capture("docs_rail_support_clicked", { target: "github" })}
-                className={primaryButton}
-              >
-                <GitHubIcon className="size-3.5" />
-                Star
-                <span className="tabular-nums opacity-55">{formatStars(stars)}</span>
-              </a>
-            </div>
-          </div>
-        </section>
       </div>
     </aside>
   )
