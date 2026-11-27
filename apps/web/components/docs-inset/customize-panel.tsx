@@ -68,8 +68,9 @@ export function PanelRow({
 }
 
 /**
- * Segmented track with the same fill and height as a DialKit row, so tracks and
- * sliders read as one set of controls. Built on the coss Tabs, so the white
+ * Segmented track that is exactly the Preview / Code tabs: same TabsList size,
+ * muted track and grey sliding indicator. The DialKit rows use the same fill,
+ * height and type (docs-playground.css), so every control in the panel matches. Built on the coss Tabs, so the white
  * indicator slides between options (Base UI measures the active tab). With no
  * matching option (values edited away from every preset) nothing is selected.
  */
@@ -94,27 +95,19 @@ function Segmented({
     >
       <TabsList
         aria-label={label}
-        className={cn(
-          "h-8 max-w-full justify-start overflow-x-auto rounded-lg bg-[#e8e8ea] p-[3px] text-zinc-500 [scrollbar-width:none] dark:bg-[#1c1c1d] dark:text-zinc-400 [&::-webkit-scrollbar]:hidden",
-          // The sliding indicator: solid white in both themes, like a raised thumb.
-          "[&>[data-slot=tab-indicator]]:bg-white [&>[data-slot=tab-indicator]]:shadow-[0_1px_2px_rgb(0_0_0/0.08)] dark:[&>[data-slot=tab-indicator]]:bg-white dark:[&>[data-slot=tab-indicator]]:shadow-[0_1px_2px_rgb(0_0_0/0.4)]"
-        )}
+        className="max-w-full justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {options.map((option) => (
           <TabsTab
             key={option.value}
             value={option.value}
-            className={cn(
-              "h-[26px] grow-0 px-2.5 text-[13px] text-zinc-500 transition-colors duration-200 ease-out hover:text-zinc-900 sm:h-[26px] sm:text-[13px] dark:text-zinc-400 dark:hover:text-zinc-100",
-              "data-active:text-zinc-900 dark:data-active:text-zinc-900",
-              option.swatch && "pl-1.5"
-            )}
+            className={cn("grow-0", option.swatch && "pl-[calc(--spacing(2)-1px)]")}
           >
             {option.swatch && (
               <span
                 aria-hidden
                 style={{ "--swatch": option.swatch } as CSSProperties}
-                className="size-3.5 shrink-0 rounded-[4px] [background:var(--swatch)] shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+                className="size-4 shrink-0 rounded-[4px] [background:var(--swatch)] shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
               />
             )}
             {option.label}
